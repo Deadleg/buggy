@@ -23,6 +23,8 @@ module Buggy.Persistence.Postgre (
 ) where
 
 import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple.FromRow
+import Database.PostgreSQL.Simple.FromField
 import Buggy.Types.Types
 import Data.Time
 import Control.Monad
@@ -46,19 +48,25 @@ getReproStep :: Maybe String -> [String]
 getReproStep Nothing = []
 getReproStep (Just x) = [x]
 
+instance (FromField a, FromField b, FromField c, FromField d, FromField e,
+          FromField f, FromField g, FromField h, FromField i, FromField j, FromField k) =>
+    FromRow (a,b,c,d,e,f,g,h,i,j,k) where
+    fromRow = (,,,,,,,,,,) <$> field <*> field <*> field <*> field <*> field
+                          <*> field <*> field <*> field <*> field <*> field <*> field
+
 selectIssues :: Integer -> IO ([Issue])
 selectIssues programId = do
     conn <- connectPostgreSQL connectionString
-    xs <- query conn "SELECT i.id, i.type, i.title, i.description, i.time_reported, i.status, u.id, u.username, r.instruction, i.edit_time \
+    xs <- query conn "SELECT i.id, i.type, i.title, i.description, i.time_reported, i.status, u.id, u.username, r.instruction, i.edit_time, i.upvotes \
                      \FROM issues i \
                      \INNER JOIN users u ON i.reporter=u.id \
                      \LEFT JOIN reproduction_steps r ON i.id=r.issue \
                      \WHERE i.program=? \
                      \ORDER BY r.step_number ASC;" [programId]
     let issues = M.toList $ M.fromListWith (++)
-                [((issueId :: Integer, issueType :: String, title :: String, description :: String, timeReported :: LocalTime, status :: String, userId :: Integer, username :: String, editTime :: Maybe LocalTime), getReproStep (reproSteps :: Maybe String)) | (issueId, issueType, title, description, timeReported, status, userId, username, reproSteps, editTime) <- xs]
-    return $ map (\((issueId, issueType, title, description, timeReported, status, userId, username, editTime), reproSteps) ->
-            (Existing programId issueId (title :: String) (description :: String) (read issueType) (map (\step -> Step step) reproSteps) (timeReported :: LocalTime) (read status) (ExistingUser userId username) editTime)) issues
+                [((issueId :: Integer, issueType :: String, title :: String, description :: String, timeReported :: LocalTime, status :: String, userId :: Integer, username :: String, editTime :: Maybe LocalTime, upvotes :: Integer), getReproStep (reproSteps :: Maybe String)) | (issueId, issueType, title, description, timeReported, status, userId, username, reproSteps, editTime, upvotes) <- xs]
+    return $ map (\((issueId, issueType, title, description, timeReported, status, userId, username, editTime, upvotes), reproSteps) ->
+            (Existing programId issueId (title :: String) (description :: String) (read issueType) (map (\step -> Step step) reproSteps) (timeReported :: LocalTime) (read status) (ExistingUser userId username) editTime upvotes)) issues
 
 insertIssue :: Issue -> IO ()
 insertIssue (New programId title description issueType reproductionSteps status reporter) = do
@@ -70,9 +78,9 @@ insertIssue (New programId title description issueType reproductionSteps status 
 selectIssue :: Integer -> Integer -> IO (Issue)
 selectIssue programId issueId = do
     conn <- connectPostgreSQL connectionString
-    [(issueType, title, description, timeReported, status, userId, username, editTime)] <- query conn "SELECT i.type, i.title, i.description, i.time_reported, i.status, u.id, u.username, i.edit_time FROM issues i INNER JOIN users u  ON i.reporter=u.id WHERE i.id=? and i.program=?" (issueId, programId)
+    [(issueType, title, description, timeReported, status, userId, username, editTime, upvotes)] <- query conn "SELECT i.type, i.title, i.description, i.time_reported, i.status, u.id, u.username, i.edit_time, i.upvotes FROM issues i INNER JOIN users u  ON i.reporter=u.id WHERE i.id=? and i.program=?" (issueId, programId)
     reproSteps <- query conn "SELECT instruction FROM reproduction_steps WHERE issue=? ORDER BY step_number ASC;" [issueId]
-    return (Existing programId issueId (title :: String) (description :: String) (read issueType) (map (\(Only i) -> Step i) reproSteps) (timeReported :: LocalTime) (read status) (ExistingUser userId username) editTime)
+    return (Existing programId issueId (title :: String) (description :: String) (read issueType) (map (\(Only i) -> Step i) reproSteps) (timeReported :: LocalTime) (read status) (ExistingUser userId username) editTime upvotes)
 
 insertIssueReport :: IssueReport -> IO ()
 insertIssueReport (NewIssueReport desc specs issueId programId reporter status _type) = do
@@ -83,14 +91,14 @@ insertIssueReport (NewIssueReport desc specs issueId programId reporter status _
 selectIssueReport :: Integer -> Integer -> Integer -> IO (IssueReport)
 selectIssueReport programId issueId reportId = do
     conn <- connectPostgreSQL connectionString
-    [(desc, specs, time, status, _type, confirmed, userId, username, id)] <- query conn "SELECT i.description, i.computer_info, i.time_reported, i.status, i.type, i.confirmed, u.id, u.username FROM issue_reports i INNER JOIN users u  ON i.reporter=u.id WHERE i.id=?" [reportId]
-    return (ExistingIssueReport desc specs issueId programId id (ExistingUser userId username) (read status) (read _type) confirmed time)
+    [(desc, specs, time, status, _type, confirmed, userId, username, id, upvotes)] <- query conn "SELECT i.description, i.computer_info, i.time_reported, i.status, i.type, i.confirmed, u.id, u.username, i.upvotes FROM issue_reports i INNER JOIN users u  ON i.reporter=u.id WHERE i.id=?" [reportId]
+    return (ExistingIssueReport desc specs issueId programId id (ExistingUser userId username) (read status) (read _type) confirmed time upvotes)
 
 selectIssueReports :: Integer -> Integer -> IO ([IssueReport])
 selectIssueReports programId issueId = do
     conn <- connectPostgreSQL connectionString
     xs <- query conn "SELECT i.description, i.computer_info, i.time_reported, i.status, i.type, i.confirmed, u.id, u.username, i.id FROM issue_reports i INNER JOIN users u ON i.reporter=u.id INNER JOIN issues q ON q.id=i.issue WHERE q.id=?" [issueId]
-    return $ map (\(desc, specs, time, status, _type, confirmed, userId, username, id) -> (ExistingIssueReport desc specs issueId programId id (ExistingUser userId username) (read status) (read _type) confirmed time)) xs
+    return $ map (\(desc, specs, time, status, _type, confirmed, userId, username, id, upvotes) -> (ExistingIssueReport desc specs issueId programId id (ExistingUser userId username) (read status) (read _type) confirmed time upvotes)) xs
 
 updateIssue :: Issue -> IO ()
 updateIssue (Edit programId issueId title description issueType reproductionSteps status) = do
@@ -121,14 +129,14 @@ insertIssueComment issueId (NewIssueComment text userId parentId) = do
 selectIssueComment :: Integer -> IO (DbIssueComment)
 selectIssueComment commentId = do
     conn <- connectPostgreSQL connectionString
-    [(id, issueId, text, timeCreated, editTime, userId, parentId)] <- query conn "SELECT id, issue, text, time_created, edit_time, commenter, parent_comment FROM issue_comments WHERE id=?;" [commentId]
-    return $ ExistingDbIssueComment issueId text userId parentId timeCreated editTime id
+    [(id, issueId, text, timeCreated, editTime, userId, parentId, upvotes)] <- query conn "SELECT id, issue, text, time_created, edit_time, commenter, parent_comment, upvotes FROM issue_comments WHERE id=?;" [commentId]
+    return $ ExistingDbIssueComment issueId text userId parentId timeCreated editTime id upvotes
 
 selectIssueComments :: Integer -> Integer -> IO ([DbIssueComment])
 selectIssueComments programId issueId = do
     conn <- connectPostgreSQL connectionString
-    xs <- query conn "SELECT id, issue, text, time_created, edit_time, commenter, parent_comment FROM issue_comments WHERE issue=?;" [issueId]
-    return $ map (\(id, issue, text, timeCreated, editTime, userId, parentComment) -> ExistingDbIssueComment issue text userId parentComment timeCreated editTime id) xs
+    xs <- query conn "SELECT id, issue, text, time_created, edit_time, commenter, parent_comment, upvotes FROM issue_comments WHERE issue=?;" [issueId]
+    return $ map (\(id, issue, text, timeCreated, editTime, userId, parentComment, upvotes) -> ExistingDbIssueComment issue text userId parentComment timeCreated editTime id upvotes) xs
 
 updateIssueComment :: Integer -> IssueComment -> IO ()
 updateIssueComment commentId (EditIssueComment text) = do
@@ -145,14 +153,14 @@ insertIssueReportComment issueId (NewIssueReportComment text userId parentId) = 
 selectIssueReportComment :: Integer -> IO (DbIssueReportComment)
 selectIssueReportComment commentId = do
     conn <- connectPostgreSQL connectionString
-    [(id, issueId, text, timeCreated, editTime, userId, parentId)] <- query conn "SELECT id, issue_report, text, time_created, edit_time, commenter, parent_comment FROM issue_report_comments WHERE id=?;" [commentId]
-    return $ ExistingDbIssueReportComment issueId text userId parentId timeCreated editTime id
+    [(id, issueId, text, timeCreated, editTime, userId, parentId, upvotes)] <- query conn "SELECT id, issue_report, text, time_created, edit_time, commenter, parent_comment, upvotes FROM issue_report_comments WHERE id=?;" [commentId]
+    return $ ExistingDbIssueReportComment issueId text userId parentId timeCreated editTime id upvotes
 
 selectIssueReportComments :: Integer -> Integer -> Integer -> IO ([DbIssueReportComment])
 selectIssueReportComments programId issueId reportId = do
     conn <- connectPostgreSQL connectionString
-    xs <- query conn "SELECT id, issue_report, text, time_created, edit_time, commenter, parent_comment FROM issue_report_comments WHERE issue_report=?;" [reportId]
-    return $ map (\(id, issueReport, text, timeCreated, editTime, userId, parentComment) -> ExistingDbIssueReportComment issueReport text userId parentComment timeCreated editTime id) xs
+    xs <- query conn "SELECT id, issue_report, text, time_created, edit_time, commenter, parent_comment, upvotes FROM issue_report_comments WHERE issue_report=?;" [reportId]
+    return $ map (\(id, issueReport, text, timeCreated, editTime, userId, parentComment, upvotes) -> ExistingDbIssueReportComment issueReport text userId parentComment timeCreated editTime id upvotes) xs
 
 updateIssueReportComment :: Integer -> IssueReportComment -> IO ()
 updateIssueReportComment commentId (EditIssueReportComment text) = do

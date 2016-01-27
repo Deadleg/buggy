@@ -89,10 +89,11 @@ data IssueReport = NewIssueReport { getIssueReportDescription :: String
                                        , getIssueReportStatus :: IssueReportStatus
                                        , getIssueReportType :: IssueReportType
                                        , getIssueReportConfirmed :: Bool
-                                       , getIssueReportTime :: LocalTime } deriving (Eq, Read)
+                                       , getIssueReportTime :: LocalTime
+                                       , getIssueUpvotes :: Integer } deriving (Eq, Read)
 
 instance ToJSON IssueReport where
-    toJSON (ExistingIssueReport description specs issueId programId reportId reporter status _type confirmed time) = object [ "description" .= description
+    toJSON (ExistingIssueReport description specs issueId programId reportId reporter status _type confirmed time upvotes) = object [ "description" .= description
                                                                                                      , "specs" .= specs
                                                                                                      , "issueId" .= issueId
                                                                                                      , "programId" .= programId
@@ -102,6 +103,7 @@ instance ToJSON IssueReport where
                                                                                                      , "time" .= time
                                                                                                      , "id" .= reportId
                                                                                                      , "confirmed" .= confirmed
+                                                                                                     , "upvotes" .= upvotes
                                                                                                      ]
 
 instance FromJSON IssueReportStatus where
@@ -115,6 +117,12 @@ instance ToJSON IssueReportStatus where
 
 instance ToJSON IssueReportType where
     toJSON _type = toJSON $ show _type
+
+instance ToJSON IssueType where
+    toJSON _type = toJSON $ show _type
+
+instance ToJSON StatusType where
+    toJSON status = toJSON $ show status
 
 instance ToField IssueReportStatus where
     toField status = Escape (B.pack $ show status)
@@ -136,17 +144,18 @@ instance ToJSON ReproductionStep where
     toJSON (Step instruction) = object ["instruction" .= instruction]
 
 instance ToJSON Issue where
-    toJSON (Existing programId issueId title description itype reproSteps time status reporter editTime) = object
+    toJSON (Existing programId issueId title description itype reproSteps time status reporter editTime upvotes) = object
                                                                                                 [ "programId" .= programId
                                                                                                 , "id" .= issueId
                                                                                                 , "title" .= title
                                                                                                 , "description" .= description
-                                                                                                , "type" .= (show itype)
+                                                                                                , "type" .= itype
                                                                                                 , "reproductionSteps" .= reproSteps
                                                                                                 , "time" .= time
-                                                                                                , "status" .= (show status)
+                                                                                                , "status" .= status
                                                                                                 , "reporter" .= reporter
-                                                                                                , "lastEdited" .= (editTime)
+                                                                                                , "lastEdited" .= editTime
+                                                                                                , "upvotes" .= upvotes
                                                                                                 ]
 
 instance FromJSON IssueType where
@@ -193,6 +202,7 @@ data Issue = New { getProgram :: Integer
                       , getStatus :: StatusType 
                       , getReporter :: User
                       , getEditTime :: Maybe LocalTime
+                      , getUpvotes :: Integer
                       } |
              Edit { getProgram :: Integer
                   , getIssueId :: Integer
@@ -209,7 +219,8 @@ data DbIssueReportComment = ExistingDbIssueReportComment { getDbReportId :: Inte
                                                            getDbReportCommentParentComment :: Maybe Integer,
                                                            getDbReportCommentTimeCreated :: LocalTime,
                                                            getDbReportCommentEditTime :: Maybe LocalTime,
-                                                           getDbReportCommentId :: Integer
+                                                           getDbReportCommentId :: Integer,
+                                                           getDbReportCommentUpvotes :: Integer
                           } deriving (Eq, Read, Show)
 
 data IssueReportComment = NewIssueReportComment { getReportCommentText :: Text,
@@ -222,13 +233,14 @@ data IssueReportComment = NewIssueReportComment { getReportCommentText :: Text,
                                                        getReportCommentChildren :: [IssueReportComment],
                                                        getReportCommentTimeCreated :: LocalTime,
                                                        getReportCommentEditTime :: Maybe LocalTime,
-                                                       getReportCommentId :: Integer
+                                                       getReportCommentId :: Integer,
+                                                       getReportCommentUpvotes :: Integer
                           } |
                           EditIssueReportComment { getReportCommentText :: Text
                           } deriving (Eq, Read, Show)
 
 instance ToJSON IssueReportComment where
-    toJSON (ExistingIssueReportComment reportId text userId children timeCreated editTime id) = object
+    toJSON (ExistingIssueReportComment reportId text userId children timeCreated editTime id upvotes) = object
                                                                                   [ "reportId" .= reportId
                                                                                   , "comment" .= text
                                                                                   , "timeCreated" .= timeCreated
@@ -236,6 +248,7 @@ instance ToJSON IssueReportComment where
                                                                                   , "children" .= children
                                                                                   , "editTime" .= editTime
                                                                                   , "id" .= id
+                                                                                  , "upvotes" .= upvotes
                                                                                   ]
 
 instance FromJSON IssueReportComment where
@@ -255,7 +268,8 @@ data IssueComment = NewIssueComment { getCommentText :: Text,
                                            getCommentChildren :: [IssueComment],
                                            getCommentTimeCreated :: LocalTime,
                                            getCommentEditTime :: Maybe LocalTime,
-                                           getCommentId :: Integer
+                                           getCommentId :: Integer,
+                                           getCommentUpvotes :: Integer
                     } |
                     EditIssueComment { getCommentText :: Text
                     } deriving (Eq, Read, Show)
@@ -266,11 +280,12 @@ data DbIssueComment = ExistingDbIssueComment { getDbCommentIssueId :: Integer,
                                                getDbCommentParentComment :: Maybe Integer,
                                                getDbCommentTimeCreated :: LocalTime,
                                                getDbCommentEditTime :: Maybe LocalTime,
-                                               getDbCommentId :: Integer
+                                               getDbCommentId :: Integer,
+                                               getDbCommentUpvotes :: Integer
                     } deriving (Eq, Read, Show)
 
 instance ToJSON IssueComment where
-    toJSON (ExistingIssueComment issueId text userId children timeCreated editTime id) = object
+    toJSON (ExistingIssueComment issueId text userId children timeCreated editTime id upvotes) = object
                                                                                   [ "issueId" .= issueId
                                                                                   , "comment" .= text
                                                                                   , "timeCreated" .= timeCreated
@@ -278,6 +293,7 @@ instance ToJSON IssueComment where
                                                                                   , "children" .= children
                                                                                   , "editTime" .= editTime
                                                                                   , "id" .= id
+                                                                                  , "upvotes" .= upvotes
                                                                                   ]
 
 instance FromJSON IssueComment where
@@ -331,7 +347,8 @@ convertToIssueCommentTree comments root = (ExistingIssueComment
                                 (map (\x -> convertToIssueCommentTree comments x) (getChildComments (getDbCommentId root) comments))
                                 (getDbCommentTimeCreated root)
                                 (getDbCommentEditTime root)
-                                (getDbCommentId root))
+                                (getDbCommentId root)
+                                (getDbCommentUpvotes root))
 
 convertToReportCommentTree :: [DbIssueReportComment] -> DbIssueReportComment -> IssueReportComment
 convertToReportCommentTree comments root = (ExistingIssueReportComment
@@ -341,7 +358,8 @@ convertToReportCommentTree comments root = (ExistingIssueReportComment
                                 (map (\x -> convertToReportCommentTree comments x) (getChildComments (getDbReportCommentId root) comments))
                                 (getDbReportCommentTimeCreated root)
                                 (getDbReportCommentEditTime root)
-                                (getDbReportCommentId root))
+                                (getDbReportCommentId root)
+                                (getDbReportCommentUpvotes root))
 
 getChildComments :: ChildComment a =>  Integer -> [a] -> [a]
 getChildComments id comments = filter (\x -> (maybe False (\y -> y == id) (getDbParentId x))) comments

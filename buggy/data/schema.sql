@@ -23,6 +23,7 @@ CREATE TABLE issues (
     description   TEXT NOT NULL,
     time_reported TIMESTAMP NOT NULL,
     edit_time     TIMESTAMP,
+    upvotes         INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT status CHECK (status in ('Open', 'Closed', 'Fixed', 'Reproducible', 'NotEnoughInformation')),
     CONSTRAINT type CHECK (type in ('Bug', 'QualityOfLife', 'Feature'))
 );
@@ -44,6 +45,7 @@ CREATE TABLE issue_reports (
     status VARCHAR(20) NOT NULL,
     time_reported TIMESTAMP,
     confirmed BOOLEAN NOT NULL DEFAULT TRUE, -- assume that when submits  their report they can confirm its behaviour
+    upvotes INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT report_type CHECK (type in ('Fix', 'PartialFix', 'Report')),
     CONSTRAINT status_value CHECK 
         ((type = 'Report' 
@@ -59,7 +61,8 @@ CREATE TABLE issue_report_comments (
     time_created TIMESTAMP NOT NULL DEFAULT NOW(),
     edit_time TIMESTAMP,
     commenter INTEGER NOT NULL REFERENCES users(id),
-    parent_comment INTEGER REFERENCES issue_report_comments(id)
+    parent_comment INTEGER REFERENCES issue_report_comments(id),
+    upvotes INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE issue_comments (
@@ -69,5 +72,6 @@ CREATE TABLE issue_comments (
     time_created TIMESTAMP NOT NULL DEFAULT NOW(),
     edit_time TIMESTAMP,
     commenter INTEGER NOT NULL REFERENCES users(id),
-    parent_comment INTEGER REFERENCES issue_comments(id)
+    parent_comment INTEGER REFERENCES issue_comments(id),
+    upvotes INTEGER NOT NULL DEFAULT 0
 );
