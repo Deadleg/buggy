@@ -22,6 +22,7 @@ CREATE TABLE issues (
     title         VARCHAR(80) NOT NULL,
     description   TEXT NOT NULL,
     time_reported TIMESTAMP NOT NULL,
+    edit_time     TIMESTAMP,
     CONSTRAINT status CHECK (status in ('Open', 'Closed', 'Fixed', 'Reproducible', 'NotEnoughInformation')),
     CONSTRAINT type CHECK (type in ('Bug', 'QualityOfLife', 'Feature'))
 );
@@ -39,11 +40,34 @@ CREATE TABLE issue_reports (
     description TEXT NOT NULL,
     reporter INTEGER NOT NULL REFERENCES users(id),
     computer_info TEXT,
-    time_reported TIMESTAMP
+    type VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    time_reported TIMESTAMP,
+    confirmed BOOLEAN NOT NULL DEFAULT TRUE, -- assume that when submits  their report they can confirm its behaviour
+    CONSTRAINT report_type CHECK (type in ('Fix', 'PartialFix', 'Report')),
+    CONSTRAINT status_value CHECK 
+        ((type = 'Report' 
+            AND status IN ('Fixed', 'Broken', 'Working', 'PartiallyWorking')) 
+        OR ((type = 'Fix' OR type = 'PartialFix') 
+            AND status IN ('Works', 'NoWork')))
 );
 
-CREATE TABLE issue_report_labels (
-    issue_report INTEGER REFERENCES issue_reports(id) NOT NULL,
-    label VARCHAR(16),
-    CONSTRAINT label_value CHECK (label in ('PendingFeedBack', 'Fix', 'PartialFix', 'Unconfirmed', 'Confirmed', 'PartiallyWorking', 'Report'))
+CREATE TABLE issue_report_comments (
+    id SERIAL PRIMARY KEY,
+    issue_report INTEGER NOT NULL REFERENCES issue_reports(id),
+    text VARCHAR(512) NOT NULL,
+    time_created TIMESTAMP NOT NULL DEFAULT NOW(),
+    edit_time TIMESTAMP,
+    commenter INTEGER NOT NULL REFERENCES users(id),
+    parent_comment INTEGER REFERENCES issue_report_comments(id)
+);
+
+CREATE TABLE issue_comments (
+    id SERIAL PRIMARY KEY,
+    issue INTEGER NOT NULL REFERENCES issue(id),
+    text VARCHAR(512) NOT NULL,
+    time_created TIMESTAMP NOT NULL DEFAULT NOW(),
+    edit_time TIMESTAMP,
+    commenter INTEGER NOT NULL REFERENCES users(id),
+    parent_comment INTEGER REFERENCES issue_comments(id)
 );

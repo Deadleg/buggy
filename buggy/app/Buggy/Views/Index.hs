@@ -13,13 +13,6 @@ import qualified Text.Blaze.Html5.Attributes as A
 
 indexPage :: ServerPart Response
 indexPage = ok $ mainTemplate "Welcome to buggy!" $ do
-    H.div $ do
-        H.h2 "Games"
-        H.ul $ do
-            H.li $ do
-                H.a ! A.href "/app/1" $ "Counter-Strike"
-            H.li $ do
-                H.a ! A.href "/app/2" $ "Dota 2"
-    H.div $ do
-        H.a ! A.href "/issues/new" $ "create issue"
+    H.div ! A.id "content" $ ""
+    H.script ! A.src "/assets/js/index.js" $ ""
 
