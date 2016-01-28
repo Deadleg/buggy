@@ -10,6 +10,7 @@ module Buggy.Rest.Program (
     createIssueReport,
     updateIssue,
     issueReportFixed,
+    issueFixed,
     updateIssueReport,
     createIssueComment,
     updateIssueComment,
@@ -102,6 +103,11 @@ updateIssueReport programId issueId reportId = do
 issueReportFixed :: Integer -> Integer -> Integer -> ServerPart Response
 issueReportFixed programId issueId reportId = do
     liftIO $ L.issueReportFixed programId issueId reportId
+    ok $ toResponse ("" :: String)
+
+issueFixed :: Integer -> Integer -> ServerPart Response
+issueFixed programId issueId = do
+    liftIO $ L.issueFixed programId issueId
     ok $ toResponse ("" :: String)
 
 createIssueComment :: Integer -> Integer -> ServerPart Response

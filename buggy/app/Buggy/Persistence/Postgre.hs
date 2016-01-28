@@ -12,6 +12,7 @@ module Buggy.Persistence.Postgre (
     updateIssue,
     updateIssueReport,
     updateIssueReportAsFixed,
+    updateIssueAsFixed,
     insertIssueComment,
     selectIssueComment,
     selectIssueComments,
@@ -118,6 +119,13 @@ updateIssueReportAsFixed :: Integer -> Integer -> Integer -> IO ()
 updateIssueReportAsFixed programId issueId reportId = do
     conn <- connectPostgreSQL connectionString
     execute conn "UPDATE issue_reports SET status='Fixed' WHERE id=? AND issue=?" (reportId, issueId)
+    return ()
+
+updateIssueAsFixed :: Integer -> Integer -> IO ()
+updateIssueAsFixed programId issueId = do
+    conn <- connectPostgreSQL connectionString
+    execute conn "UPDATE issues SET status='Fixed' WHERE id=?" [issueId]
+    execute conn "UPDATE issue_reports SET confimed=FALSE WHERE issue=?" [issueId]
     return ()
 
 insertIssueComment :: Integer -> IssueComment -> IO ()

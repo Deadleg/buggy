@@ -19,6 +19,8 @@ main = simpleHTTP nullConf $ msum
                                                                                                            R.createIssueReport programId issueId
     , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "reports" $ path $ \reportId -> dir "fixed" $ do method POST
                                                                                                                                         R.issueReportFixed programId issueId reportId
+    , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "fixed" $ do method POST
+                                                                                                    R.issueFixed programId issueId
     , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "reports" $ path $ \reportId -> dir "comments" $ do method GET
                                                                                                                                            R.getIssueReportComments programId issueId reportId
     , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "reports" $ path $ \reportId -> dir "comments" $ do method POST

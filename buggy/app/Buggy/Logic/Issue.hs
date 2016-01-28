@@ -11,6 +11,7 @@ module Buggy.Logic.Issue (
     updateIssue,
     updateIssueReport,
     issueReportFixed,
+    issueFixed,
     createIssueComment,
     updateIssueComment,
     getIssueComment,
@@ -56,6 +57,9 @@ updateIssueReport issueReport = P.updateIssueReport issueReport
 
 issueReportFixed :: Integer -> Integer -> Integer -> IO ()
 issueReportFixed programId issueId reportId = P.updateIssueReportAsFixed programId issueId reportId
+
+issueFixed :: Integer -> Integer -> IO ()
+issueFixed programId issueId = P.updateIssueAsFixed programId issueId
 
 createIssueComment :: Integer -> T.IssueComment -> IO ()
 createIssueComment issueId comment = P.insertIssueComment issueId comment
