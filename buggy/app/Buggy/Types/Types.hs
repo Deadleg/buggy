@@ -14,8 +14,12 @@ module Buggy.Types.Types (
     IssueReportType(..),
     IssueComment(..),
     IssueReportComment(..),
+    IssueCommentReport(..),
+    IssueReportCommentReport(..),
     DbIssueComment(..),
     DbIssueReportComment(..),
+    Messageable(..),
+    Reportable(..),
     convertToIssueCommentTree,
     convertToReportCommentTree,
     toForest
@@ -363,3 +367,52 @@ convertToReportCommentTree comments root = (ExistingIssueReportComment
 
 getChildComments :: ChildComment a =>  Integer -> [a] -> [a]
 getChildComments id comments = filter (\x -> (maybe False (\y -> y == id) (getDbParentId x))) comments
+
+class Messageable a where
+    sendMessage :: a -> [b] -> IO ()
+
+class Messageable a => Reportable a where
+    notifyReportee :: a -> IO ()
+
+instance Messageable IssueCommentReport where
+    sendMessage _ _ = return () -- TODO
+
+instance Reportable IssueCommentReport where
+    notifyReportee report = do
+        sendMessage report [] -- TODO get recipients
+
+instance Messageable IssueReportCommentReport where
+    sendMessage _ _ = return () -- TODO
+
+instance Reportable IssueReportCommentReport where
+    notifyReportee report = do
+        sendMessage report [] -- TODO get recipients
+
+-- TODO define instances for the above
+data IssueCommentReport = NewIssueCommentReport {
+                              getIssueCommentReporter :: Integer
+                          } |
+                          ExistingIssueCommentReport {
+                              getIssueCommentReporter :: Integer
+                            , getIssueCommentId :: Integer
+                            , getIssueCommentReportId :: Integer
+                            , getIssueCommentReportTime :: LocalTime
+                            , getIssueCommentReporteeNotified :: Maybe LocalTime
+                          }
+
+data IssueReportCommentReport = NewIssueReportCommentReport {
+                              getIssueReportCommentReporter :: Integer
+                          } |
+                          ExistingIssueReportCommentReport {
+                              getIssueReportCommentReporter :: Integer
+                            , getIssueReportCommentId :: Integer
+                            , getIssueReportCommentReportId :: Integer
+                            , getIssueReportCommentReportTime :: LocalTime
+                            , getIssueReportCommentReporteeNotified :: Maybe LocalTime
+                          }
+
+instance FromJSON IssueCommentReport where
+    parseJSON (Object v) = NewIssueCommentReport <$> v .: "reporter"
+
+instance FromJSON IssueReportCommentReport where
+    parseJSON (Object v) = NewIssueReportCommentReport <$> v .: "reporter"

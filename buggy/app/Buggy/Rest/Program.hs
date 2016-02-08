@@ -19,7 +19,9 @@ module Buggy.Rest.Program (
     createIssueReportComment,
     updateIssueReportComment,
     getIssueReportComment,
-    getIssueReportComments
+    getIssueReportComments,
+    reportIssueReportComment,
+    reportIssueComment,
 ) where
 
 import qualified Buggy.Logic.Issue as L
@@ -28,6 +30,7 @@ import Buggy.Types.Types
 import Happstack.Server
 import Happstack.Server.Types
 import Control.Monad.IO.Class
+import Data.Text
 import Data.Aeson
 import Data.Maybe (fromJust)
 
@@ -165,3 +168,21 @@ getIssueReportComments :: Integer -> Integer -> Integer -> ServerPart Response
 getIssueReportComments programId issueId reportId = do
     comment <- liftIO $ L.getIssueReportComments programId issueId reportId
     ok $ toResponse comment
+
+reportIssueReportComment :: Integer -> Integer -> Integer -> Integer -> ServerPart Response
+reportIssueReportComment programId issueId reportId commentId = do
+    body <- getBody
+    let issue = eitherDecode body :: Either String IssueReportCommentReport
+    case issue of
+        Left s -> liftIO $ putStrLn s
+        Right issue -> liftIO $ L.reportIssueReportComment programId issueId reportId commentId issue
+    ok $ toResponse ("" :: Text)
+
+reportIssueComment :: Integer -> Integer -> Integer -> ServerPart Response
+reportIssueComment programId issueId commentId = do
+    body <- getBody
+    let issue = eitherDecode body :: Either String IssueCommentReport
+    case issue of
+        Left s -> liftIO $ putStrLn s
+        Right issue -> liftIO $ L.reportIssueComment programId issueId commentId issue
+    ok $ toResponse ("" :: Text)

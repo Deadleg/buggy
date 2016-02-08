@@ -21,10 +21,14 @@ main = simpleHTTP nullConf $ msum
                                                                                                                                         R.issueReportFixed programId issueId reportId
     , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "fixed" $ do method POST
                                                                                                     R.issueFixed programId issueId
+    , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "reports" $ path $ \reportId -> dir "comments" $ path $ \commentId -> dir "report" $ do method POST
+                                                                                                                                                                               R.reportIssueReportComment programId issueId reportId commentId
     , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "reports" $ path $ \reportId -> dir "comments" $ do method GET
                                                                                                                                            R.getIssueReportComments programId issueId reportId
     , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "reports" $ path $ \reportId -> dir "comments" $ do method POST
                                                                                                                                            R.createIssueReportComment programId issueId reportId
+    , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "comments" $ path $ \commentId -> dir "report" $ do method POST
+                                                                                                                                           R.reportIssueComment programId issueId commentId
     , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "comments" $ do method GET
                                                                                                        R.getIssueComments programId issueId
     , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "comments" $ do method POST

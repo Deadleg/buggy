@@ -4,16 +4,19 @@
 
 CREATE TABLE programs (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(30) NOT NULL
+    name      VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(10) NOT NULL
+    email VARCHAR(64),
+    username  VARCHAR(10) NOT NULL,
+    auto_issue_subscription BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE issues (
     id            SERIAL PRIMARY KEY,
+    issue_number  INTEGER NOT NULL, -- program/1/issues/{issue_number}
     program       INTEGER NOT NULL REFERENCES programs(id),
     issue_type    VARCHAR(32) NOT NULL,
     reporter      INTEGER NOT NULL REFERENCES users(id),
@@ -23,30 +26,41 @@ CREATE TABLE issues (
     description   TEXT NOT NULL,
     time_reported TIMESTAMP NOT NULL,
     edit_time     TIMESTAMP,
-    upvotes         INTEGER NOT NULL DEFAULT 0,
-    CONSTRAINT status CHECK (status in ('Open', 'Closed', 'Fixed', 'Reproducible', 'NotEnoughInformation')),
-    CONSTRAINT type CHECK (type in ('Bug', 'QualityOfLife', 'Feature'))
+    upvotes       INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT status
+        CHECK (status in ('Open', 'Closed', 'Fixed', 'Reproducible', 'NotEnoughInformation')),
+    CONSTRAINT type
+        CHECK (type in ('Bug', 'QualityOfLife', 'Feature'))
+);
+
+CREATE TABLE issue_subscriptions (
+    user              INTEGER NOT NULL REFERENCES users(id),
+    issue             INTEGER NOT NULL REFERENCES issues(id),
+    notification_sent BOOLEAN NOT NULL DEFAULT FALSE,
+    time_subscribed   TIMESTAMP NOT NULL DEFAULT NOW(),
+    time_sent         TIMESTAMP
 );
 
 CREATE TABLE reproduction_steps (
-    id SERIAL PRIMARY KEY,
-    issue INTEGER REFERENCES issues(id) NOT NULL,
+    id SERIAL   PRIMARY KEY,
+    issue       INTEGER REFERENCES issues(id) NOT NULL,
     step_number INTEGER NOT NULL,
     instruction VARCHAR(200) NOT NULL
 );
 
 CREATE TABLE issue_reports (
-    id SERIAL PRIMARY KEY,
-    issue INTEGER NOT NULL REFERENCES issues(id),
-    description TEXT NOT NULL,
-    reporter INTEGER NOT NULL REFERENCES users(id),
-    computer_info TEXT,
-    type VARCHAR(20) NOT NULL,
-    status VARCHAR(20) NOT NULL,
-    time_reported TIMESTAMP,
-    confirmed BOOLEAN NOT NULL DEFAULT TRUE, -- assume that when submits  their report they can confirm its behaviour
-    upvotes INTEGER NOT NULL DEFAULT 0,
-    CONSTRAINT report_type CHECK (type in ('Fix', 'PartialFix', 'Report')),
+    id SERIAL      PRIMARY KEY,
+    report_number  INTEGER NOT NULL, -- issues/1/reports/{report_number}
+    issue          INTEGER NOT NULL REFERENCES issues(id),
+    description    TEXT NOT NULL,
+    reporter       INTEGER NOT NULL REFERENCES users(id),
+    computer_info  TEXT,
+    type           VARCHAR(20) NOT NULL,
+    status         VARCHAR(20) NOT NULL,
+    time_reported  TIMESTAMP,
+    confirmed      BOOLEAN NOT NULL DEFAULT TRUE, -- assume that when submits their report they can confirm its behaviour
+    upvotes        INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT report_type  CHECK (type in ('Fix', 'PartialFix', 'Report')),
     CONSTRAINT status_value CHECK 
         ((type = 'Report' 
             AND status IN ('Fixed', 'Broken', 'Working', 'PartiallyWorking')) 
@@ -55,23 +69,39 @@ CREATE TABLE issue_reports (
 );
 
 CREATE TABLE issue_report_comments (
-    id SERIAL PRIMARY KEY,
-    issue_report INTEGER NOT NULL REFERENCES issue_reports(id),
-    text VARCHAR(512) NOT NULL,
-    time_created TIMESTAMP NOT NULL DEFAULT NOW(),
-    edit_time TIMESTAMP,
-    commenter INTEGER NOT NULL REFERENCES users(id),
+    id SERIAL      PRIMARY KEY,
+    issue_report   INTEGER NOT NULL REFERENCES issue_reports(id),
+    text           VARCHAR(512) NOT NULL,
+    time_created   TIMESTAMP NOT NULL DEFAULT NOW(),
+    edit_time      TIMESTAMP,
+    commenter      INTEGER NOT NULL REFERENCES users(id),
     parent_comment INTEGER REFERENCES issue_report_comments(id),
-    upvotes INTEGER NOT NULL DEFAULT 0
+    upvotes        INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE issue_comments (
-    id SERIAL PRIMARY KEY,
-    issue INTEGER NOT NULL REFERENCES issue(id),
-    text VARCHAR(512) NOT NULL,
-    time_created TIMESTAMP NOT NULL DEFAULT NOW(),
-    edit_time TIMESTAMP,
-    commenter INTEGER NOT NULL REFERENCES users(id),
+    id SERIAL      PRIMARY KEY,
+    issue          INTEGER NOT NULL REFERENCES issue(id),
+    text           VARCHAR(512) NOT NULL,
+    time_created   TIMESTAMP NOT NULL DEFAULT NOW(),
+    edit_time      TIMESTAMP,
+    commenter      INTEGER NOT NULL REFERENCES users(id),
     parent_comment INTEGER REFERENCES issue_comments(id),
-    upvotes INTEGER NOT NULL DEFAULT 0
+    upvotes        INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE issue_comment_reports (
+    id SERIAL              PRIMARY KEY,
+    reporter               INTEGER NOT NULL REFERENCES users(id),
+    comment                INTEGER NOT NULL REFERENCES issue_comments(id),
+    time_reported          INTEGER NOT NULL DEFAULT NOW(),
+    reportee_notified_time TIMESTAMP
+);
+
+CREATE TABLE issue_report_comment_reports (
+    id SERIAL              PRIMARY KEY,
+    reporter               INTEGER NOT NULL REFERENCES users(id),
+    comment                INTEGER NOT NULL REFERENCES issue_report_comments(id),
+    time_reported          INTEGER NOT NULL DEFAULT NOW(),
+    reportee_notified_time TIMESTAMP
 );

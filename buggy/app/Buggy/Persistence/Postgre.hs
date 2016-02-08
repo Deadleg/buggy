@@ -20,7 +20,9 @@ module Buggy.Persistence.Postgre (
     insertIssueReportComment,
     selectIssueReportComment,
     selectIssueReportComments,
-    updateIssueReportComment
+    updateIssueReportComment,
+    createIssueReportCommentReport,
+    createIssueCommentReport
 ) where
 
 import Database.PostgreSQL.Simple
@@ -175,3 +177,9 @@ updateIssueReportComment commentId (EditIssueReportComment text) = do
     conn <- connectPostgreSQL connectionString
     execute conn "UPDATE issue_report_comments SET text=?, edit_time=NOW() WHERE id=?" [commentId]
     return ()
+
+createIssueCommentReport :: Integer -> Integer -> Integer -> IssueCommentReport -> IO ()
+createIssueCommentReport programId issueId commentId report = return () -- TODO
+
+createIssueReportCommentReport :: Integer -> Integer -> Integer -> Integer -> IssueReportCommentReport -> IO ()
+createIssueReportCommentReport programId issueId reportId commentId report = return () -- TODO

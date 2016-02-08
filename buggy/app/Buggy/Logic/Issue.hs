@@ -19,7 +19,9 @@ module Buggy.Logic.Issue (
     createIssueReportComment,
     updateIssueReportComment,
     getIssueReportComment,
-    getIssueReportComments
+    getIssueReportComments,
+    reportIssueComment,
+    reportIssueReportComment
 ) where
 
 import qualified Buggy.Types.Types as T
@@ -92,3 +94,13 @@ getIssueReportComments :: Integer -> Integer -> Integer -> IO ([T.IssueReportCom
 getIssueReportComments programId issueId reportId = do
     comments <- P.selectIssueReportComments programId issueId reportId
     return $ T.toForest comments T.convertToReportCommentTree
+
+reportIssueComment :: Integer -> Integer -> Integer -> T.IssueCommentReport -> IO ()
+reportIssueComment programId issueId commentId report = do
+    P.createIssueCommentReport programId issueId commentId report
+    T.notifyReportee report
+
+reportIssueReportComment :: Integer -> Integer -> Integer -> Integer -> T.IssueReportCommentReport -> IO ()
+reportIssueReportComment programId issueId reportId commentId report = do
+    P.createIssueReportCommentReport programId issueId commentId reportId report
+    T.notifyReportee report
