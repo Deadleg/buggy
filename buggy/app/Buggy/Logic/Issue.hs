@@ -61,7 +61,11 @@ issueReportFixed :: Integer -> Integer -> Integer -> IO ()
 issueReportFixed programId issueId reportId = P.updateIssueReportAsFixed programId issueId reportId
 
 issueFixed :: Integer -> Integer -> IO ()
-issueFixed programId issueId = P.updateIssueAsFixed programId issueId
+issueFixed programId issueId = do
+    P.updateIssueAsFixed programId issueId
+    users <- P.selectIssueSubscriptors issueId
+    issue <- P.selectIssue programId issueId
+    T.sendMessage issue users
 
 createIssueComment :: Integer -> T.IssueComment -> IO ()
 createIssueComment issueId comment = P.insertIssueComment issueId comment

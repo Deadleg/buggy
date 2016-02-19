@@ -374,6 +374,9 @@ class Messageable a where
 class Messageable a => Reportable a where
     notifyReportee :: a -> IO ()
 
+instance Messageable Issue where
+    sendMessage _ _ = return () -- TODO
+
 instance Messageable IssueCommentReport where
     sendMessage _ _ = return () -- TODO
 

@@ -106,6 +106,7 @@ updateIssueReport programId issueId reportId = do
 issueReportFixed :: Integer -> Integer -> Integer -> ServerPart Response
 issueReportFixed programId issueId reportId = do
     liftIO $ L.issueReportFixed programId issueId reportId
+
     ok $ toResponse ("" :: String)
 
 issueFixed :: Integer -> Integer -> ServerPart Response

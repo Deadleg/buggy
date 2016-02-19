@@ -22,7 +22,11 @@ module Buggy.Persistence.Postgre (
     selectIssueReportComments,
     updateIssueReportComment,
     createIssueReportCommentReport,
-    createIssueCommentReport
+    createIssueCommentReport,
+    subscribeToIssue,
+    unsubscribeFromIssue,
+    issueSubscriptionNotificationSent,
+    selectIssueSubscriptors
 ) where
 
 import Database.PostgreSQL.Simple
@@ -183,3 +187,15 @@ createIssueCommentReport programId issueId commentId report = return () -- TODO
 
 createIssueReportCommentReport :: Integer -> Integer -> Integer -> Integer -> IssueReportCommentReport -> IO ()
 createIssueReportCommentReport programId issueId reportId commentId report = return () -- TODO
+
+subscribeToIssue :: Integer -> Integer -> IO ()
+subscribeToIssue userId issueId = return () -- TODO
+
+unsubscribeFromIssue :: Integer -> Integer -> IO ()
+unsubscribeFromIssue userId issueId = return () -- TODO
+
+issueSubscriptionNotificationSent :: Integer -> IO ()
+issueSubscriptionNotificationSent issueId = return () -- TODO
+
+selectIssueSubscriptors :: Integer -> IO ([User])
+selectIssueSubscriptors issueId = return []
