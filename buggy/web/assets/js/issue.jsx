@@ -63,7 +63,7 @@ module.exports = React.createClass({
     render: function() {
         var steps = this.state.issue.reproductionSteps.map(function(step, index) {
             return (
-                <li key={index} className="collection-item">{step.instruction}</li>
+                <li key={index} className="common-list-item">{step.instruction}</li>
             );
         });
 
@@ -92,53 +92,67 @@ module.exports = React.createClass({
             }
 
             return (
-                <div key={index}>
-                    <div className="card grey white-text">
-                        <div className="card-content">
-                            <p>{report.description}</p>
-                            <p>{report.specs}</p>
-                            <p>Reported by {report.reporter.username}</p>
-                            <p>At {report.time}</p>
-                            <div className="chip">{report.status}</div>
-                            <div className="chip">{report.type}</div>
-                            <div className="chip">{report.confirmed ? "Confirmed" : "Unconfirmed"}</div>
-                            <button onClick={self.markReportAsFixed.bind(self, index)}>Mark as fixed</button>
+                <div key={index} className="row" style={{"marginBottom": "1rem"}}>
+                    <div className="col-sm-12" style={{"marginBottom": "1rem"}}>
+                        <div>{report.description}</div>
+                        <p>{report.specs}</p>
+                        <div className="label-group">
+                            <div className="label label-default">{report.status}</div>
+                            <div className="label label-default">{report.type}</div>
+                            <div className="label label-default">{report.confirmed ? "Confirmed" : "Unconfirmed"}</div>
                         </div>
-                        <div className="card-action">
-                            <Link to={"/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + report.id + "/comments/new"}>Comment</Link>
+                        <div><small>Reported by {report.reporter.username}</small></div>
+                        <div><small>At {report.time}</small></div>
+                        <div className="btn-group-spaced" style={{"marginBottom": "1rem"}}>
+                            <button className="btn btn-common" onClick={self.markReportAsFixed.bind(self, index)}>Mark as fixed</button>
+                            <div className="btn btn-common">
+                                <Link to={"/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + report.id + "/comments/new"}>Comment</Link>
+                            </div>
                         </div>
+                        {reportComments}
                     </div>
-                    {reportComments}
                 </div>
             );
         });
 
         var edited = "";
         if (this.state.issue.lastEdited) {
-            edited = <p>Edit time: {this.state.issue.lastEdited}</p>
+            edited = <div><small>Edit time: {this.state.issue.lastEdited}</small></div>
         }
 
         return (
-            <div>
-                <div className="col s12">
-                    <div className="card blue-grey darken-1 white-text">
-                        <div className="card-content">
-                            <span className="card-title">{this.state.issue.title}</span>
-                            <p>{this.state.issue.description}</p>
-                            <div className="chip">{this.state.issue.type}</div>
-                            <div className="chip">{this.state.issue.status}</div>
-                            <p>Reported by: {this.state.issue.reporter.username}</p>
-                            <p>At {this.state.issue.time}</p>
-                            {edited}
+            <div className="container">
+                <div className="row">
+                    <div className="col-sm-6">
+                        <h3>{this.state.issue.title}</h3>
+                        <div className="label-group" style={{"marginBottom": "1rem"}}>
+                            <span className="label label-default">{this.state.issue.type}</span>
+                            <span className="label label-default">{this.state.issue.status}</span>
                         </div>
+                        <div>{this.state.issue.description}</div>
                     </div>
                 </div>
-                <ul className="collection">
-                    {steps}
-                </ul>
-                <button className="waves-effect waves-light btn"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}>Create report</Link></button>
-                <button className="waves-effect waves-light btn"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/comments/new"}>Add comment</Link></button>
-                <button className="waves-effect waves-light btn"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}>Edit issue</Link></button>
+                <div className="row">
+                    <div className="col-sm-6">
+                        <ol className="common-list">
+                            {steps}
+                        </ol>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-sm-6">
+                        <div><small>Reported by: {this.state.issue.reporter.username}</small></div>
+                        <div><small>At {this.state.issue.time}</small></div>
+                        {edited}
+                    </div>
+                </div>
+                <div className="row" style={{"marginTop":"2rem", "marginBottom": "2rem"}}>
+                    <div className="col-sm-6 btn-group-spaced">
+                        <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}>Add report</Link></button>
+                        <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/comments/new"}>Add comment</Link></button>
+                        <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}>Edit issue</Link></button>
+                    </div>
+                </div>
                 {comments}
                 {reports}
             </div>

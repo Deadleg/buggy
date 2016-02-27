@@ -1,0 +1,15 @@
+.navbar {
+    background: $theme-bg-secondary;
+    margin-bottom: $navbar-margin;
+
+    a {
+        color: $text-color;
+
+        // don't set visited
+        &:link, &:hover, &:active, &:visited {
+            color: darken($text-color, 12%);
+            text-decoration: none;
+        }
+    }
+}
+

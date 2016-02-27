@@ -1,0 +1,31 @@
+.common-list {
+    counter-reset: li;
+    background: $list-group-bg;
+    margin-left: 0;
+    padding-left: 0;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.common-list-item {
+    padding-right: 0.5rem;
+    border: 2px $theme-bg solid;
+    list-style: none;
+    word-break: break-word;
+
+    &:before {
+        content: counter(li);
+        counter-increment: li;
+        background: white;
+        color: black;
+        margin-right: 0.5rem;
+        padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+        display: inline-block;
+        line-height: $line-height;
+    }
+}
+
+.list-number {
+    color: black;
+    background: white;
+}

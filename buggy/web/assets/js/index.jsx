@@ -20,18 +20,21 @@ var Games = React.createClass({
     render: function() {
         var content = this.state.programs.map(function (program, index) {
             return (
-                <div className="col m3 s12" key={index}>
-                    <div className="card blue-grey darken-1 white-text">
-                        <div className="card-content">
-                            <span className="card-title"><Link to={"/app/" + program.id + "/issue"}>{program.name}</Link></span>
-                            <p>Issues: {program.issues}</p>
+                <div className="row" key={index}>
+                    <div className="col-sm-3">
+                        <div className="card">
+                            <img src="http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296" className="img-fluid card-img-top"/>
+                            <div className="card-block">
+                                <h4 className="card-title"><Link to={"/app/" + program.id + "/issue"}>{program.name}</Link></h4>
+                                <p className="card-text">Issues: {program.issues}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             );
         });
         return (
-            <div>
+            <div className="container">
                 {content}
             </div>
         );

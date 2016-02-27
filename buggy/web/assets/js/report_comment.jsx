@@ -22,23 +22,21 @@ var ReportComment = React.createClass({
         });
 
         return (
-            <div>
-                <div>
-                    <div className="card green lighten-4">
-                        <div className="card-content">
-                            <p>{this.props.comment.comment}</p>
+            <div className="row">
+                <div className="col-sm-12">
+                    <div className="card">
+                        <div className="card-block">
+                            <p className="card-text">{this.props.comment.comment}</p>
                             <br />
-                            <p>Posted {this.props.comment.timeCreated}</p>
-                        </div>
-                        <div className="card-action">
-                            <button type="button" onClick={this.replyTo.bind(this, this.props.comment.id)}>Reply</button>
+                            <p className="card-text">Posted {this.props.comment.timeCreated}</p>
+                            <button type="button" className="btn btn-common" onClick={this.replyTo.bind(this, this.props.comment.id)}>Reply</button>
                         </div>
                     </div>
+                    <div className={this.state.show ? "" : "hide"}>
+                        <CreateIssueReportComment reportId={this.props.reportId} params={this.props.params} parentComment={this.props.comment.id} />
+                    </div>
+                    {children}
                 </div>
-                <div className={this.state.show ? "" : "hide"}>
-                    <CreateIssueReportComment reportId={this.props.reportId} params={this.props.params} parentComment={this.props.comment.id} />
-                </div>
-                {children}
             </div>
         );
     }

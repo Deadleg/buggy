@@ -1,0 +1,13 @@
+body {
+    background: $theme-bg;
+    color: $text-color;
+}
+
+a {
+    color:$text-color;
+
+    &:hover, &:active {
+        color: darken($text-color, 12%);
+    }
+}
+

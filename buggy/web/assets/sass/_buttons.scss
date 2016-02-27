@@ -1,0 +1,34 @@
+.btn-common {
+    @include button-variant($text-color, $btn-common-bg, $btn-common-bg);
+    @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, 0);
+
+    a:hover, a:active {
+        text-decoration: none;
+        color: $text-color;
+    }
+
+    a:visited {
+        color: $text-color;
+    }
+}
+
+.btn-red {
+    @include button-variant($text-color, $red, $red);
+    @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, 0);
+
+    a:hover, a:active {
+        text-decoration: none;
+        color: $text-color;
+    }
+
+    a:visited {
+        color: $text-color;
+    }
+}
+
+// TODO remove in mobile view
+.btn-group-spaced {
+    .btn:not(:first-child) {
+        margin-left: 1rem;
+    }
+}

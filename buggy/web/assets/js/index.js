@@ -7773,6 +7773,7 @@ var HTMLDOMPropertyConfig = {
     multiple: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
     muted: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
     name: null,
+    nonce: MUST_USE_ATTRIBUTE,
     noValidate: HAS_BOOLEAN_VALUE,
     open: HAS_BOOLEAN_VALUE,
     optimum: null,
@@ -7784,6 +7785,7 @@ var HTMLDOMPropertyConfig = {
     readOnly: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
     rel: null,
     required: HAS_BOOLEAN_VALUE,
+    reversed: HAS_BOOLEAN_VALUE,
     role: MUST_USE_ATTRIBUTE,
     rows: MUST_USE_ATTRIBUTE | HAS_POSITIVE_NUMERIC_VALUE,
     rowSpan: null,
@@ -7834,8 +7836,8 @@ var HTMLDOMPropertyConfig = {
      */
     // autoCapitalize and autoCorrect are supported in Mobile Safari for
     // keyboard hints.
-    autoCapitalize: null,
-    autoCorrect: null,
+    autoCapitalize: MUST_USE_ATTRIBUTE,
+    autoCorrect: MUST_USE_ATTRIBUTE,
     // autoSave allows WebKit/Blink to persist values of input fields on page reloads
     autoSave: null,
     // color is for Safari mask-icon link
@@ -7866,9 +7868,7 @@ var HTMLDOMPropertyConfig = {
     httpEquiv: 'http-equiv'
   },
   DOMPropertyNames: {
-    autoCapitalize: 'autocapitalize',
     autoComplete: 'autocomplete',
-    autoCorrect: 'autocorrect',
     autoFocus: 'autofocus',
     autoPlay: 'autoplay',
     autoSave: 'autosave',
@@ -8229,6 +8229,7 @@ assign(React, {
 });
 
 React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactDOM;
+React.__SECRET_DOM_SERVER_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactDOMServer;
 
 module.exports = React;
 },{"./Object.assign":74,"./ReactDOM":87,"./ReactDOMServer":97,"./ReactIsomorphic":115,"./deprecated":158}],77:[function(require,module,exports){
@@ -12270,7 +12271,10 @@ var ReactDOMOption = {
       }
     });
 
-    nativeProps.children = content;
+    if (content) {
+      nativeProps.children = content;
+    }
+
     return nativeProps;
   }
 
@@ -12310,7 +12314,7 @@ function updateOptionsIfPendingUpdateAndMounted() {
     var value = LinkedValueUtils.getValue(props);
 
     if (value != null) {
-      updateOptions(this, props, value);
+      updateOptions(this, Boolean(props.multiple), value);
     }
   }
 }
@@ -13389,7 +13393,9 @@ var DOM_OPERATION_TYPES = {
   'setValueForProperty': 'update attribute',
   'setValueForAttribute': 'update attribute',
   'deleteValueForProperty': 'remove attribute',
-  'dangerouslyReplaceNodeWithMarkupByID': 'replace'
+  'setValueForStyles': 'update styles',
+  'replaceNodeWithMarkup': 'replace',
+  'updateTextContent': 'set textContent'
 };
 
 function getTotalTime(measurements) {
@@ -18437,7 +18443,7 @@ module.exports = ReactUpdates;
 
 'use strict';
 
-module.exports = '0.14.2';
+module.exports = '0.14.7';
 },{}],137:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -19532,6 +19538,7 @@ var warning = require('fbjs/lib/warning');
  */
 var EventInterface = {
   type: null,
+  target: null,
   // currentTarget is set when dispatching; no use in copying it here
   currentTarget: emptyFunction.thatReturnsNull,
   eventPhase: null,
@@ -19565,8 +19572,6 @@ function SyntheticEvent(dispatchConfig, dispatchMarker, nativeEvent, nativeEvent
   this.dispatchConfig = dispatchConfig;
   this.dispatchMarker = dispatchMarker;
   this.nativeEvent = nativeEvent;
-  this.target = nativeEventTarget;
-  this.currentTarget = nativeEventTarget;
 
   var Interface = this.constructor.Interface;
   for (var propName in Interface) {
@@ -19577,7 +19582,11 @@ function SyntheticEvent(dispatchConfig, dispatchMarker, nativeEvent, nativeEvent
     if (normalize) {
       this[propName] = normalize(nativeEvent);
     } else {
-      this[propName] = nativeEvent[propName];
+      if (propName === 'target') {
+        this.target = nativeEventTarget;
+      } else {
+        this[propName] = nativeEvent[propName];
+      }
     }
   }
 
@@ -22697,11 +22706,14 @@ module.exports = focusNode;
  * @typechecks
  */
 
+/* eslint-disable fb-www/typeof-undefined */
+
 /**
  * Same as document.activeElement but wraps in a try-catch block. In IE it is
  * not safe to call document.activeElement if there is nothing focused.
  *
- * The activeElement will be null only if the document or document body is not yet defined.
+ * The activeElement will be null only if the document or document body is not
+ * yet defined.
  */
 'use strict';
 
@@ -22709,7 +22721,6 @@ function getActiveElement() /*?DOMElement*/{
   if (typeof document === 'undefined') {
     return null;
   }
-
   try {
     return document.activeElement || document.body;
   } catch (e) {
@@ -22955,7 +22966,7 @@ module.exports = hyphenateStyleName;
  * will remain to ensure logic does not differ in production.
  */
 
-var invariant = function (condition, format, a, b, c, d, e, f) {
+function invariant(condition, format, a, b, c, d, e, f) {
   if (process.env.NODE_ENV !== 'production') {
     if (format === undefined) {
       throw new Error('invariant requires an error message argument');
@@ -22969,15 +22980,16 @@ var invariant = function (condition, format, a, b, c, d, e, f) {
     } else {
       var args = [a, b, c, d, e, f];
       var argIndex = 0;
-      error = new Error('Invariant Violation: ' + format.replace(/%s/g, function () {
+      error = new Error(format.replace(/%s/g, function () {
         return args[argIndex++];
       }));
+      error.name = 'Invariant Violation';
     }
 
     error.framesToPop = 1; // we don't care about invariant's own frame
     throw error;
   }
-};
+}
 
 module.exports = invariant;
 }).call(this,require('_process'))
@@ -23242,18 +23254,23 @@ module.exports = performance || {};
 'use strict';
 
 var performance = require('./performance');
-var curPerformance = performance;
+
+var performanceNow;
 
 /**
  * Detect if we can use `window.performance.now()` and gracefully fallback to
  * `Date.now()` if it doesn't exist. We need to support Firefox < 15 for now
  * because of Facebook's testing infrastructure.
  */
-if (!curPerformance || !curPerformance.now) {
-  curPerformance = Date;
+if (performance.now) {
+  performanceNow = function () {
+    return performance.now();
+  };
+} else {
+  performanceNow = function () {
+    return Date.now();
+  };
 }
-
-var performanceNow = curPerformance.now.bind(curPerformance);
 
 module.exports = performanceNow;
 },{"./performance":203}],205:[function(require,module,exports){
@@ -23460,46 +23477,42 @@ var Comment = React.createClass({
 
         return React.createElement(
             "div",
-            null,
+            { className: "row" },
             React.createElement(
                 "div",
-                null,
+                { className: "col-sm-12" },
                 React.createElement(
                     "div",
-                    { className: "card green lighten-4" },
+                    { className: "card" },
                     React.createElement(
                         "div",
-                        { className: "card-content" },
+                        { className: "card-block" },
                         React.createElement(
                             "p",
-                            null,
+                            { className: "card-text" },
                             this.props.comment.comment
                         ),
                         React.createElement("br", null),
                         React.createElement(
                             "p",
-                            null,
+                            { className: "card-text" },
                             "Posted ",
                             this.props.comment.timeCreated
-                        )
-                    ),
-                    React.createElement(
-                        "div",
-                        { className: "card-action" },
+                        ),
                         React.createElement(
                             "button",
-                            { type: "button", onClick: this.replyTo.bind(this, this.props.comment.id) },
+                            { type: "button", className: "btn btn-common", onClick: this.replyTo.bind(this, this.props.comment.id) },
                             "Reply"
                         )
                     )
-                )
-            ),
-            React.createElement(
-                "div",
-                { className: this.state.show ? "" : "hide" },
-                React.createElement(CreateIssueComment, { params: this.props.params, parentComment: this.props.comment.id })
-            ),
-            children
+                ),
+                React.createElement(
+                    "div",
+                    { className: this.state.show ? "" : "hide" },
+                    React.createElement(CreateIssueComment, { params: this.props.params, parentComment: this.props.comment.id })
+                ),
+                children
+            )
         );
     }
 });
@@ -23516,10 +23529,6 @@ module.exports = React.createClass({
         return {
             reproductionSteps: []
         };
-    },
-    componentDidMount: function () {
-        var self = this;
-        $('select').material_select();
     },
     addReproductionStep: function () {
         var currentReproductionSteps = this.state.reproductionSteps;
@@ -23562,102 +23571,118 @@ module.exports = React.createClass({
                 "div",
                 { key: index },
                 React.createElement(
-                    "div",
-                    { className: "input-field col s9" },
-                    React.createElement("input", { type: "text", placeholder: "What did you do?", value: step.instruction.length > 0 ? step.instruction : null, ref: "instruction" + index }),
+                    "fieldset",
+                    { className: "form-group" },
                     React.createElement(
                         "label",
-                        { className: "active" },
+                        null,
                         "Step ",
                         index + 1
+                    ),
+                    React.createElement("input", { className: "form-control", type: "text", placeholder: "What did you do?", value: step.instruction.length > 0 ? step.instruction : null, ref: "instruction" + index }),
+                    React.createElement(
+                        "div",
+                        { className: "btn-group form-sequence-buttons pull-sm-right" },
+                        React.createElement(
+                            "button",
+                            { className: "btn btn-red", type: "button", onClick: self.removeReproductionStep.bind(self, index) },
+                            "Delete"
+                        )
                     )
-                ),
-                React.createElement(
-                    "button",
-                    { className: "waves-effect waves-light btn col s3 red", type: "button", onClick: self.removeReproductionStep.bind(self, index) },
-                    "Delete"
                 )
             );
         });
         return React.createElement(
             "div",
-            null,
+            { className: "container" },
             React.createElement(
-                "h1",
-                null,
-                "New issue"
-            ),
-            React.createElement(
-                "form",
-                { method: "post", onSubmit: this.createIssue },
+                "div",
+                { className: "row" },
                 React.createElement(
                     "div",
-                    { className: "input-field col s12" },
-                    React.createElement("input", { type: "text", placeholder: "A short descriptive title", ref: "title" }),
+                    { className: "col-sm-12" },
                     React.createElement(
-                        "label",
+                        "h1",
                         null,
-                        "Title"
+                        "New issue"
                     )
                 ),
                 React.createElement(
                     "div",
-                    { className: "input-field col s12" },
-                    React.createElement("textarea", { className: "materialize-textarea", placeholder: "A description of the problem", ref: "description" }),
+                    { className: "col-sm-6" },
                     React.createElement(
-                        "label",
-                        null,
-                        "Description"
-                    )
-                ),
-                React.createElement(
-                    "div",
-                    { className: "input-field col s6" },
-                    React.createElement(
-                        "select",
-                        { value: "", ref: "type" },
-                        React.createElement("option", { value: "", disabled: true }),
+                        "form",
+                        { method: "post", onSubmit: this.createIssue },
                         React.createElement(
-                            "option",
-                            { value: "Bug" },
-                            "Bug"
+                            "fieldset",
+                            { className: "form-group" },
+                            React.createElement(
+                                "label",
+                                null,
+                                "Title"
+                            ),
+                            React.createElement("input", { type: "text", className: "form-control", placeholder: "A short descriptive title", ref: "title" })
                         ),
                         React.createElement(
-                            "option",
-                            { value: "Feature" },
-                            "Feature"
+                            "fieldset",
+                            { className: "form-group" },
+                            React.createElement(
+                                "label",
+                                null,
+                                "Description"
+                            ),
+                            React.createElement("textarea", { className: "form-control", placeholder: "A description of the problem", ref: "description" })
                         ),
                         React.createElement(
-                            "option",
-                            { value: "UX" },
-                            "UX"
+                            "fieldset",
+                            { className: "form-group" },
+                            React.createElement(
+                                "label",
+                                null,
+                                "Issue type"
+                            ),
+                            React.createElement(
+                                "select",
+                                { defaultValue: "", ref: "type", className: "form-control" },
+                                React.createElement("option", { value: "", disabled: true }),
+                                React.createElement(
+                                    "option",
+                                    { value: "Bug" },
+                                    "Bug"
+                                ),
+                                React.createElement(
+                                    "option",
+                                    { value: "Feature" },
+                                    "Feature"
+                                ),
+                                React.createElement(
+                                    "option",
+                                    { value: "UX" },
+                                    "UX"
+                                ),
+                                React.createElement(
+                                    "option",
+                                    { value: "Graphic" },
+                                    "Graphic"
+                                )
+                            )
+                        ),
+                        steps,
+                        React.createElement(
+                            "button",
+                            { type: "button", className: "btn btn-common", onClick: this.addReproductionStep },
+                            "Add step"
                         ),
                         React.createElement(
-                            "option",
-                            { value: "Graphic" },
-                            "Graphic"
+                            "div",
+                            { className: "col s12", style: { "marginTop": "2rem" } },
+                            React.createElement(
+                                "button",
+                                { type: "submit", className: "btn btn-common" },
+                                "Submit"
+                            )
                         )
-                    ),
-                    React.createElement(
-                        "label",
-                        null,
-                        "Issue type"
                     )
-                ),
-                steps,
-                React.createElement(
-                    "div",
-                    { className: "col s12" },
-                    React.createElement(
-                        "button",
-                        { type: "button", className: "waves-effect waves-light btn", onClick: this.addReproductionStep },
-                        "Add step"
-                    )
-                ),
-                React.createElement(
-                    "button",
-                    { type: "submit", className: "waves-effect waves-light btn" },
-                    "Submit"
                 )
             )
         );
@@ -24153,27 +24178,32 @@ var Games = React.createClass({
         var content = this.state.programs.map(function (program, index) {
             return React.createElement(
                 'div',
-                { className: 'col m3 s12', key: index },
+                { className: 'row', key: index },
                 React.createElement(
                     'div',
-                    { className: 'card blue-grey darken-1 white-text' },
+                    { className: 'col-sm-3' },
                     React.createElement(
                         'div',
-                        { className: 'card-content' },
+                        { className: 'card' },
+                        React.createElement('img', { src: 'http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296', className: 'img-fluid card-img-top' }),
                         React.createElement(
-                            'span',
-                            { className: 'card-title' },
+                            'div',
+                            { className: 'card-block' },
                             React.createElement(
-                                Link,
-                                { to: "/app/" + program.id + "/issue" },
-                                program.name
+                                'h4',
+                                { className: 'card-title' },
+                                React.createElement(
+                                    Link,
+                                    { to: "/app/" + program.id + "/issue" },
+                                    program.name
+                                )
+                            ),
+                            React.createElement(
+                                'p',
+                                { className: 'card-text' },
+                                'Issues: ',
+                                program.issues
                             )
-                        ),
-                        React.createElement(
-                            'p',
-                            null,
-                            'Issues: ',
-                            program.issues
                         )
                     )
                 )
@@ -24181,7 +24211,7 @@ var Games = React.createClass({
         });
         return React.createElement(
             'div',
-            null,
+            { className: 'container' },
             content
         );
     }
@@ -24277,7 +24307,7 @@ module.exports = React.createClass({
         var steps = this.state.issue.reproductionSteps.map(function (step, index) {
             return React.createElement(
                 "li",
-                { key: index, className: "collection-item" },
+                { key: index, className: "common-list-item" },
                 step.instruction
             );
         });
@@ -24308,158 +24338,206 @@ module.exports = React.createClass({
 
             return React.createElement(
                 "div",
-                { key: index },
+                { key: index, className: "row", style: { "marginBottom": "1rem" } },
                 React.createElement(
                     "div",
-                    { className: "card grey white-text" },
+                    { className: "col-sm-12", style: { "marginBottom": "1rem" } },
                     React.createElement(
                         "div",
-                        { className: "card-content" },
-                        React.createElement(
-                            "p",
-                            null,
-                            report.description
-                        ),
-                        React.createElement(
-                            "p",
-                            null,
-                            report.specs
-                        ),
-                        React.createElement(
-                            "p",
-                            null,
-                            "Reported by ",
-                            report.reporter.username
-                        ),
-                        React.createElement(
-                            "p",
-                            null,
-                            "At ",
-                            report.time
-                        ),
+                        null,
+                        report.description
+                    ),
+                    React.createElement(
+                        "p",
+                        null,
+                        report.specs
+                    ),
+                    React.createElement(
+                        "div",
+                        { className: "label-group" },
                         React.createElement(
                             "div",
-                            { className: "chip" },
+                            { className: "label label-default" },
                             report.status
                         ),
                         React.createElement(
                             "div",
-                            { className: "chip" },
+                            { className: "label label-default" },
                             report.type
                         ),
                         React.createElement(
                             "div",
-                            { className: "chip" },
+                            { className: "label label-default" },
                             report.confirmed ? "Confirmed" : "Unconfirmed"
-                        ),
-                        React.createElement(
-                            "button",
-                            { onClick: self.markReportAsFixed.bind(self, index) },
-                            "Mark as fixed"
                         )
                     ),
                     React.createElement(
                         "div",
-                        { className: "card-action" },
+                        null,
                         React.createElement(
-                            Link,
-                            { to: "/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + report.id + "/comments/new" },
-                            "Comment"
+                            "small",
+                            null,
+                            "Reported by ",
+                            report.reporter.username
                         )
-                    )
-                ),
-                reportComments
+                    ),
+                    React.createElement(
+                        "div",
+                        null,
+                        React.createElement(
+                            "small",
+                            null,
+                            "At ",
+                            report.time
+                        )
+                    ),
+                    React.createElement(
+                        "div",
+                        { className: "btn-group-spaced", style: { "marginBottom": "1rem" } },
+                        React.createElement(
+                            "button",
+                            { className: "btn btn-common", onClick: self.markReportAsFixed.bind(self, index) },
+                            "Mark as fixed"
+                        ),
+                        React.createElement(
+                            "div",
+                            { className: "btn btn-common" },
+                            React.createElement(
+                                Link,
+                                { to: "/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + report.id + "/comments/new" },
+                                "Comment"
+                            )
+                        )
+                    ),
+                    reportComments
+                )
             );
         });
 
         var edited = "";
         if (this.state.issue.lastEdited) {
             edited = React.createElement(
-                "p",
+                "div",
                 null,
-                "Edit time: ",
-                this.state.issue.lastEdited
+                React.createElement(
+                    "small",
+                    null,
+                    "Edit time: ",
+                    this.state.issue.lastEdited
+                )
             );
         }
 
         return React.createElement(
             "div",
-            null,
+            { className: "container" },
             React.createElement(
                 "div",
-                { className: "col s12" },
+                { className: "row" },
                 React.createElement(
                     "div",
-                    { className: "card blue-grey darken-1 white-text" },
+                    { className: "col-sm-6" },
+                    React.createElement(
+                        "h3",
+                        null,
+                        this.state.issue.title
+                    ),
                     React.createElement(
                         "div",
-                        { className: "card-content" },
+                        { className: "label-group", style: { "marginBottom": "1rem" } },
                         React.createElement(
                             "span",
-                            { className: "card-title" },
-                            this.state.issue.title
-                        ),
-                        React.createElement(
-                            "p",
-                            null,
-                            this.state.issue.description
-                        ),
-                        React.createElement(
-                            "div",
-                            { className: "chip" },
+                            { className: "label label-default" },
                             this.state.issue.type
                         ),
                         React.createElement(
-                            "div",
-                            { className: "chip" },
+                            "span",
+                            { className: "label label-default" },
                             this.state.issue.status
-                        ),
-                        React.createElement(
-                            "p",
-                            null,
-                            "Reported by: ",
-                            this.state.issue.reporter.username
-                        ),
-                        React.createElement(
-                            "p",
-                            null,
-                            "At ",
-                            this.state.issue.time
-                        ),
-                        edited
+                        )
+                    ),
+                    React.createElement(
+                        "div",
+                        null,
+                        this.state.issue.description
                     )
                 )
             ),
             React.createElement(
-                "ul",
-                { className: "collection" },
-                steps
-            ),
-            React.createElement(
-                "button",
-                { className: "waves-effect waves-light btn" },
+                "div",
+                { className: "row" },
                 React.createElement(
-                    Link,
-                    { to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new" },
-                    "Create report"
+                    "div",
+                    { className: "col-sm-6" },
+                    React.createElement(
+                        "ol",
+                        { className: "common-list" },
+                        steps
+                    )
                 )
             ),
             React.createElement(
-                "button",
-                { className: "waves-effect waves-light btn" },
+                "div",
+                { className: "row" },
                 React.createElement(
-                    Link,
-                    { to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/comments/new" },
-                    "Add comment"
+                    "div",
+                    { className: "col-sm-6" },
+                    React.createElement(
+                        "div",
+                        null,
+                        React.createElement(
+                            "small",
+                            null,
+                            "Reported by: ",
+                            this.state.issue.reporter.username
+                        )
+                    ),
+                    React.createElement(
+                        "div",
+                        null,
+                        React.createElement(
+                            "small",
+                            null,
+                            "At ",
+                            this.state.issue.time
+                        )
+                    ),
+                    edited
                 )
             ),
             React.createElement(
-                "button",
-                { className: "waves-effect waves-light btn" },
+                "div",
+                { className: "row", style: { "marginTop": "2rem", "marginBottom": "2rem" } },
                 React.createElement(
-                    Link,
-                    { to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit" },
-                    "Edit issue"
+                    "div",
+                    { className: "col-sm-6 btn-group-spaced" },
+                    React.createElement(
+                        "button",
+                        { className: "btn btn-common" },
+                        React.createElement(
+                            Link,
+                            { to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new" },
+                            "Add report"
+                        )
+                    ),
+                    React.createElement(
+                        "button",
+                        { className: "btn btn-common" },
+                        React.createElement(
+                            Link,
+                            { to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/comments/new" },
+                            "Add comment"
+                        )
+                    ),
+                    React.createElement(
+                        "button",
+                        { className: "btn btn-common" },
+                        React.createElement(
+                            Link,
+                            { to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit" },
+                            "Edit issue"
+                        )
+                    )
                 )
             ),
             comments,
@@ -24490,16 +24568,16 @@ module.exports = React.createClass({
         var content = this.state.issues.map(function (issue, index) {
             return React.createElement(
                 "div",
-                { className: "col m3 s12", key: index },
+                { className: "col-sm-4", key: index },
                 React.createElement(
                     "div",
-                    { className: "card blue-grey darken-1 white-text" },
+                    { className: "card" },
                     React.createElement(
                         "div",
-                        { className: "card-content" },
+                        { className: "card-block" },
                         React.createElement(
-                            "p",
-                            { className: "card-title" },
+                            "div",
+                            { className: "card-title font-weight-bold" },
                             React.createElement(
                                 Link,
                                 { to: "/app/" + self.props.params.programId + "/issue/" + issue.id },
@@ -24508,17 +24586,21 @@ module.exports = React.createClass({
                         ),
                         React.createElement(
                             "div",
-                            { className: "chip" },
-                            issue.type
-                        ),
-                        React.createElement(
-                            "div",
-                            { className: "chip" },
-                            issue.status
+                            { className: "label-group" },
+                            React.createElement(
+                                "span",
+                                { className: "label label-default" },
+                                issue.type
+                            ),
+                            React.createElement(
+                                "span",
+                                { className: "label label-default" },
+                                issue.status
+                            )
                         ),
                         React.createElement(
                             "p",
-                            null,
+                            { className: "card-text" },
                             "Reported on ",
                             issue.time
                         )
@@ -24528,24 +24610,7 @@ module.exports = React.createClass({
         });
         return React.createElement(
             "div",
-            { className: "col s12" },
-            React.createElement(
-                "div",
-                { className: "row" },
-                React.createElement(
-                    "div",
-                    { className: "col s4" },
-                    React.createElement(
-                        "button",
-                        { className: "waves-effect waves-light btn" },
-                        React.createElement(
-                            Link,
-                            { to: "/app/" + self.props.params.programId + "/issue/new" },
-                            "Create an issue"
-                        )
-                    )
-                )
-            ),
+            { className: "container" },
             React.createElement(
                 "div",
                 { className: "row" },
@@ -24583,20 +24648,48 @@ module.exports = React.createClass({
             null,
             React.createElement(
                 "div",
-                { className: "col s12" },
+                { className: "banner" },
                 React.createElement(
                     "div",
-                    { className: "card blue-grey darken-1 white-text" },
+                    { className: "container" },
                     React.createElement(
                         "div",
-                        { className: "card-content" },
+                        { className: "row" },
                         React.createElement(
-                            "span",
-                            { className: "card-title" },
+                            "div",
+                            { className: "col-sm-3 vertical-flex-parent" },
                             React.createElement(
-                                Link,
-                                { to: "/app/" + this.props.params.programId + "/issue" },
-                                this.state.program.name
+                                "div",
+                                { style: { "width": "100%" } },
+                                React.createElement("img", { src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid" })
+                            )
+                        ),
+                        React.createElement(
+                            "div",
+                            { className: "col-sm-9 banner-body" },
+                            React.createElement(
+                                "h4",
+                                { className: "card-title" },
+                                React.createElement(
+                                    Link,
+                                    { to: "/app/" + this.props.params.programId + "/issue" },
+                                    this.state.program.name
+                                )
+                            ),
+                            React.createElement(
+                                "p",
+                                null,
+                                "Issues: ",
+                                this.state.program.issues
+                            ),
+                            React.createElement(
+                                "button",
+                                { className: "btn btn-common" },
+                                React.createElement(
+                                    Link,
+                                    { to: "/app/" + this.props.params.programId + "/issue/new" },
+                                    "Create an issue"
+                                )
                             )
                         )
                     )
@@ -24635,46 +24728,42 @@ var ReportComment = React.createClass({
 
         return React.createElement(
             "div",
-            null,
+            { className: "row" },
             React.createElement(
                 "div",
-                null,
+                { className: "col-sm-12" },
                 React.createElement(
                     "div",
-                    { className: "card green lighten-4" },
+                    { className: "card" },
                     React.createElement(
                         "div",
-                        { className: "card-content" },
+                        { className: "card-block" },
                         React.createElement(
                             "p",
-                            null,
+                            { className: "card-text" },
                             this.props.comment.comment
                         ),
                         React.createElement("br", null),
                         React.createElement(
                             "p",
-                            null,
+                            { className: "card-text" },
                             "Posted ",
                             this.props.comment.timeCreated
-                        )
-                    ),
-                    React.createElement(
-                        "div",
-                        { className: "card-action" },
+                        ),
                         React.createElement(
                             "button",
-                            { type: "button", onClick: this.replyTo.bind(this, this.props.comment.id) },
+                            { type: "button", className: "btn btn-common", onClick: this.replyTo.bind(this, this.props.comment.id) },
                             "Reply"
                         )
                     )
-                )
-            ),
-            React.createElement(
-                "div",
-                { className: this.state.show ? "" : "hide" },
-                React.createElement(CreateIssueReportComment, { reportId: this.props.reportId, params: this.props.params, parentComment: this.props.comment.id })
-            ),
-            children
+                ),
+                React.createElement(
+                    "div",
+                    { className: this.state.show ? "" : "hide" },
+                    React.createElement(CreateIssueReportComment, { reportId: this.props.reportId, params: this.props.params, parentComment: this.props.comment.id })
+                ),
+                children
+            )
         );
     }
 });

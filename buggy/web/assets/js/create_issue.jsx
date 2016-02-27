@@ -6,10 +6,6 @@ module.exports = React.createClass({
             reproductionSteps: [],
         }
     },
-    componentDidMount: function() {
-        var self = this;
-        $('select').material_select();
-    },
     addReproductionStep: function() {
         var currentReproductionSteps = this.state.reproductionSteps;
         currentReproductionSteps.push({
@@ -54,42 +50,50 @@ module.exports = React.createClass({
         var steps = this.state.reproductionSteps.map(function(step, index) {
             return (
                 <div key={index}>
-                    <div className="input-field col s9">
-                        <input type="text" placeholder="What did you do?" value={step.instruction.length > 0 ? step.instruction : null} ref={"instruction" + index} />
-                        <label className="active">Step {index + 1}</label>
-                    </div>
-                    <button className="waves-effect waves-light btn col s3 red" type="button" onClick={self.removeReproductionStep.bind(self, index)}>Delete</button>
+                    <fieldset className="form-group">
+                        <label>Step {index + 1}</label>
+                        <input className="form-control" type="text" placeholder="What did you do?" value={step.instruction.length > 0 ? step.instruction : null} ref={"instruction" + index} />
+                        <div className="btn-group form-sequence-buttons pull-sm-right">
+                            <button className="btn btn-red" type="button" onClick={self.removeReproductionStep.bind(self, index)}>Delete</button>
+                        </div>
+                    </fieldset>
                 </div>
             );
         });
         return (
-            <div>
-                <h1>New issue</h1>
-                <form method="post" onSubmit={this.createIssue}>
-                    <div className="input-field col s12">
-                        <input type="text" placeholder="A short descriptive title" ref="title"></input>
-                        <label>Title</label>
+            <div className="container">
+                <div className="row">
+                    <div className="col-sm-12">
+                        <h1>New issue</h1>
                     </div>
-                    <div className="input-field col s12">
-                        <textarea className="materialize-textarea" placeholder="A description of the problem" ref="description"></textarea>
-                        <label>Description</label>
+                    <div className="col-sm-6">
+                        <form method="post" onSubmit={this.createIssue}>
+                            <fieldset className="form-group">
+                                <label>Title</label>
+                                <input type="text" className="form-control" placeholder="A short descriptive title" ref="title"></input>
+                            </fieldset>
+                            <fieldset className="form-group">
+                                <label>Description</label>
+                                <textarea className="form-control" placeholder="A description of the problem" ref="description"></textarea>
+                            </fieldset>
+                            <fieldset className="form-group">
+                                <label>Issue type</label>
+                                <select defaultValue="" ref="type" className="form-control">
+                                    <option value="" disabled></option>
+                                    <option value="Bug">Bug</option>
+                                    <option value="Feature">Feature</option>
+                                    <option value="UX">UX</option>
+                                    <option value="Graphic">Graphic</option>
+                                </select>
+                            </fieldset>
+                            {steps}
+                            <button type="button" className="btn btn-common" onClick={this.addReproductionStep}>Add step</button>
+                            <div className="col s12" style={{"marginTop": "2rem"}}>
+                                <button type="submit" className="btn btn-common">Submit</button>
+                            </div>
+                        </form>
                     </div>
-                    <div className="input-field col s6">
-                        <select value="" ref="type">
-                            <option value="" disabled></option>
-                            <option value="Bug">Bug</option>
-                            <option value="Feature">Feature</option>
-                            <option value="UX">UX</option>
-                            <option value="Graphic">Graphic</option>
-                        </select>
-                        <label>Issue type</label>
-                    </div>
-                    {steps}
-                    <div className="col s12">
-                        <button type="button" className="waves-effect waves-light btn" onClick={this.addReproductionStep}>Add step</button>
-                    </div>
-                    <button type="submit" className="waves-effect waves-light btn">Submit</button>
-                </form>
+                </div>
             </div>
         );
     }

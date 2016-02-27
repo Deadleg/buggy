@@ -4,6 +4,7 @@
 
 CREATE TABLE programs (
     id SERIAL PRIMARY KEY,
+    image     VARCHAR(50) NOT NULL,
     name      VARCHAR(30) NOT NULL
 );
 
