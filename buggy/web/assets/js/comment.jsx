@@ -27,8 +27,7 @@ var Comment = React.createClass({
                     <div className="card">
                         <div className="card-block">
                             <p className="card-text">{this.props.comment.comment}</p>
-                            <br />
-                            <p className="card-text">Posted {this.props.comment.timeCreated}</p>
+                            <p className="card-text"><small>Posted {this.props.comment.timeCreated}</small></p>
                             <button type="button" className="btn btn-common" onClick={this.replyTo.bind(this, this.props.comment.id)}>Reply</button>
                         </div>
                     </div>

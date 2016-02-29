@@ -2,6 +2,11 @@ var React = require("react");
 var Link = require('react-router').Link
 var Comment = require("./comment.jsx");
 var ReportComment = require("./report_comment.jsx");
+var ReactTabs = require("react-tabs");
+var Tab = ReactTabs.Tab;
+var Tabs = ReactTabs.Tabs;
+var TabList = ReactTabs.TabList;
+var TabPanel = ReactTabs.TabPanel;
 
 module.exports = React.createClass({
     getInitialState: function() {
@@ -49,6 +54,11 @@ module.exports = React.createClass({
             console.log(data);
             self.setState({comments: data});
         });
+
+        $("#issueTabs a").click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
     },
     markReportAsFixed: function(reportId) {
         $.post(
@@ -92,24 +102,27 @@ module.exports = React.createClass({
             }
 
             return (
-                <div key={index} className="row" style={{"marginBottom": "1rem"}}>
-                    <div className="col-sm-12" style={{"marginBottom": "1rem"}}>
-                        <div>{report.description}</div>
-                        <p>{report.specs}</p>
-                        <div className="label-group">
-                            <div className="label label-default">{report.status}</div>
-                            <div className="label label-default">{report.type}</div>
-                            <div className="label label-default">{report.confirmed ? "Confirmed" : "Unconfirmed"}</div>
-                        </div>
-                        <div><small>Reported by {report.reporter.username}</small></div>
-                        <div><small>At {report.time}</small></div>
-                        <div className="btn-group-spaced" style={{"marginBottom": "1rem"}}>
-                            <button className="btn btn-common" onClick={self.markReportAsFixed.bind(self, index)}>Mark as fixed</button>
-                            <div className="btn btn-common">
-                                <Link to={"/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + report.id + "/comments/new"}>Comment</Link>
+                <div key={index} className="col-sm-4" style={{"marginBottom": "1rem"}}>
+                    <div style={{"marginBottom": "1rem"}}>
+                        <div className="card">
+                            <div className="card-block">
+                                <div>{report.description}</div>
+                                <p>{report.specs}</p>
+                                <div className="label-group">
+                                    <div className="label label-default">{report.status}</div>
+                                    <div className="label label-default">{report.type}</div>
+                                    <div className="label label-default">{report.confirmed ? "Confirmed" : "Unconfirmed"}</div>
+                                </div>
+                                <div><small>Reported by {report.reporter.username}</small></div>
+                                <div><small>At {report.time}</small></div>
+                                <div className="btn-group-spaced" style={{"marginBottom": "1rem"}}>
+                                    <button className="btn btn-common" onClick={self.markReportAsFixed.bind(self, index)}>Mark as fixed</button>
+                                    <div className="btn btn-common">
+                                        <Link to={"/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + report.id + "/comments/new"}>Comment</Link>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        {reportComments}
                     </div>
                 </div>
             );
@@ -147,17 +160,31 @@ module.exports = React.createClass({
                     </div>
                 </div>
                 <div className="row" style={{"marginTop":"2rem", "marginBottom": "2rem"}}>
-                    <div className="col-sm-6 btn-group-spaced">
+                    <div className="col-sm-6 btn-group-spaced" id="issueTabs">
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}>Add report</Link></button>
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/comments/new"}>Add comment</Link></button>
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}>Edit issue</Link></button>
                     </div>
                 </div>
-                {comments}
-                {reports}
+                <div className="row">
+                    <div className="col-sm-12">
+                        <Tabs style={{"border": 0}}>
+                            <TabList>
+                                <Tab className="btn btn-common">Reports</Tab>
+                                <Tab className="btn btn-common">Comments</Tab>
+                            </TabList>
+                            <TabPanel>
+                                <div className="row">
+                                    {reports}
+                                </div>
+                            </TabPanel>
+                            <TabPanel>
+                                {comments}
+                            </TabPanel>
+                        </Tabs>
+                    </div>
+                </div>
             </div>
         );
     }
 });
-
-
