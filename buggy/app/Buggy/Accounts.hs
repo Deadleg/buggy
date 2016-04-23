@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Buggy.Accounts (
-    googleLogin
+    googleLogin,
 ) where
 
 import qualified  Web.JWT as JWT
@@ -15,3 +15,4 @@ googleLogin rawJwt = case email of
                         Success s -> Right $ JWT.encodeUnsigned (JWT.JWTClaimsSet (JWT.stringOrURI "buggy") (JWT.stringOrURI s) (Just $ Left (fromJust $ JWT.stringOrURI "buggy")) Nothing Nothing Nothing Nothing Map.empty)
                         Error s -> Left $ pack s
     where email = fromJSON $ fromJust (Map.lookup "email" $ fromJust $ fmap (JWT.unregisteredClaims . JWT.claims) (JWT.decode rawJwt))
+

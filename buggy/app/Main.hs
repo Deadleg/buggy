@@ -14,11 +14,10 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 
 main = do
-    key <- getDefaultKey
     simpleHTTP nullConf $ msum
         [ dir "assets" $ serveDirectory EnableBrowsing [] "/home/deadleg/buggy/buggy/web/assets"
         , dirs "api/account/login/google" $ R.loginGoogle
-        , dirs "api/account/me" $ R.myDetails
+        --, dirs "api/account/me" $ R.myDetails
         , dirs "api/programs" $ path $ \programId -> dirs "issues/new" $ do method POST
                                                                             R.createIssue programId
         , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dirs "reports/new" $ do method POST
