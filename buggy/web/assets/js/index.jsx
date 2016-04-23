@@ -3,8 +3,9 @@ var ReactDOM = require('react-dom');
 var Router = require('react-router').Router
 var Route = require('react-router').Route
 var Link = require('react-router').Link
+var browserHistory = require('react-router').browserHistory
 
-var Games = React.createClass({
+var Home = React.createClass({
     getInitialState: function() {
         return {programs: []}
     },
@@ -49,15 +50,19 @@ var CreateIssue = require("./create_issue.jsx");
 var CreateIssueReport = require("./create_issue_report.jsx");
 var CreateIssueComment = require("./create_issue_comment.jsx");
 var CreateIssueReportComment = require("./create_issue_report_comment.jsx");
+var IssueReport = require("./issue_report.jsx")
+var Login = require("./login.jsx")
 
 ReactDOM.render((
-    <Router>
-        <Route path="/" component={Games}/>
+    <Router history={browserHistory}>
+        <Route path="/" component={Home}/>
+        <Route path="/account/login" component={Login}/>
         <Route path="/app/:programId" component={Program}>
             <Route path="/app/:programId/issue/new" component={CreateIssue} />
-            <Route path="/app/:programId/issue/:issueId" component={Issue} />
             <Route path="/app/:programId/issue/:issueId/edit" component={EditIssue} />
+            <Route path="/app/:programId/issue/:issueId" component={Issue} />
             <Route path="/app/:programId/issue/:issueId/report/new" component={CreateIssueReport} />
+            <Route path="/app/:programId/issue/:issueId/report/:reportId" component={IssueReport} />
             <Route path="/app/:programId/issue/:issueId/report/:reportId/comments/new" component={CreateIssueReportComment} />
             <Route path="/app/:programId/issue/:issueId/comments/new" component={CreateIssueComment} />
             <Route path="/app/:programId/issue" component={Issues} />

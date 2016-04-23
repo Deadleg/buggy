@@ -6,6 +6,7 @@ module Buggy.Rest.Program (
     getIssueForProgram,
     getProgramJSON,
     getIssueReports,
+    getIssueReport,
     createIssue,
     createIssueReport,
     updateIssue,
@@ -13,26 +14,29 @@ module Buggy.Rest.Program (
     issueFixed,
     updateIssueReport,
     createIssueComment,
-    updateIssueComment,
-    getIssueComment,
-    getIssueComments,
-    createIssueReportComment,
-    updateIssueReportComment,
+    updateIssueComment, getIssueComment, getIssueComments, createIssueReportComment, updateIssueReportComment,
     getIssueReportComment,
     getIssueReportComments,
     reportIssueReportComment,
     reportIssueComment,
+    loginGoogle
 ) where
 
 import qualified Buggy.Logic.Issue as L
 import qualified Data.ByteString.Lazy.Char8 as B
 import Buggy.Types.Types
+import Buggy.Views.Types
+import qualified Buggy.Accounts as A
 import Happstack.Server
+import Happstack.Server.ClientSession
 import Happstack.Server.Types
+import qualified Web.JWT as JWT
 import Control.Monad.IO.Class
+import Buggy.Views.Types
 import Data.Text
 import Data.Aeson
 import Data.Maybe (fromJust)
+import qualified Data.Text as T
 
 getAllPrograms :: ServerPart Response
 getAllPrograms = do
@@ -79,6 +83,11 @@ getIssueReports :: Integer -> Integer -> ServerPart Response
 getIssueReports programId issueId = do
     reports <- liftIO $ L.getIssueReports programId issueId
     ok $ toResponse reports
+
+getIssueReport :: Integer -> Integer -> Integer -> ServerPart Response
+getIssueReport programId issueId reportId = do
+    report <- liftIO $ L.getIssueReport programId issueId reportId
+    ok $ toResponse report
 
 getProgramJSON :: Integer -> ServerPart Response
 getProgramJSON programId = do
@@ -186,4 +195,23 @@ reportIssueComment programId issueId commentId = do
     case issue of
         Left s -> liftIO $ putStrLn s
         Right issue -> liftIO $ L.reportIssueComment programId issueId commentId issue
+    ok $ toResponse ("" :: Text)
+
+workingHeader = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" :: Text
+
+constructJwt jwt = let [a,b,c] = T.splitOn "." jwt in
+    workingHeader `append` "." `append` b `append` "." `append` c
+
+loginGoogle :: ServerPart Response
+loginGoogle = do
+    body <- getBody
+    let jwt = eitherDecode body :: Either String GoogleToken
+    case jwt of
+        Left s -> liftIO $ putStrLn s
+        Right jwtToken -> do
+            let cookie = A.googleLogin (constructJwt (token jwtToken))
+            liftIO $ putStrLn $ show $ cookie
+            case cookie of
+                Left er -> liftIO $ putStrLn $ unpack $ er
+                Right c -> addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack c) False True)
     ok $ toResponse ("" :: Text)

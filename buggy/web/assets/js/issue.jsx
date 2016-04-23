@@ -27,6 +27,16 @@ module.exports = React.createClass({
             show: []
         }
     },
+    markReportAsFixed: function(reportId) {
+        $.post(
+            "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/reports/" + reportId + "/fixed",
+            "",
+            function(data) {
+                console.log("fixed");
+            },
+            "json"
+         );
+    },
     componentDidMount: function() {
         var self = this;
 
@@ -60,16 +70,6 @@ module.exports = React.createClass({
             $(this).tab('show');
         });
     },
-    markReportAsFixed: function(reportId) {
-        $.post(
-            "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/reports/" + reportId + "/fixed",
-            "",
-            function(data) {
-                console.log("fixed");
-            },
-            "json"
-         );
-    },
     render: function() {
         var steps = this.state.issue.reproductionSteps.map(function(step, index) {
             return (
@@ -90,8 +90,6 @@ module.exports = React.createClass({
         var reports = this.state.reports.map(function(report, index) {
             var reportComments = null;
             if (report.comments) {
-                console.log("report")
-                console.log(report.id)
                 reportComments = report.comments.map(function(comment, index) {
                     return (
                         <div key={index}>
@@ -118,7 +116,7 @@ module.exports = React.createClass({
                                 <div className="btn-group-spaced" style={{"marginBottom": "1rem"}}>
                                     <button className="btn btn-common" onClick={self.markReportAsFixed.bind(self, index)}>Mark as fixed</button>
                                     <div className="btn btn-common">
-                                        <Link to={"/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + report.id + "/comments/new"}>Comment</Link>
+                                        <Link to={"/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + report.id}>Comments</Link>
                                     </div>
                                 </div>
                             </div>

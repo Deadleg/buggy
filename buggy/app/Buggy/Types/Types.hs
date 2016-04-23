@@ -110,6 +110,9 @@ instance ToJSON IssueReport where
                                                                                                      , "upvotes" .= upvotes
                                                                                                      ]
 
+instance ToJSON LocalTime where
+    toJSON time = toJSON $ show time
+
 instance FromJSON IssueReportStatus where
     parseJSON (String s) = pure $ read $ T.unpack s
 

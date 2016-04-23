@@ -98,7 +98,7 @@ insertIssueReport (NewIssueReport desc specs issueId programId reporter status _
 selectIssueReport :: Integer -> Integer -> Integer -> IO (IssueReport)
 selectIssueReport programId issueId reportId = do
     conn <- connectPostgreSQL connectionString
-    [(desc, specs, time, status, type_, confirmed, userId, username, upvotes)] <- query conn "SELECT i.description, i.computer_info, i.time_reported, i.status, i.type, i.confirmed, u.id, u.username, i.upvotes FROM issue_reports i INNER JOIN users u ON i.reporter=u.id WHERE i.id=?" [reportId]
+    [(desc, specs, time, status, type_, confirmed, userId, username, upvotes)] <- query conn "SELECT i.description, i.computer_info, i.time_reported, i.status, i.type, i.confirmed, u.id, u.username, i.upvotes FROM issue_reports i INNER JOIN users u ON i.reporter=u.id WHERE i.report_number=?" [reportId]
     return (ExistingIssueReport desc specs issueId programId reportId (ExistingUser userId username) (read status) (read type_) confirmed time upvotes)
 
 selectIssueReports :: Integer -> Integer -> IO ([IssueReport])
@@ -173,7 +173,7 @@ selectIssueReportComment commentId = do
 selectIssueReportComments :: Integer -> Integer -> Integer -> IO ([DbIssueReportComment])
 selectIssueReportComments programId issueId reportId = do
     conn <- connectPostgreSQL connectionString
-    xs <- query conn "SELECT id, issue_report, text, time_created, edit_time, commenter, parent_comment, upvotes FROM issue_report_comments WHERE issue_report=?;" [reportId]
+    xs <- query conn "SELECT c.id, c.issue_report, c.text, c.time_created, c.edit_time, c.commenter, c.parent_comment, c.upvotes FROM issue_report_comments c INNER JOIN issue_reports r ON c.issue_report=r.id WHERE r.report_number=?;" [reportId]
     return $ map (\(id, issueReport, text, timeCreated, editTime, userId, parentComment, upvotes) -> ExistingDbIssueReportComment issueReport text userId parentComment timeCreated editTime id upvotes) xs
 
 updateIssueReportComment :: Integer -> IssueReportComment -> IO ()

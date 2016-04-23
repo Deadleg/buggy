@@ -32,3 +32,6 @@ fabric.properties
 
 node_modules/
 .sass-cache/
+
+# happstack session
+*.aes
