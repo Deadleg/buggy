@@ -22,7 +22,8 @@ module Buggy.Types.Types (
     Reportable(..),
     convertToIssueCommentTree,
     convertToReportCommentTree,
-    toForest
+    toForest,
+    NewUser(..)
 ) where
 
 import Data.Time
@@ -48,8 +49,12 @@ data StatusType = Fixed | Open | Workaround | Reproducible | NotEnoughInformatio
 data ReproductionStep = Step { getStepDescription :: String 
                              } deriving (Eq, Show, Read)
 
+data NewUser = NewUser {
+                    email :: Text }
+                    deriving (Eq, Show, Read)
+
 data User = ExistingUser { getUserId :: Integer 
-                         , getUsername :: String 
+                         , getUsername :: Text
                          } deriving (Eq, Show, Read)
 
 instance ToJSON User where

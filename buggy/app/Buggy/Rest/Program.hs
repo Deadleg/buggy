@@ -35,7 +35,8 @@ import Control.Monad.IO.Class
 import Buggy.Views.Types
 import Data.Text
 import Data.Aeson
-import Data.Maybe (fromJust)
+import Control.Monad (when)
+import Data.Maybe (fromJust, isNothing)
 import qualified Data.Text as T
 
 getAllPrograms :: ServerPart Response
@@ -209,9 +210,11 @@ loginGoogle = do
     case jwt of
         Left s -> liftIO $ putStrLn s
         Right jwtToken -> do
-            let cookie = A.googleLogin (constructJwt (token jwtToken))
+            let fixedJwt = constructJwt (token jwtToken)
+            let email = A.getEmail fixedJwt
+            maybeUser <- liftIO $ A.getUser email
+            when (isNothing maybeUser) (liftIO $ A.newLogin (NewUser email) >> return ())
+            let cookie = A.googleLogin fixedJwt
             liftIO $ putStrLn $ show $ cookie
-            case cookie of
-                Left er -> liftIO $ putStrLn $ unpack $ er
-                Right c -> addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack c) False True)
+            addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
     ok $ toResponse ("" :: Text)

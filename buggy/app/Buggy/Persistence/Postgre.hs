@@ -26,7 +26,9 @@ module Buggy.Persistence.Postgre (
     subscribeToIssue,
     unsubscribeFromIssue,
     issueSubscriptionNotificationSent,
-    selectIssueSubscriptors
+    selectIssueSubscriptors,
+    createNewUser,
+    getUser
 ) where
 
 import Database.PostgreSQL.Simple
@@ -35,6 +37,7 @@ import Database.PostgreSQL.Simple.FromField
 import Buggy.Types.Types
 import Data.Time
 import Control.Monad
+import Data.Text (Text)
 import qualified Data.Map as M
 
 connectionString = "host='localhost' port=5433 user='buggy' password='buggy' dbname='buggy'"
@@ -71,7 +74,7 @@ selectIssues programId = do
                      \WHERE i.program=? \
                      \ORDER BY r.step_number ASC;" [programId]
     let issues = M.toList $ M.fromListWith (++)
-                [((issueId :: Integer, issueType :: String, title :: String, description :: String, timeReported :: LocalTime, status :: String, userId :: Integer, username :: String, editTime :: Maybe LocalTime, upvotes :: Integer), getReproStep (reproSteps :: Maybe String)) | (issueId, issueType, title, description, timeReported, status, userId, username, reproSteps, editTime, upvotes) <- xs]
+                [((issueId :: Integer, issueType :: String, title :: String, description :: String, timeReported :: LocalTime, status :: String, userId :: Integer, username :: Text, editTime :: Maybe LocalTime, upvotes :: Integer), getReproStep (reproSteps :: Maybe String)) | (issueId, issueType, title, description, timeReported, status, userId, username, reproSteps, editTime, upvotes) <- xs]
     return $ map (\((issueId, issueType, title, description, timeReported, status, userId, username, editTime, upvotes), reproSteps) ->
             (Existing programId issueId (title :: String) (description :: String) (read issueType) (map (\step -> Step step) reproSteps) (timeReported :: LocalTime) (read status) (ExistingUser userId username) editTime upvotes)) issues
 
@@ -199,3 +202,19 @@ issueSubscriptionNotificationSent issueId = return () -- TODO
 
 selectIssueSubscriptors :: Integer -> IO ([User])
 selectIssueSubscriptors issueId = return []
+
+createNewUser :: NewUser -> IO (Integer)
+createNewUser (NewUser email) = do
+    conn <- connectPostgreSQL connectionString
+    [Only userId] <- query conn "INSERT INTO users (username) VALUES (?) RETURNING id" [email]
+    return userId
+
+getUser :: Text -> IO (Maybe User)
+getUser email = do
+    conn <- connectPostgreSQL connectionString
+    rows <- query conn "SELECT id, username FROM users WHERE username = ?" [email]
+    return $ maybeUser rows
+
+maybeUser :: [(Integer, Text)] -> Maybe User
+maybeUser [] = Nothing
+maybeUser [(id, username)] = Just $ ExistingUser id username

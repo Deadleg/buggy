@@ -10,8 +10,8 @@ CREATE TABLE programs (
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    email VARCHAR(64),
-    username  VARCHAR(10) NOT NULL,
+    email VARCHAR(64) UNIQUE,
+    username  VARCHAR(10) NOT NULL UNIQUE,
     auto_issue_subscription BOOLEAN DEFAULT FALSE
 );
 
