@@ -19,7 +19,8 @@ module Buggy.Rest.Program (
     getIssueReportComments,
     reportIssueReportComment,
     reportIssueComment,
-    loginGoogle
+    loginGoogle,
+    loginSteam
 ) where
 
 import qualified Buggy.Logic.Issue as L
@@ -33,7 +34,6 @@ import Happstack.Server.Types
 import qualified Web.JWT as JWT
 import Control.Monad.IO.Class
 import Buggy.Views.Types
-import Data.Text
 import Data.Aeson
 import Control.Monad (when)
 import Data.Maybe (fromJust, isNothing)
@@ -187,7 +187,7 @@ reportIssueReportComment programId issueId reportId commentId = do
     case issue of
         Left s -> liftIO $ putStrLn s
         Right issue -> liftIO $ L.reportIssueReportComment programId issueId reportId commentId issue
-    ok $ toResponse ("" :: Text)
+    ok $ toResponse ("" :: T.Text)
 
 reportIssueComment :: Integer -> Integer -> Integer -> ServerPart Response
 reportIssueComment programId issueId commentId = do
@@ -196,12 +196,13 @@ reportIssueComment programId issueId commentId = do
     case issue of
         Left s -> liftIO $ putStrLn s
         Right issue -> liftIO $ L.reportIssueComment programId issueId commentId issue
-    ok $ toResponse ("" :: Text)
+    ok $ toResponse ("" :: T.Text)
 
-workingHeader = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" :: Text
+workingHeader = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" :: T.Text
 
+-- Needed since the JWT doesn't support this type of header
 constructJwt jwt = let [a,b,c] = T.splitOn "." jwt in
-    workingHeader `append` "." `append` b `append` "." `append` c
+    workingHeader `T.append` "." `T.append` b `T.append` "." `T.append` c
 
 loginGoogle :: ServerPart Response
 loginGoogle = do
@@ -217,4 +218,17 @@ loginGoogle = do
             let cookie = A.googleLogin fixedJwt
             liftIO $ putStrLn $ show $ cookie
             addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
-    ok $ toResponse ("" :: Text)
+    ok $ toResponse ("" :: T.Text)
+
+loginSteam :: ServerPart Response
+loginSteam = do
+    claimedId <- look "openid.claimed_id"
+    liftIO $ putStrLn $ claimedId
+    let steamId = last (T.splitOn "/" (T.pack claimedId))
+    maybeUser <- liftIO $ A.getUser steamId
+    when (isNothing maybeUser) (liftIO $ A.newLogin (NewUser steamId) >> return ())
+    user <- liftIO $ A.getSteamInfo steamId
+    liftIO $ putStrLn $ show user
+    let cookie = A.steamLogin steamId
+    addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
+    seeOther ("/" :: T.Text) (toResponse ("Logging you in..." :: T.Text))

@@ -17,6 +17,7 @@ main = do
     simpleHTTP nullConf $ msum
         [ dir "assets" $ serveDirectory EnableBrowsing [] "/home/deadleg/buggy/buggy/web/assets"
         , dirs "api/account/login/google" $ R.loginGoogle
+        , dirs "login/steam" $ R.loginSteam
         --, dirs "api/account/me" $ R.myDetails
         , dirs "api/programs" $ path $ \programId -> dirs "issues/new" $ do method POST
                                                                             R.createIssue programId
