@@ -212,9 +212,9 @@ loginGoogle = do
         Left s -> liftIO $ putStrLn s
         Right jwtToken -> do
             let fixedJwt = constructJwt (token jwtToken)
-            let email = A.getEmail fixedJwt
-            maybeUser <- liftIO $ A.getUser email
-            when (isNothing maybeUser) (liftIO $ A.newLogin (NewUser email) >> return ())
+            let newUser = A.makeGoogleUser fixedJwt
+            maybeUser <- liftIO $ A.getUser (username newUser)
+            when (isNothing maybeUser) (liftIO $ A.newLogin newUser >> return ())
             let cookie = A.googleLogin fixedJwt
             liftIO $ putStrLn $ show $ cookie
             addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
@@ -225,10 +225,10 @@ loginSteam = do
     claimedId <- look "openid.claimed_id"
     liftIO $ putStrLn $ claimedId
     let steamId = last (T.splitOn "/" (T.pack claimedId))
-    maybeUser <- liftIO $ A.getUser steamId
-    when (isNothing maybeUser) (liftIO $ A.newLogin (NewUser steamId) >> return ())
     user <- liftIO $ A.getSteamInfo steamId
-    liftIO $ putStrLn $ show user
+    let newUser = A.makeSteamUser user
+    maybeUser <- liftIO $ A.getUser (username newUser)
+    when (isNothing maybeUser) (liftIO $ A.newLogin newUser >> return ())
     let cookie = A.steamLogin steamId
     addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
     seeOther ("/" :: T.Text) (toResponse ("Logging you in..." :: T.Text))

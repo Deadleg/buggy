@@ -23,7 +23,8 @@ module Buggy.Types.Types (
     convertToIssueCommentTree,
     convertToReportCommentTree,
     toForest,
-    NewUser(..)
+    NewUser(..),
+    LoginType(..)
 ) where
 
 import Data.Time
@@ -46,16 +47,29 @@ data IssueType = Bug | Feature | UX | Graphic deriving (Eq, Show, Read)
 
 data StatusType = Fixed | Open | Workaround | Reproducible | NotEnoughInformation deriving (Eq, Show, Read)
 
+data LoginType = Google | Steam deriving (Eq, Show, Read)
+
 data ReproductionStep = Step { getStepDescription :: String 
                              } deriving (Eq, Show, Read)
 
-data NewUser = NewUser {
-                    email :: Text }
-                    deriving (Eq, Show, Read)
+data NewUser = NewUser
+                { username :: Text
+                , email :: Maybe Text
+                , steamId :: Maybe Text
+                , loginType :: LoginType
+                } deriving (Eq, Show, Read)
 
-data User = ExistingUser { getUserId :: Integer 
-                         , getUsername :: Text
-                         } deriving (Eq, Show, Read)
+data User = ExistingUser
+                { getUserId :: Integer
+                , getUsername :: Text
+                } |
+             FullExistingUser
+                { getUserId :: Integer
+                , getUsername :: Text
+                , getUserEmail :: Maybe Text
+                , getUserSteamId :: Maybe Text
+                , getUserLoginType :: LoginType
+                } deriving (Eq, Show, Read)
 
 instance ToJSON User where
     toJSON (ExistingUser id name) = object ["id" .= id, "username" .= name]

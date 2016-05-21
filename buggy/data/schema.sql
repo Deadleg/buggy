@@ -12,7 +12,11 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(64) UNIQUE,
     username  VARCHAR(10) NOT NULL UNIQUE,
-    auto_issue_subscription BOOLEAN DEFAULT FALSE
+    login_type  VARCHAR(10) NOT NULL,
+    auto_issue_subscription BOOLEAN DEFAULT FALSE,
+    steam_id VARCHAR(64),
+    CONSTRAINT login_types CHECK (login_type in ('Google', 'Steam')),
+    CONSTRAINT steam_id CHECK (login_type='Steam' AND steam_id IS NOT NULL),
 );
 
 CREATE TABLE issues (

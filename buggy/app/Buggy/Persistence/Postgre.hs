@@ -204,9 +204,9 @@ selectIssueSubscriptors :: Integer -> IO ([User])
 selectIssueSubscriptors issueId = return []
 
 createNewUser :: NewUser -> IO (Integer)
-createNewUser (NewUser email) = do
+createNewUser (NewUser username email steamId loginType) = do
     conn <- connectPostgreSQL connectionString
-    [Only userId] <- query conn "INSERT INTO users (username) VALUES (?) RETURNING id" [email]
+    [Only userId] <- query conn "INSERT INTO users (username, email, steam_id, login_type) VALUES (?,?,?,?) RETURNING id" (username, email, steamId, show loginType)
     return userId
 
 getUser :: Text -> IO (Maybe User)

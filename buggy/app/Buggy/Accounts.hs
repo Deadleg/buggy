@@ -7,7 +7,9 @@ module Buggy.Accounts (
     getUser,
     getSteamInfo,
     SteamUser(..),
-    SteamResponse(..)
+    SteamResponse(..),
+    makeGoogleUser,
+    makeSteamUser
 ) where
 
 import qualified  Web.JWT as JWT
@@ -15,11 +17,14 @@ import qualified  Data.Map as Map
 import Data.Maybe
 import Data.Aeson
 import Data.Text hiding (head)
+import Data.Text.Lazy.Encoding (encodeUtf8)
+import qualified Data.Text.Lazy as L
 import Buggy.Views.Types
 import Buggy.Types.Types
 import Network.HTTP.Simple
 import Network.HTTP.Conduit
 import qualified Buggy.Persistence.Postgre as DB
+import qualified Data.ByteString.Lazy as B
 
 data SteamUser = SteamUser {
     steamid :: String,
@@ -60,7 +65,27 @@ newLogin :: NewUser -> IO (User)
 newLogin newUser = do
     id <- DB.createNewUser newUser
     putStrLn "new user"
-    return $ ExistingUser id (email newUser)
+    return $ ExistingUser id (username newUser)
+
+data GoogleJWT = GoogleJWT
+                    { gEmail :: Text
+                    , gName :: Text
+                    , locale :: Text
+                    } deriving (Eq, Read, Show)
+
+instance FromJSON GoogleJWT where
+    parseJSON (Object v) = GoogleJWT <$>
+                                v .: "email" <*>
+                                v .: "name" <*>
+                                v .: "locale"
+
+makeGoogleUser :: JWT.JSON -> NewUser
+makeGoogleUser rawJwt = NewUser (gName gJwt) (Just $ gEmail gJwt) Nothing Google
+    where [_, payload, _] = fmap encodeUtf8 (L.splitOn "." (L.fromStrict rawJwt))
+          gJwt = fromJust (decode payload :: Maybe GoogleJWT)
+
+makeSteamUser :: SteamUser -> NewUser
+makeSteamUser (SteamUser steamId username realname locale) = NewUser (pack username) Nothing (Just $ pack steamId) Steam
 
 getUser :: Text -> IO (Maybe User)
 getUser email = DB.getUser email
