@@ -20,7 +20,9 @@ module Buggy.Rest.Program (
     reportIssueReportComment,
     reportIssueComment,
     loginGoogle,
-    loginSteam
+    loginSteam,
+    getMeBasic,
+    signout
 ) where
 
 import qualified Buggy.Logic.Issue as L
@@ -38,6 +40,19 @@ import Data.Aeson
 import Control.Monad (when)
 import Data.Maybe (fromJust, isNothing)
 import qualified Data.Text as T
+
+signout :: ServerPart Response
+signout = do
+    expireCookie "buggy-user"
+    seeOther ("/" :: T.Text) (toResponse ("Signing you out..." :: T.Text))
+
+getMeBasic :: ServerPart Response
+getMeBasic = do
+    cookie <- lookCookieValue "buggy-user"
+    liftIO $ putStrLn $ "ME"
+    user <- liftIO $ A.getBuggyUser (T.pack cookie)
+    liftIO $ putStrLn $ show user
+    ok $ toResponse user
 
 getAllPrograms :: ServerPart Response
 getAllPrograms = do
@@ -215,20 +230,18 @@ loginGoogle = do
             let newUser = A.makeGoogleUser fixedJwt
             maybeUser <- liftIO $ A.getUser (username newUser)
             when (isNothing maybeUser) (liftIO $ A.newLogin newUser >> return ())
-            let cookie = A.googleLogin fixedJwt
-            liftIO $ putStrLn $ show $ cookie
+            let cookie = A.googleLogin newUser
             addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
     ok $ toResponse ("" :: T.Text)
 
 loginSteam :: ServerPart Response
 loginSteam = do
     claimedId <- look "openid.claimed_id"
-    liftIO $ putStrLn $ claimedId
     let steamId = last (T.splitOn "/" (T.pack claimedId))
     user <- liftIO $ A.getSteamInfo steamId
     let newUser = A.makeSteamUser user
     maybeUser <- liftIO $ A.getUser (username newUser)
     when (isNothing maybeUser) (liftIO $ A.newLogin newUser >> return ())
-    let cookie = A.steamLogin steamId
+    let cookie = A.steamLogin newUser
     addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
     seeOther ("/" :: T.Text) (toResponse ("Logging you in..." :: T.Text))

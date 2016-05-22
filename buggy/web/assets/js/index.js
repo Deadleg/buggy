@@ -25245,7 +25245,7 @@ var Home = React.createClass({
     displayName: 'Home',
 
     getInitialState: function () {
-        return { programs: [] };
+        return { programs: [], user: {} };
     },
     componentDidMount: function () {
         var self = this;
@@ -25929,7 +25929,7 @@ var Login = React.createClass({
                     { className: "col-sm-12" },
                     React.createElement(
                         "a",
-                        { id: "login", href: "https://steamcommunity.com/openid/login?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.mode=checkid_setup&openid.return_to=http%3A%2F%2Flocalhost:8000%2Flogin%2Fsteam&openid.realm=http%3A%2F%2Flocalhost:8000&openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fextensions%2Fsreg%2F1.1&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select" },
+                        { href: "https://steamcommunity.com/openid/login?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.mode=checkid_setup&openid.return_to=http%3A%2F%2Flocalhost:8000%2Flogin%2Fsteam&openid.realm=http%3A%2F%2Flocalhost:8000&openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fextensions%2Fsreg%2F1.1&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select" },
                         React.createElement("img", { src: "https://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_small.png" })
                     )
                 )

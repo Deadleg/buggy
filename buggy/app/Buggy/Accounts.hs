@@ -8,8 +8,10 @@ module Buggy.Accounts (
     getSteamInfo,
     SteamUser(..),
     SteamResponse(..),
+    GoogleJWT(..),
     makeGoogleUser,
-    makeSteamUser
+    makeSteamUser,
+    getBuggyUser
 ) where
 
 import qualified  Web.JWT as JWT
@@ -24,7 +26,8 @@ import Buggy.Types.Types
 import Network.HTTP.Simple
 import Network.HTTP.Conduit
 import qualified Buggy.Persistence.Postgre as DB
-import qualified Data.ByteString.Lazy as B
+import qualified Data.ByteString.Lazy as LBS
+import qualified Data.ByteString.Base64 as BB
 
 data SteamUser = SteamUser {
     steamid :: String,
@@ -49,8 +52,8 @@ instance FromJSON SteamUser where
                 v .: "realname" <*>
                 v .: "loccountrycode"
 
-steamLogin :: Text -> JWT.JSON
-steamLogin steamId = JWT.encodeUnsigned (JWT.JWTClaimsSet (JWT.stringOrURI "buggy") (JWT.stringOrURI (steamId)) (Just $ Left (fromJust $ JWT.stringOrURI "buggy")) Nothing Nothing Nothing Nothing Map.empty)
+steamLogin :: NewUser -> JWT.JSON
+steamLogin (NewUser username _ _ _) = JWT.encodeUnsigned (JWT.JWTClaimsSet (JWT.stringOrURI "buggy") (JWT.stringOrURI username) (Just $ Left (fromJust $ JWT.stringOrURI "buggy")) Nothing Nothing Nothing Nothing Map.empty)
 
 getSteamInfo :: Text -> IO (SteamUser)
 getSteamInfo steamId = do
@@ -58,8 +61,8 @@ getSteamInfo steamId = do
     response <- httpJSON request
     return (head $ players $ steamResponse (getResponseBody response :: SteamResponse))
 
-googleLogin :: JWT.JSON -> JWT.JSON
-googleLogin rawJwt = JWT.encodeUnsigned (JWT.JWTClaimsSet (JWT.stringOrURI "buggy") (JWT.stringOrURI (getEmail rawJwt)) (Just $ Left (fromJust $ JWT.stringOrURI "buggy")) Nothing Nothing Nothing Nothing Map.empty)
+googleLogin :: NewUser -> JWT.JSON
+googleLogin (NewUser username _ _ _) = JWT.encodeUnsigned (JWT.JWTClaimsSet (JWT.stringOrURI "buggy") (JWT.stringOrURI username) (Just $ Left (fromJust $ JWT.stringOrURI "buggy")) Nothing Nothing Nothing Nothing Map.empty)
 
 newLogin :: NewUser -> IO (User)
 newLogin newUser = do
@@ -82,7 +85,7 @@ instance FromJSON GoogleJWT where
 makeGoogleUser :: JWT.JSON -> NewUser
 makeGoogleUser rawJwt = NewUser (gName gJwt) (Just $ gEmail gJwt) Nothing Google
     where [_, payload, _] = fmap encodeUtf8 (L.splitOn "." (L.fromStrict rawJwt))
-          gJwt = fromJust (decode payload :: Maybe GoogleJWT)
+          gJwt = fromJust (decode (LBS.fromStrict $ BB.decodeLenient $ LBS.toStrict payload) :: Maybe GoogleJWT)
 
 makeSteamUser :: SteamUser -> NewUser
 makeSteamUser (SteamUser steamId username realname locale) = NewUser (pack username) Nothing (Just $ pack steamId) Steam
@@ -95,4 +98,8 @@ getEmail rawJwt = case result of
                         Success email -> email
                         Error s -> pack s
      where result = fromJSON $ fromJust (Map.lookup "email" $ fromJust $ fmap (JWT.unregisteredClaims . JWT.claims) (JWT.decode rawJwt))
+
+getBuggyUser :: JWT.JSON -> IO (Maybe User)
+getBuggyUser jwt = getUser username
+    where username = (pack . show . fromJust . JWT.sub . JWT.claims . fromJust . JWT.decode) jwt
 

@@ -24,3 +24,4 @@ indexPage = do
     ok $ mainTemplate Nothing "Welcome to buggy!" $ do
         H.div ! A.id "content" $ ""
         H.script ! A.src "/assets/js/index.js" $ ""
+        H.script ! A.src "/assets/js/user.js" $ ""

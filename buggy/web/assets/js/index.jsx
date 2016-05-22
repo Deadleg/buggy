@@ -7,7 +7,7 @@ var browserHistory = require('react-router').browserHistory
 
 var Home = React.createClass({
     getInitialState: function() {
-        return {programs: []}
+        return {programs: [], user: {}}
     },
     componentDidMount: function() {
         var self = this;
