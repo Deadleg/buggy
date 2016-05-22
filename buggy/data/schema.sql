@@ -38,6 +38,11 @@ CREATE TABLE issues (
         CHECK (type in ('Bug', 'QualityOfLife', 'Feature'))
 );
 
+CREATE TABLE issue_watchers (
+    issue INTEGER NOT NULL REFERENCES issues(id),
+    user INTEGER NOT NULL REFERENCES users(id)
+);
+
 CREATE TABLE issue_subscriptions (
     user              INTEGER NOT NULL REFERENCES users(id),
     issue             INTEGER NOT NULL REFERENCES issues(id),

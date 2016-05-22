@@ -28,7 +28,9 @@ module Buggy.Persistence.Postgre (
     issueSubscriptionNotificationSent,
     selectIssueSubscriptors,
     createNewUser,
-    getUser
+    getUser,
+    getUserWatches,
+    watchIssue
 ) where
 
 import Database.PostgreSQL.Simple
@@ -41,6 +43,27 @@ import Data.Text (Text)
 import qualified Data.Map as M
 
 connectionString = "host='localhost' port=5433 user='buggy' password='buggy' dbname='buggy'"
+
+getUserWatches :: Integer -> IO ([Issue])
+getUserWatches userId = do
+    conn <- connectPostgreSQL connectionString
+    xs <- query conn "SELECT i.program, i.id, i.type, i.title, i.description, i.time_reported, i.status, u.id, u.username, r.instruction, i.edit_time, i.upvotes \
+                     \FROM issues i \
+                     \INNER JOIN issue_watchers w ON i.id=u.issue_id\
+                     \INNER JOIN users u ON i.reporter=u.id \
+                     \LEFT JOIN reproduction_steps r ON i.id=r.issue \
+                     \WHERE u.issue=? \
+                     \ORDER BY r.step_number ASC;" [userId]
+    let issues = M.toList $ M.fromListWith (++)
+                [((programId :: Integer, issueId :: Integer, issueType :: String, title :: String, description :: String, timeReported :: LocalTime, status :: String, userId :: Integer, username :: Text, editTime :: Maybe LocalTime, upvotes :: Integer), getReproStep (reproSteps :: Maybe String)) | (programId, issueId, issueType, title, description, timeReported, status, userId, username, reproSteps, editTime, upvotes) <- xs]
+    return $ map (\((programId, issueId, issueType, title, description, timeReported, status, userId, username, editTime, upvotes), reproSteps) ->
+            (Existing programId issueId (title :: String) (description :: String) (read issueType) (map (\step -> Step step) reproSteps) (timeReported :: LocalTime) (read status) (ExistingUser userId username) editTime upvotes)) issues
+
+watchIssue :: Integer -> Integer -> IO ()
+watchIssue userId issueId = do
+    conn <- connectPostgreSQL connectionString
+    execute conn "INSERT INTO issue_watchers (issue, user) VALUES (?, ?);" (issueId, userId)
+    return ()
 
 selectProgram :: Integer -> IO (Program)
 selectProgram programId = do
@@ -57,6 +80,12 @@ selectPrograms = do
 getReproStep :: Maybe String -> [String]
 getReproStep Nothing = []
 getReproStep (Just x) = [x]
+
+instance (FromField a, FromField b, FromField c, FromField d, FromField e,
+          FromField f, FromField g, FromField h, FromField i, FromField j, FromField k, FromField l) =>
+    FromRow (a,b,c,d,e,f,g,h,i,j,k,l) where
+    fromRow = (,,,,,,,,,,,) <$> field <*> field <*> field <*> field <*> field <*> field
+                          <*> field <*> field <*> field <*> field <*> field <*> field
 
 instance (FromField a, FromField b, FromField c, FromField d, FromField e,
           FromField f, FromField g, FromField h, FromField i, FromField j, FromField k) =>

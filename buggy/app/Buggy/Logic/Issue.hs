@@ -21,11 +21,19 @@ module Buggy.Logic.Issue (
     getIssueReportComment,
     getIssueReportComments,
     reportIssueComment,
-    reportIssueReportComment
+    reportIssueReportComment,
+    getUserWatches,
+    watchIssue
 ) where
 
 import qualified Buggy.Types.Types as T
 import qualified Buggy.Persistence.Postgre as P
+
+getUserWatches :: Integer -> IO ([T.Issue])
+getUserWatches userId = P.getUserWatches userId
+
+watchIssue :: Integer -> Integer -> IO ()
+watchIssue userId issueId = P.watchIssue userId issueId
 
 getPrograms :: IO ([T.Program])
 getPrograms = P.selectPrograms

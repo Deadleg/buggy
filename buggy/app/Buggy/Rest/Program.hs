@@ -22,7 +22,9 @@ module Buggy.Rest.Program (
     loginGoogle,
     loginSteam,
     getMeBasic,
-    signout
+    signout,
+    myIssueWatches,
+    watchIssue
 ) where
 
 import qualified Buggy.Logic.Issue as L
@@ -41,6 +43,25 @@ import Control.Monad (when)
 import Data.Maybe (fromJust, isNothing)
 import qualified Data.Text as T
 
+myIssueWatches :: ServerPart Response
+myIssueWatches = do
+    cookie <- lookCookieValue "buggy-user"
+    user <- liftIO $ A.getBuggyUser (T.pack cookie)
+    case user of
+        Just u -> do
+            watches <- liftIO $ L.getUserWatches (getUserId u)
+            ok $ toResponse watches
+        Nothing -> ok $ toResponse ("" :: T.Text)
+
+watchIssue :: Integer -> ServerPart Response
+watchIssue issueId = do
+    cookie <- lookCookieValue "buggy-user"
+    user <- liftIO $ A.getBuggyUser (T.pack cookie)
+    case user of
+        Just u -> liftIO $ L.watchIssue (getUserId u) issueId
+        Nothing -> return ()
+    ok $ toResponse ("" :: T.Text)
+
 signout :: ServerPart Response
 signout = do
     expireCookie "buggy-user"
@@ -49,9 +70,7 @@ signout = do
 getMeBasic :: ServerPart Response
 getMeBasic = do
     cookie <- lookCookieValue "buggy-user"
-    liftIO $ putStrLn $ "ME"
     user <- liftIO $ A.getBuggyUser (T.pack cookie)
-    liftIO $ putStrLn $ show user
     ok $ toResponse user
 
 getAllPrograms :: ServerPart Response
