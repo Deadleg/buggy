@@ -49,10 +49,10 @@ getUserWatches userId = do
     conn <- connectPostgreSQL connectionString
     xs <- query conn "SELECT i.program, i.id, i.type, i.title, i.description, i.time_reported, i.status, u.id, u.username, r.instruction, i.edit_time, i.upvotes \
                      \FROM issues i \
-                     \INNER JOIN issue_watchers w ON i.id=u.issue_id\
+                     \INNER JOIN issue_watchers w ON i.id=w.buser \
                      \INNER JOIN users u ON i.reporter=u.id \
                      \LEFT JOIN reproduction_steps r ON i.id=r.issue \
-                     \WHERE u.issue=? \
+                     \WHERE w.buser=? \
                      \ORDER BY r.step_number ASC;" [userId]
     let issues = M.toList $ M.fromListWith (++)
                 [((programId :: Integer, issueId :: Integer, issueType :: String, title :: String, description :: String, timeReported :: LocalTime, status :: String, userId :: Integer, username :: Text, editTime :: Maybe LocalTime, upvotes :: Integer), getReproStep (reproSteps :: Maybe String)) | (programId, issueId, issueType, title, description, timeReported, status, userId, username, reproSteps, editTime, upvotes) <- xs]
@@ -62,7 +62,7 @@ getUserWatches userId = do
 watchIssue :: Integer -> Integer -> IO ()
 watchIssue userId issueId = do
     conn <- connectPostgreSQL connectionString
-    execute conn "INSERT INTO issue_watchers (issue, user) VALUES (?, ?);" (issueId, userId)
+    execute conn "INSERT INTO issue_watchers (issue, buser) VALUES (?, ?);" (issueId, userId)
     return ()
 
 selectProgram :: Integer -> IO (Program)

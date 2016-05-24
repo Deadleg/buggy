@@ -102,4 +102,3 @@ getEmail rawJwt = case result of
 getBuggyUser :: JWT.JSON -> IO (Maybe User)
 getBuggyUser jwt = getUser username
     where username = (pack . show . fromJust . JWT.sub . JWT.claims . fromJust . JWT.decode) jwt
-

@@ -70,6 +70,13 @@ module.exports = React.createClass({
             $(this).tab('show');
         });
     },
+    watchIssue: function() {
+        $.post(
+            "/api/issues/me/watch/" + this.props.params.issueId
+        ).fail(function(data) {
+            console.log("watch failed", data);
+        });
+    },
     render: function() {
         var steps = this.state.issue.reproductionSteps.map(function(step, index) {
             return (
@@ -158,10 +165,11 @@ module.exports = React.createClass({
                     </div>
                 </div>
                 <div className="row" style={{"marginTop":"2rem", "marginBottom": "2rem"}}>
-                    <div className="col-sm-6 btn-group-spaced" id="issueTabs">
+                    <div className="col-sm-12 btn-group-spaced" id="issueTabs">
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}>Add report</Link></button>
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/comments/new"}>Add comment</Link></button>
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}>Edit issue</Link></button>
+                        <button className="btn btn-common" onClick={this.watchIssue}>Watch</button>
                     </div>
                 </div>
                 <div className="row">

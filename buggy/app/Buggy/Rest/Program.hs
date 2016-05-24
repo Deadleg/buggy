@@ -24,7 +24,8 @@ module Buggy.Rest.Program (
     getMeBasic,
     signout,
     myIssueWatches,
-    watchIssue
+    watchIssue,
+    getMyIssueStuffForProgram
 ) where
 
 import qualified Buggy.Logic.Issue as L
@@ -37,11 +38,35 @@ import Happstack.Server.ClientSession
 import Happstack.Server.Types
 import qualified Web.JWT as JWT
 import Control.Monad.IO.Class
+import Control.Exception
 import Buggy.Views.Types
 import Data.Aeson
+import Database.PostgreSQL.Simple (SqlError, sqlState)
 import Control.Monad (when)
 import Data.Maybe (fromJust, isNothing)
 import qualified Data.Text as T
+
+getMyIssueStuffForProgram :: Serverpart Response
+getMyIssueStuffForProgram programId issueId = do
+    req <- askRq
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    case maybeCookie of
+        Nothing -> do
+            unauthorized $ toResponse ("Not logged in!" :: T.Text)
+        Just cookie -> do
+            user <- liftIO $ A.getBuggyUser (T.pack $ cookieValue cookie)
+            case user of
+                Just u -> do
+                    success <- liftIO $ try $ L.getMyIssueStuff programId issueId (getUserId u)
+                Nothing -> do
+                    liftIO $ putStrLn "No user"
+                    unauthorized $ toResponse ("Not logged in!" :: T.Text)
+
+getBuggyCookie :: [(String, Cookie)] -> Maybe Cookie
+getBuggyCookie cookies
+    | search == [] = Nothing
+    | otherwise = Just $ snd (head search)
+    where search = filter (\x -> fst x == "buggy-user") cookies
 
 myIssueWatches :: ServerPart Response
 myIssueWatches = do
@@ -51,16 +76,30 @@ myIssueWatches = do
         Just u -> do
             watches <- liftIO $ L.getUserWatches (getUserId u)
             ok $ toResponse watches
-        Nothing -> ok $ toResponse ("" :: T.Text)
+        Nothing -> do
+            ok $ toResponse ("" :: T.Text)
 
 watchIssue :: Integer -> ServerPart Response
 watchIssue issueId = do
-    cookie <- lookCookieValue "buggy-user"
-    user <- liftIO $ A.getBuggyUser (T.pack cookie)
-    case user of
-        Just u -> liftIO $ L.watchIssue (getUserId u) issueId
-        Nothing -> return ()
-    ok $ toResponse ("" :: T.Text)
+    req <- askRq
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    case maybeCookie of
+        Nothing -> do
+            liftIO $ putStrLn "No cookie"
+            unauthorized $ toResponse ("Not logged in!" :: T.Text)
+        Just cookie -> do
+            user <- liftIO $ A.getBuggyUser (T.pack $ cookieValue cookie)
+            case user of
+                Just u -> do
+                    liftIO $ putStrLn $ show u
+                    success <- liftIO $ try $ L.watchIssue (getUserId u) issueId
+                    case success of
+                        Left ex -> do
+                            if sqlState (ex :: SqlError) == "23505" then (ok $ toResponse ("Already watching" :: T.Text)) else (badRequest $ toResponse $ show (ex :: SqlError))
+                        Right _ -> ok $ toResponse ("" :: T.Text)
+                Nothing -> do
+                    liftIO $ putStrLn "No user"
+                    unauthorized $ toResponse ("Not logged in!" :: T.Text)
 
 signout :: ServerPart Response
 signout = do

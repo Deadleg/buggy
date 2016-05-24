@@ -39,8 +39,10 @@ CREATE TABLE issues (
 );
 
 CREATE TABLE issue_watchers (
+    id SERIAL PRIMARY KEY,
     issue INTEGER NOT NULL REFERENCES issues(id),
-    user INTEGER NOT NULL REFERENCES users(id)
+    buser INTEGER NOT NULL REFERENCES users(id)
+    UNIQUE (issue, buser)
 );
 
 CREATE TABLE issue_subscriptions (

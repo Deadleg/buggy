@@ -25399,6 +25399,11 @@ module.exports = React.createClass({
             $(this).tab('show');
         });
     },
+    watchIssue: function () {
+        $.post("/api/issues/me/watch/" + this.props.params.issueId).fail(function (data) {
+            console.log("watch failed", data);
+        });
+    },
     render: function () {
         var steps = this.state.issue.reproductionSteps.map(function (step, index) {
             return React.createElement(
@@ -25611,7 +25616,7 @@ module.exports = React.createClass({
                 { className: "row", style: { "marginTop": "2rem", "marginBottom": "2rem" } },
                 React.createElement(
                     "div",
-                    { className: "col-sm-6 btn-group-spaced", id: "issueTabs" },
+                    { className: "col-sm-12 btn-group-spaced", id: "issueTabs" },
                     React.createElement(
                         "button",
                         { className: "btn btn-common" },
@@ -25638,6 +25643,11 @@ module.exports = React.createClass({
                             { to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit" },
                             "Edit issue"
                         )
+                    ),
+                    React.createElement(
+                        "button",
+                        { className: "btn btn-common", onClick: this.watchIssue },
+                        "Watch"
                     )
                 )
             ),
