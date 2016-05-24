@@ -30,7 +30,8 @@ module Buggy.Persistence.Postgre (
     createNewUser,
     getUser,
     getUserWatches,
-    watchIssue
+    watchIssue,
+    getMyIssue
 ) where
 
 import Database.PostgreSQL.Simple
@@ -43,6 +44,16 @@ import Data.Text (Text)
 import qualified Data.Map as M
 
 connectionString = "host='localhost' port=5433 user='buggy' password='buggy' dbname='buggy'"
+
+getMyIssue :: Integer -> Integer -> Integer -> IO (MyIssue)
+getMyIssue programId issueId userId = do
+    conn <- connectPostgreSQL connectionString
+    [(watching, mine)] <- query conn "SELECT i.reporter, w.buser \
+                     \FROM issues i \
+                     \INNER JOIN issue_watchers w ON i.id=w.buser \
+                     \WHERE i.id=? and i.program=? and w.buser=? \
+                     \ORDER BY r.step_number ASC;" (issueId, programId, userId)
+    return (MyIssue watching mine)
 
 getUserWatches :: Integer -> IO ([Issue])
 getUserWatches userId = do

@@ -24,7 +24,8 @@ module Buggy.Types.Types (
     convertToReportCommentTree,
     toForest,
     NewUser(..),
-    LoginType(..)
+    LoginType(..),
+    MyIssue(..)
 ) where
 
 import Data.Time
@@ -238,6 +239,15 @@ data Issue = New { getProgram :: Integer
                   , getReproductionSteps :: [ReproductionStep]
                   , getStatus :: StatusType
              } deriving (Eq, Read, Show)
+
+data MyIssue = MyIssue
+    {
+        getMyIssueIsWatching :: Bool,
+        getMyIssueIsMine :: Bool
+    }
+
+instance ToJSON MyIssue where
+    toJSON (MyIssue watching mine) = object [ "watching" .= watching, "mine" .= mine ]
 
 data DbIssueReportComment = ExistingDbIssueReportComment { getDbReportId :: Integer,
                                                            getDbReportCommentText :: Text,

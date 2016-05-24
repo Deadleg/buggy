@@ -46,7 +46,7 @@ import Control.Monad (when)
 import Data.Maybe (fromJust, isNothing)
 import qualified Data.Text as T
 
-getMyIssueStuffForProgram :: Serverpart Response
+getMyIssueStuffForProgram :: Integer -> Integer -> ServerPart Response
 getMyIssueStuffForProgram programId issueId = do
     req <- askRq
     let maybeCookie = getBuggyCookie (rqCookies req)
@@ -57,7 +57,8 @@ getMyIssueStuffForProgram programId issueId = do
             user <- liftIO $ A.getBuggyUser (T.pack $ cookieValue cookie)
             case user of
                 Just u -> do
-                    success <- liftIO $ try $ L.getMyIssueStuff programId issueId (getUserId u)
+                    myStuff <- liftIO $ L.getMyIssueStuff programId issueId (getUserId u)
+                    ok $ toResponse myStuff
                 Nothing -> do
                     liftIO $ putStrLn "No user"
                     unauthorized $ toResponse ("Not logged in!" :: T.Text)
