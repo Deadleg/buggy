@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Buggy.Rest.Program (
     getAllPrograms,
@@ -38,30 +39,37 @@ import Happstack.Server.ClientSession
 import Happstack.Server.Types
 import qualified Web.JWT as JWT
 import Control.Monad.IO.Class
+import Control.Monad.Trans.Class
 import Control.Exception
 import Buggy.Views.Types
 import Data.Aeson
 import Database.PostgreSQL.Simple (SqlError, sqlState)
-import Control.Monad (when)
+import Control.Monad (when, mzero, liftM)
 import Data.Maybe (fromJust, isNothing)
 import qualified Data.Text as T
+
+mapUserOperation :: (ToMessage a) => UserOperations a -> ServerPart Response
+mapUserOperation (Authorized a) = ok $ toResponse a
+mapUserOperation NotAuthenticated = unauthorized $ toResponse ("Not logged in!" :: T.Text)
+mapUserOperation NotAuthorized = unauthorized $ toResponse ("Not authorized!" :: T.Text)
+
+class AuthenticationRequired a where
+    doAuthenticated :: Maybe Cookie -> (User -> a) -> ServerPart Response
+
+instance (ToJSON a) => AuthenticationRequired (UserOperationsIO a) where
+    doAuthenticated Nothing f = unauthorized $ toResponse ("Not logged in!" :: T.Text)
+    doAuthenticated (Just cookie) f = do
+        maybeUser <- liftIO $ A.getBuggyUser (T.pack $ cookieValue cookie)
+        case maybeUser of
+            Nothing -> unauthorized $ toResponse ("Not logged in!" :: T.Text)
+            Just user -> (lift $ runUserOperations (f user)) >>= mapUserOperation
+
 
 getMyIssueStuffForProgram :: Integer -> Integer -> ServerPart Response
 getMyIssueStuffForProgram programId issueId = do
     req <- askRq
     let maybeCookie = getBuggyCookie (rqCookies req)
-    case maybeCookie of
-        Nothing -> do
-            unauthorized $ toResponse ("Not logged in!" :: T.Text)
-        Just cookie -> do
-            user <- liftIO $ A.getBuggyUser (T.pack $ cookieValue cookie)
-            case user of
-                Just u -> do
-                    myStuff <- liftIO $ L.getMyIssueStuff programId issueId (getUserId u)
-                    ok $ toResponse myStuff
-                Nothing -> do
-                    liftIO $ putStrLn "No user"
-                    unauthorized $ toResponse ("Not logged in!" :: T.Text)
+    doAuthenticated maybeCookie (\user -> UserOperationsT $ fmap Authorized $ L.getMyIssueStuff programId issueId (getUserId user))
 
 getBuggyCookie :: [(String, Cookie)] -> Maybe Cookie
 getBuggyCookie cookies

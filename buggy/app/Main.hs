@@ -7,11 +7,7 @@ import Buggy.Logic.Issue
 import Control.Monad (msum)
 import Control.Applicative ((<$>), optional)
 import Happstack.Server
-import Happstack.Server.ClientSession
 import Buggy.Views.Types
-import qualified Data.Text as T
-import qualified Text.Blaze.Html5 as H
-import qualified Text.Blaze.Html5.Attributes as A
 
 main = do
     simpleHTTP nullConf $ msum

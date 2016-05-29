@@ -25,7 +25,10 @@ module Buggy.Types.Types (
     toForest,
     NewUser(..),
     LoginType(..),
-    MyIssue(..)
+    MyIssue(..),
+    UserOperations(..),
+    UserOperationsT(..),
+    UserOperationsIO(..)
 ) where
 
 import Data.Time
@@ -36,9 +39,76 @@ import Happstack.Server
 import Data.List (groupBy)
 import Data.Text (Text)
 import Data.Maybe (isNothing, fromJust)
+import Control.Monad
+import Control.Monad.IO.Class
+import Control.Monad.Trans.Class
+import Control.Applicative
+import Happstack.Server (Cookie)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.ByteString.Lazy as L
+
+data UserOperations a = Authorized a | NotAuthenticated | NotAuthorized
+
+newtype UserOperationsT m a = UserOperationsT { runUserOperations :: m (UserOperations a) }
+
+type UserOperationsIO a = UserOperationsT IO a
+
+instance Functor m => Functor (UserOperationsT m) where
+    fmap f a = UserOperationsT $ fmap (fmap f) (runUserOperations a)
+
+instance Applicative m => Applicative (UserOperationsT m) where
+    pure = UserOperationsT . pure . pure
+    UserOperationsT m1 <*> userOp = UserOperationsT $ liftA2 (<*>) m1 (runUserOperations userOp)
+
+instance (Monad m, Applicative m, Functor m) => Monad (UserOperationsT m) where
+    return = UserOperationsT . return . Authorized
+
+    x >>= f = UserOperationsT $ do
+        op <- runUserOperations x
+        case op of
+            Authorized a -> runUserOperations (f a)
+            NotAuthorized -> return NotAuthorized
+            NotAuthenticated -> return NotAuthenticated
+
+instance MonadTrans UserOperationsT where
+    lift m = UserOperationsT $ liftM Authorized m
+
+instance (MonadIO m) => MonadIO (UserOperationsT m) where
+    liftIO = lift . liftIO
+
+instance Functor UserOperations where
+    fmap f (Authorized x) = Authorized (f x)
+    fmap f NotAuthenticated = NotAuthenticated
+    fmap f NotAuthorized = NotAuthorized
+
+instance Applicative UserOperations where
+    pure x = Authorized x
+
+    Authorized f <*> m = fmap f m
+    NotAuthenticated <*> _ = NotAuthenticated
+    NotAuthorized <*> _ = NotAuthorized
+
+    Authorized f *> m = m
+    NotAuthenticated *> _ = NotAuthenticated
+    NotAuthorized *> _ = NotAuthorized
+
+instance Monad UserOperations where
+    return = pure
+    op >>= f = case op of
+        Authorized a -> f a
+        NotAuthenticated -> NotAuthenticated
+        NotAuthorized -> NotAuthorized
+    fail _ = NotAuthorized
+
+instance Alternative UserOperations where
+    empty = NotAuthorized
+
+    l <|> NotAuthorized = l
+    l <|> NotAuthenticated = l
+    _ <|> r = r
+
+instance MonadPlus UserOperations
 
 instance (ToJSON a) => ToMessage a where
     toContentType _  = B.pack "application/json;charset=utf-8"
