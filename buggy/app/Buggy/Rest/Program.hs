@@ -69,7 +69,8 @@ getMyIssueStuffForProgram :: Integer -> Integer -> ServerPart Response
 getMyIssueStuffForProgram programId issueId = do
     req <- askRq
     let maybeCookie = getBuggyCookie (rqCookies req)
-    doAuthenticated maybeCookie (\user -> UserOperationsT $ fmap Authorized $ L.getMyIssueStuff programId issueId (getUserId user))
+    doAuthenticated maybeCookie (\user ->
+        lift $ L.getMyIssueStuff programId issueId (getUserId user) :: UserOperationsIO MyIssue)
 
 getBuggyCookie :: [(String, Cookie)] -> Maybe Cookie
 getBuggyCookie cookies
@@ -92,23 +93,15 @@ watchIssue :: Integer -> ServerPart Response
 watchIssue issueId = do
     req <- askRq
     let maybeCookie = getBuggyCookie (rqCookies req)
-    case maybeCookie of
-        Nothing -> do
-            liftIO $ putStrLn "No cookie"
-            unauthorized $ toResponse ("Not logged in!" :: T.Text)
-        Just cookie -> do
-            user <- liftIO $ A.getBuggyUser (T.pack $ cookieValue cookie)
-            case user of
-                Just u -> do
-                    liftIO $ putStrLn $ show u
-                    success <- liftIO $ try $ L.watchIssue (getUserId u) issueId
-                    case success of
-                        Left ex -> do
-                            if sqlState (ex :: SqlError) == "23505" then (ok $ toResponse ("Already watching" :: T.Text)) else (badRequest $ toResponse $ show (ex :: SqlError))
-                        Right _ -> ok $ toResponse ("" :: T.Text)
-                Nothing -> do
-                    liftIO $ putStrLn "No user"
-                    unauthorized $ toResponse ("Not logged in!" :: T.Text)
+    doAuthenticated maybeCookie (\user -> do
+        success <- liftIO $ try $ L.watchIssue (getUserId user) issueId
+        case success of
+            Left ex -> do
+                if sqlState (ex :: SqlError) == "23505" then
+                    (return $ "Already watching") :: UserOperationsIO T.Text
+                else
+                    UserOperationsT $ return (BadRequest 400 (T.pack $ show ex))
+            Right _ -> (return "") :: UserOperationsIO T.Text)
 
 signout :: ServerPart Response
 signout = do

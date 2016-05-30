@@ -48,7 +48,9 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.ByteString.Lazy as L
 
-data UserOperations a = Authorized a | NotAuthenticated | NotAuthorized
+type ErrorCode = Int
+
+data UserOperations a = Authorized a | NotAuthenticated | NotAuthorized | BadRequest ErrorCode Text
 
 newtype UserOperationsT m a = UserOperationsT { runUserOperations :: m (UserOperations a) }
 

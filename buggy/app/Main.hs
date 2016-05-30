@@ -11,7 +11,7 @@ import Buggy.Views.Types
 
 main = do
     simpleHTTP nullConf $ msum
-        [ dir "assets" $ serveDirectory EnableBrowsing [] "/home/deadleg/buggy/buggy/web/assets"
+        [ dir "assets" $ serveDirectory EnableBrowsing [] "/Users/williamkerrigan/william/buggy/buggy/web/assets"
         , dirs "api/account/login/google" $ R.loginGoogle
         , dirs "api/account/me/basic" $ R.getMeBasic
         , dirs "api/issues/me/watch" $ path $ \issueId -> do method POST
