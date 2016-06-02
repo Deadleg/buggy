@@ -5,7 +5,6 @@ module Buggy.Views.Index (
 ) where
 
 import Happstack.Server
-import Happstack.Server.ClientSession
 import Buggy.Views.Templates
 import Buggy.Views.Types
 import Control.Monad.IO.Class

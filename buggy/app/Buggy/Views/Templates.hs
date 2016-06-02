@@ -5,7 +5,6 @@ module Buggy.Views.Templates (
 ) where
 
 import Happstack.Server
-import Happstack.Server.ClientSession
 import Text.Blaze.Html5 ((!))
 import Buggy.Views.Types
 import Buggy.Types.Types

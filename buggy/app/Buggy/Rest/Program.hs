@@ -35,7 +35,6 @@ import Buggy.Types.Types
 import Buggy.Views.Types
 import qualified Buggy.Accounts as A
 import Happstack.Server
-import Happstack.Server.ClientSession
 import Happstack.Server.Types
 import qualified Web.JWT as JWT
 import Control.Monad.IO.Class
@@ -63,7 +62,6 @@ instance (ToJSON a) => AuthenticationRequired (UserOperationsIO a) where
         case maybeUser of
             Nothing -> unauthorized $ toResponse ("Not logged in!" :: T.Text)
             Just user -> (lift $ runUserOperations (f user)) >>= mapUserOperation
-
 
 getMyIssueStuffForProgram :: Integer -> Integer -> ServerPart Response
 getMyIssueStuffForProgram programId issueId = do

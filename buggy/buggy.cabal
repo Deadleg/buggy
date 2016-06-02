@@ -34,19 +34,18 @@ executable buggy-exe
   build-depends:       base
                      , buggy
                      , happstack-server >= 7.4.5
-                     , happstack-clientsession >= 7.3.0
                      , blaze-html >= 0.8.1.1
                      , text >= 1.1.0.0 && < 1.3
                      , postgresql-simple >= 0.5.1.2
                      , transformers >= 0.4.2.0
                      , time >= 1.5.0.1
-                     , aeson >= 0.9.0.1
+                     , aeson >= 0.11.2.0
                      , bytestring >= 0.10.6.0
                      , containers >= 0.5.6.2
                      , text >= 1.2.2.0
                      , smtp-mail >= 0.1.4.5
                      , safecopy >= 0.8.6
-                     , jwt >= 0.6.0
+                     , jwt >= 0.7.1
                      , text >= 1.2.2.0
                      , http-conduit >= 2.1.10.1
                      , base64-bytestring >= 1.0.0.1

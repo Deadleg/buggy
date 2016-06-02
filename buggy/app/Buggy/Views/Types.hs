@@ -6,7 +6,6 @@ module Buggy.Views.Types (
 ) where
 
 import Data.SafeCopy (base, deriveSafeCopy)
-import Happstack.Server.ClientSession
 import Data.Text
 import Data.Data
 import Data.Aeson
