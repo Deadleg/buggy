@@ -18,8 +18,8 @@ cabal.sandbox.config
 
 # Intellij
 *.iml
-
 .idea/
+
 *.ipr
 *.iws
 /out/
