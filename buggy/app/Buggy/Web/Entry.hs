@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Buggy.Rest.Program (
+module Buggy.Web.Entry (
     getAllPrograms,
     getIssuesForProgram,
     getIssueForProgram,
@@ -29,22 +29,21 @@ module Buggy.Rest.Program (
     getMyIssueStuffForProgram
 ) where
 
-import qualified Buggy.Logic.Issue as L
-import qualified Data.ByteString.Lazy.Char8 as B
-import Buggy.Types.Types
-import Buggy.Views.Types
-import qualified Buggy.Accounts as A
+import Buggy.Core.Types
+import Buggy.Web.Types
 import Happstack.Server
 import Happstack.Server.Types
-import qualified Web.JWT as JWT
+import Control.Monad (when, mzero, liftM)
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Class
 import Control.Exception
-import Buggy.Views.Types
 import Data.Aeson
-import Database.PostgreSQL.Simple (SqlError, sqlState)
-import Control.Monad (when, mzero, liftM)
 import Data.Maybe (fromJust, isNothing)
+import Database.PostgreSQL.Simple (SqlError, sqlState)
+import qualified Buggy.Core.Issue as L
+import qualified Data.ByteString.Lazy.Char8 as B
+import qualified Web.JWT as JWT
+import qualified Buggy.Web.Signin as A
 import qualified Data.Text as T
 
 mapUserOperation :: (ToMessage a) => UserOperations a -> ServerPart Response

@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Buggy.Logic.Issue (
+module Buggy.Core.Issue (
     createIssue,
     getIssue,
     getIssueReport,
@@ -27,7 +27,7 @@ module Buggy.Logic.Issue (
     getMyIssueStuff
 ) where
 
-import qualified Buggy.Types.Types as T
+import qualified Buggy.Core.Types as T
 import qualified Buggy.Persistence.Postgre as P
 
 getMyIssueStuff :: Integer -> Integer -> Integer -> IO (T.MyIssue)

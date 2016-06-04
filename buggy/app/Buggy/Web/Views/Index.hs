@@ -1,17 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Buggy.Views.Index (
+module Buggy.Web.Views.Index (
     indexPage
 ) where
 
+import Buggy.Web.Views.Templates
+import Buggy.Web.Types
+import Buggy.Web.Util (getBuggyCookie)
 import Happstack.Server
-import Buggy.Views.Templates
-import Buggy.Views.Types
 import Control.Monad.IO.Class
-import qualified Data.Text as T
 import Text.Blaze.Html5 ((!))
-import Buggy.Views.Types
-import Buggy.Views.Util (getBuggyCookie)
+import qualified Data.Text as T
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 

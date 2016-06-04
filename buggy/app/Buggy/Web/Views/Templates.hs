@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Buggy.Views.Templates (
+module Buggy.Web.Views.Templates (
     mainTemplate
 ) where
 
 import Happstack.Server
 import Text.Blaze.Html5 ((!))
-import Buggy.Views.Types
-import Buggy.Types.Types
+import Buggy.Web.Types
+import Buggy.Core.Types
 import qualified Data.Text as T
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A

@@ -2,7 +2,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Buggy.Types.Types (
+module Buggy.Core.Types (
     Issue(..),
     IssueType(..),
     IssueReport(..),

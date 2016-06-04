@@ -1,13 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE TemplateHaskell #-}
-module Buggy.Views.Types (
+
+module Buggy.Web.Types (
     GoogleToken(..)
 ) where
 
-import Data.SafeCopy (base, deriveSafeCopy)
 import Data.Text
-import Data.Data
 import Data.Aeson
 import qualified Web.JWT as JWT
 

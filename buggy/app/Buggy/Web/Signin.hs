@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Buggy.Accounts (
+module Buggy.Web.Signin (
     googleLogin,
     steamLogin,
     newLogin,
@@ -14,17 +14,17 @@ module Buggy.Accounts (
     getBuggyUser
 ) where
 
-import qualified  Web.JWT as JWT
-import qualified  Data.Map as Map
 import Data.Maybe
 import Data.Aeson
 import Data.Text hiding (head)
 import Data.Text.Lazy.Encoding (encodeUtf8)
-import qualified Data.Text.Lazy as L
-import Buggy.Views.Types
-import Buggy.Types.Types
+import Buggy.Web.Types
+import Buggy.Core.Types
 import Network.HTTP.Simple
 import Network.HTTP.Conduit
+import qualified Web.JWT as JWT
+import qualified Data.Map as Map
+import qualified Data.Text.Lazy as L
 import qualified Buggy.Persistence.Postgre as DB
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Base64 as BB

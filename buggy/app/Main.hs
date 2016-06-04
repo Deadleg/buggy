@@ -1,13 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import Buggy.Views.Index
-import qualified Buggy.Rest.Program as R
-import Buggy.Logic.Issue
+import Buggy.Web.Views.Index
 import Control.Monad (msum)
 import Control.Applicative ((<$>), optional)
 import Happstack.Server
-import Buggy.Views.Types
+import qualified Buggy.Web.Entry as R
 
 main = do
     simpleHTTP nullConf $ msum

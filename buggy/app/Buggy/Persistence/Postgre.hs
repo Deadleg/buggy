@@ -40,7 +40,7 @@ module Buggy.Persistence.Postgre (
 import Database.PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.FromField
-import Buggy.Types.Types
+import Buggy.Core.Types
 import Data.Time
 import Control.Monad
 import Data.Text (Text)

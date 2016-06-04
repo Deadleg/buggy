@@ -1,4 +1,4 @@
-module Buggy.Views.Util (
+module Buggy.Web.Util (
     getBuggyCookie
 ) where
 
