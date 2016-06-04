@@ -28,7 +28,8 @@ module Buggy.Types.Types (
     MyIssue(..),
     UserOperations(..),
     UserOperationsT(..),
-    UserOperationsIO(..)
+    UserOperationsIO(..),
+    ProgramSummary(..)
 ) where
 
 import Data.Time
@@ -115,6 +116,15 @@ instance MonadPlus UserOperations
 instance (ToJSON a) => ToMessage a where
     toContentType _  = B.pack "application/json;charset=utf-8"
     toMessage        = encode
+
+data ProgramSummary = ProgramSummary
+    { top5Issues :: [(Text, Integer)]
+    , numberOfIssuesThisWeek :: Int
+    , name :: Text
+    } deriving (Eq, Show, Read)
+
+instance ToJSON ProgramSummary where
+    toJSON (ProgramSummary issues numIssues name) = object ["top5Issues" .= issues, "numIssuesThisWeek" .= numIssues, "name" .= name]
 
 data IssueType = Bug | Feature | UX | Graphic deriving (Eq, Show, Read)
 

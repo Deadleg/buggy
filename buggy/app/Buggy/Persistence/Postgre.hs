@@ -31,7 +31,10 @@ module Buggy.Persistence.Postgre (
     getUser,
     getUserWatches,
     watchIssue,
-    getMyIssue
+    getMyIssue,
+    updateProgramPopularity,
+    updateIssuePopularity,
+    getTopPrograms
 ) where
 
 import Database.PostgreSQL.Simple
@@ -44,6 +47,34 @@ import Data.Text (Text)
 import qualified Data.Map as M
 
 connectionString = "host='localhost' port=5433 user='buggy' password='buggy' dbname='buggy'"
+
+type ProgramId = Integer
+type IssueId = Integer
+
+getTopPrograms :: IO [ProgramSummary]
+getTopPrograms = do
+    conn <- connectPostgreSQL connectionString
+    xs <- query_ conn "SELECT p.name, i.title, i.id FROM program_popularity ppop \
+                     \INNER JOIN programs p ON p.id = ppop.program \
+                     \LEFT JOIN issues i ON i.program = ppop.program \
+                     \WHERE ORDER BY p.score DESC LIMIT 5"
+    let programs = M.toList $ M.fromListWith (++)
+         [(programName :: Text, [(issueTitle :: Text, issueId :: IssueId)]) | (programName, issueTitle, issueId) <- xs]
+    return $ map (\(name, issues) -> ProgramSummary issues (length issues) name) programs
+
+updateProgramPopularity :: ProgramId -> Integer -> IO ()
+updateProgramPopularity programId score = do
+    conn <- connectPostgreSQL connectionString
+    execute conn "INSERT INTO program_popularity (program, score) values (?, ?) \
+                  \ON CONFLICT DO UPDATE SET score = ?" (programId, score)
+    return ()
+
+updateIssuePopularity :: IssueId -> Integer -> IO ()
+updateIssuePopularity issueId score = do
+    conn <- connectPostgreSQL connectionString
+    execute conn "INSERT INTO issue_popularity (issue, score) values (?, ?) \
+                  \ON CONFLICT DO UPDATE SET score = ?" (issueId, score)
+    return ()
 
 getMyIssue :: Integer -> Integer -> Integer -> IO (MyIssue)
 getMyIssue programId issueId userId = do

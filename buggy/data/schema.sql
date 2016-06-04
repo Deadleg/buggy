@@ -117,3 +117,13 @@ CREATE TABLE issue_report_comment_reports (
     time_reported          INTEGER NOT NULL DEFAULT NOW(),
     reportee_notified_time TIMESTAMP
 );
+
+CREATE TABLE program_popularity (
+    program INTEGER NOT NULL REFERENCES programs(id) UNIQUE,
+    score INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE issue_popularity (
+    issue INTEGER NOT NULL REFERENCES issues(id) UNIQUE,
+    score INTEGER NOT NULL DEFAULT 0
+);
