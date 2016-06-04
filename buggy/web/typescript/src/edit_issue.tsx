@@ -1,47 +1,59 @@
-var React = require("react");
+import * as React from "react";
+import { IssueParams } from "./model/router_params";
+import { RouteComponentProps } from "react-router";
 
-module.exports = React.createClass({
-    getInitialState: function() {
-        return {
+export interface EditIssueProps extends RouteComponentProps<IssueParams, any> {
+}
+
+export class EditIssue extends React.Component<EditIssueProps, any> {
+    constructor(props: EditIssueProps) {
+        super(props);
+
+        this.state = {
             reproductionSteps: [],
             issue: {}
         }
-    },
-    componentWillMount: function() {
+    }
+
+    componentWillMount() {
         var self = this;
         $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId, function(data) {
             console.log(data);
             self.setState({issue: data, reproductionSteps: data.reproductionSteps});
         });
-    },
-    componentDidMount: function() {
-        $('select').material_select();
-    },
-    addReproductionStep: function() {
+    }
+    
+    componentDidMount() {
+        ($('select') as any).material_select();
+    }
+    
+    addReproductionStep() {
         var currentReproductionSteps = this.state.reproductionSteps;
         currentReproductionSteps.push({
             instruction: ""
         });
         this.setState({reproductionSteps: currentReproductionSteps});
-    },
-    removeReproductionStep: function(index) {
+    }
+    
+    removeReproductionStep(index) {
         var currentReproductionSteps = this.state.reproductionSteps;
         this.setState(currentReproductionSteps.splice(index, 1));
-    },
-    updateIssue: function(e) {
+    }
+    
+    updateIssue(e) {
         e.preventDefault();
 
         var steps = [];
 
-        for (i = 0; i < this.state.reproductionSteps.length; i++) {
-            steps.push(this.refs["instruction" + i].value);
+        for (var i = 0; i < this.state.reproductionSteps.length; i++) {
+            steps.push((this.refs["instruction" + i] as HTMLInputElement).value);
         }
 
         var data = {
             programId: this.state.issue.programId,
             id: this.state.issue.id,
-            title: this.refs.title.value,
-            description: this.refs.description.value,
+            title: (this.refs["title"] as HTMLInputElement).value,
+            description: (this.refs["description"] as HTMLInputElement).value,
             type: "Bug",
             reproductionSteps: steps,
         };
@@ -53,14 +65,17 @@ module.exports = React.createClass({
             type: "PUT",
             data: JSON.stringify(data),
         });
-    },
-    updateDescription: function() {
-        this.setState({issue: {description: this.refs.description.value}});
-    },
-    updateTitle: function() {
-        this.setState({issue: {title: this.refs.title.value}});
-    },
-    render: function() {
+    }
+    
+    updateDescription() {
+        this.setState({issue: {description: (this.refs["description"] as HTMLInputElement).value}});
+    }
+    
+    updateTitle() {
+        this.setState({issue: {title: (this.refs["title"] as HTMLInputElement).value}});
+    }
+    
+    render() {
         var self = this;
         var steps = this.state.reproductionSteps.map(function(step, index) {
             return (
@@ -104,4 +119,4 @@ module.exports = React.createClass({
             </div>
         );
     }
-});
+};

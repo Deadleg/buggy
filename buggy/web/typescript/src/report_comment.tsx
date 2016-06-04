@@ -1,22 +1,38 @@
-var React = require("react");
-var CreateIssueReportComment = require("./create_issue_report_comment.jsx");
+import * as React from "react";
+import { IssueParams } from "./model/router_params";
+import { RouteComponentProps } from "react-router";
+import { CreateIssueReportComment } from "./create_issue_report_comment";
 
-var ReportComment = React.createClass({
-    getInitialState: function() {
-        return {
-            show: false
-        }
-    },
-    replyTo: function(commentParent) {
+export interface CommentData {
+    children: CommentData[];
+    comment: string;
+    timeCreated: string;
+    id: string;
+}
+
+export interface ReportCommentProps extends RouteComponentProps<IssueParams, any> {
+    comment: CommentData;
+    reportId: string;
+}
+
+export class ReportComment extends React.Component<ReportCommentProps, any> {
+    constructor(props: ReportCommentProps) {
+        super(props);
+
+        this.state = { show: false };
+    }
+
+    replyTo(commentParent) {
         this.setState({show: true})
-    },
-    render: function() {
+    }
+    
+    render() {
         var self = this;
 
         var children = this.props.comment.children.map(function(comment, index) {
             return (
                 <div style={{"marginLeft": "1rem"}} key={index}>
-                    <ReportComment params={self.props.params} reportId={self.props.reportId} comment={comment} />
+                    <ReportComment params={self.props.params} reportId={this.props.repordId} comment={comment} />
                 </div>
             );
         });
@@ -33,13 +49,11 @@ var ReportComment = React.createClass({
                         </div>
                     </div>
                     <div className={this.state.show ? "" : "hide"}>
-                        <CreateIssueReportComment reportId={this.props.reportId} params={this.props.params} parentComment={this.props.comment.id} />
+                        <CreateIssueReportComment parentComment={this.props.comment.id} />
                     </div>
                     {children}
                 </div>
             </div>
         );
     }
-});
-
-module.exports = ReportComment
+};

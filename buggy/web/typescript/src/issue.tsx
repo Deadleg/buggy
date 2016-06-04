@@ -1,16 +1,17 @@
-var React = require("react");
-var Link = require('react-router').Link
-var Comment = require("./comment.jsx");
-var ReportComment = require("./report_comment.jsx");
-var ReactTabs = require("react-tabs");
-var Tab = ReactTabs.Tab;
-var Tabs = ReactTabs.Tabs;
-var TabList = ReactTabs.TabList;
-var TabPanel = ReactTabs.TabPanel;
+import * as React from "react";
+import { IssueParams } from "./model/router_params";
+import { Link, RouteComponentProps } from "react-router"
+import { Comment } from "./comment";
+import { ReportComment } from "./report_comment";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 
-module.exports = React.createClass({
-    getInitialState: function() {
-        return {
+export interface IssueProps extends RouteComponentProps<IssueParams, any> {}
+
+export class Issue extends React.Component<IssueProps, any> {
+    constructor(props: IssueProps) {
+        super(props);
+
+        this.state = {
             issue: {
                 description: "",
                 id: 0,
@@ -26,8 +27,9 @@ module.exports = React.createClass({
             comments: [],
             show: []
         }
-    },
-    markReportAsFixed: function(reportId) {
+    }
+
+    markReportAsFixed(reportId) {
         $.post(
             "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/reports/" + reportId + "/fixed",
             "",
@@ -36,8 +38,9 @@ module.exports = React.createClass({
             },
             "json"
          );
-    },
-    componentDidMount: function() {
+    }
+    
+    componentDidMount() {
         var self = this;
 
         $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId, function(data) {
@@ -67,17 +70,19 @@ module.exports = React.createClass({
 
         $("#issueTabs a").click(function (e) {
             e.preventDefault();
-            $(this).tab('show');
+            ($(this) as any).tab('show');
         });
-    },
-    watchIssue: function() {
+    }
+    
+    watchIssue() {
         $.post(
             "/api/issues/me/watch/" + this.props.params.issueId
         ).fail(function(data) {
             console.log("watch failed", data);
         });
-    },
-    render: function() {
+    }
+    
+    render() {
         var steps = this.state.issue.reproductionSteps.map(function(step, index) {
             return (
                 <li key={index} className="common-list-item">{step.instruction}</li>
@@ -133,7 +138,7 @@ module.exports = React.createClass({
             );
         });
 
-        var edited = "";
+        var edited;
         if (this.state.issue.lastEdited) {
             edited = <div><small>Edit time: {this.state.issue.lastEdited}</small></div>
         }
@@ -174,7 +179,7 @@ module.exports = React.createClass({
                 </div>
                 <div className="row">
                     <div className="col-sm-12">
-                        <Tabs style={{"border": 0}}>
+                        <Tabs className="no-border">
                             <TabList>
                                 <Tab className="btn btn-common">Reports</Tab>
                                 <Tab className="btn btn-common">Comments</Tab>
@@ -193,4 +198,4 @@ module.exports = React.createClass({
             </div>
         );
     }
-});
+};

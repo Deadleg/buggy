@@ -1,23 +1,34 @@
-var React = require("react");
-var Link = require('react-router').Link
+import * as React from "react";
+import { ProgramParams } from "./model/router_params";
+import { Link, RouteComponentProps } from "react-router";
 
-module.exports = React.createClass({
-    getInitialState: function() {
-        return { program: {
-            name: "",
-            id: 0,
-            issues: 0
-        }}
-    },
-    componentDidMount: function() {
+export interface ProgramProps extends RouteComponentProps<ProgramParams, any> {
+}
+
+export class Program extends React.Component<ProgramProps, any> {
+    constructor(props: ProgramProps) {
+        super(props);
+
+        this.state =
+            {
+                program: {
+                    name: "",
+                    id: 0,
+                    issues: 0
+                }
+            }
+    }
+
+    componentDidMount() {
         var self = this;
 
         $.getJSON("/api/programs/" + this.props.params.programId, function(data) {
             console.log(data);
             self.setState({program: data});
         });
-    },
-    render: function() {
+    }
+    
+    render() {
         return (
             <div>
                 <div className="banner">
@@ -40,6 +51,4 @@ module.exports = React.createClass({
             </div>
         );
     }
-});
-
-
+};

@@ -1,7 +1,7 @@
-var React = require("react");
+import * as React from "react";
 
-var Login = React.createClass({
-    render: function() {
+export class Login extends React.Component<{}, {}> {
+    render() {
         return (
             <div className="container">
                 <div className="row">
@@ -17,6 +17,4 @@ var Login = React.createClass({
             </div>
         );
     }
-});
-
-module.exports = Login;
+};

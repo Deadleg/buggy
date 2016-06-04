@@ -23,7 +23,8 @@ mainTemplate user title body = toResponse $
             H.script ! A.src "https://code.jquery.com/jquery-2.1.4.min.js" $ ""
             H.script ! A.src "https://apis.google.com/js/platform.js" ! A.async "" ! A.defer "" $ ""
             H.script ! A.src "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" $ ""
-            H.script ! A.src "/assets/js/login.js" $ ""
+            H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js" $ ""
+            H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js" $ ""
         H.body $ do
             H.nav $ do
                 H.nav ! A.class_ "navbar navbar-full" $ do

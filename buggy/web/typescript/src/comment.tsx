@@ -1,16 +1,34 @@
-var React = require("react");
-var CreateIssueComment = require("./create_issue_comment.jsx");
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { IssueParams } from "./model/router_params";
+import { RouteComponentProps } from "react-router";
+import { CreateIssueComment } from "./create_issue_comment";
 
-var Comment = React.createClass({
-    getInitialState: function() {
-        return {
+export interface CommentData {
+    children: CommentData[];
+    comment: string;
+    timeCreated: string;
+    id: number;
+}
+
+export interface CommentProps extends RouteComponentProps<IssueParams, any> {
+    comment: CommentData;
+}
+
+export class Comment extends React.Component<CommentProps, any> {
+    constructor(props: CommentProps) {
+        super(props);
+
+        this.state = {
             show: false
         }
-    },
-    replyTo: function(commentParent) {
+    }
+
+    replyTo(commentParent) {
         this.setState({show: true})
-    },
-    render: function() {
+    }
+    
+    render() {
         var self = this;
 
         var children = this.props.comment.children.map(function(comment, index) {
@@ -32,13 +50,11 @@ var Comment = React.createClass({
                         </div>
                     </div>
                     <div className={this.state.show ? "" : "hide"}>
-                        <CreateIssueComment params={this.props.params} parentComment={this.props.comment.id} />
+                        <CreateIssueComment parentComment={this.props.comment.id} params={this.props.params} />
                     </div>
                     {children}
                 </div>
             </div>
         );
     }
-});
-
-module.exports = Comment
+};

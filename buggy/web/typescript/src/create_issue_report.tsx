@@ -1,30 +1,41 @@
-var React = require("react");
+import * as React from "react";
+import { IssueParams } from "./model/router_params";
+import { RouteComponentProps } from "react-router";
 
-module.exports = React.createClass({
-    getInitialState: function() {
-        return {
+export interface CreateIssueProps extends RouteComponentProps<IssueParams, string> {
+}
+
+export class CreateIssueReport extends React.Component<CreateIssueProps, any> {
+    constructor(props: CreateIssueProps) {
+        super(props);
+
+        this.state = {
             programId: this.props.params.programId,
             issueId: this.props.params.issueId,
             labels: []
         }
-    },
-    componentDidMount: function() {
+    }
+
+    componentDidMount() {
         var self = this;
-        $('select').material_select();
-    },
-    addLabel: function() {
+        ($('select') as any).material_select(); // TODO proper type
+    }
+    
+    addLabel() {
         var labels = this.state.labels;
         labels.push({
-                text: $(this.refs.label).children("option:selected")[0].text,
-                value: this.refs.label.value
+                text: ($(this.refs["label"]).children("option:selected")[0] as HTMLInputElement).textContent,
+                value: (this.refs["label"] as HTMLInputElement).value
         });
         this.setState({labels: labels});
-    },
-    removeLabel: function(index) {
+    }
+    
+    removeLabel(index) {
         var labels = this.state.labels;
         this.setState(labels.splice(index, 1));
-    },
-    createIssue: function(e) {
+    }
+    
+    createIssue(e) {
         e.preventDefault();
 
         var labels = this.state.labels.map(function(x) {
@@ -32,11 +43,11 @@ module.exports = React.createClass({
         });
 
         var data = {
-            specs: this.refs.specs.value,
-            description: this.refs.description.value,
+            specs: (this.refs as any).specs.value,
+            description: (this.refs as any).description.value,
             reporterId: 1,
-            type: this.refs.type.value,
-            status: this.refs.status.value,
+            type: (this.refs as any).type.value,
+            status: (this.refs as any).status.value,
             programId: parseInt(this.props.params.programId),
             issueId: parseInt(this.props.params.issueId)
         };
@@ -51,8 +62,9 @@ module.exports = React.createClass({
             },
             "json"
         );
-    },
-    render: function() {
+    }
+    
+    render() {
         var self = this;
         var labels = this.state.labels.map(function(label, index) {
             return (
@@ -100,4 +112,4 @@ module.exports = React.createClass({
             </div>
         );
     }
-});
+};

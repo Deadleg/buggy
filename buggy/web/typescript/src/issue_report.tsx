@@ -1,19 +1,26 @@
-var React = require("react");
-var Link = require('react-router').Link
-var ReportComment = require("./report_comment.jsx");
+import * as React from "react";
+import { Link, RouteComponentProps } from "react-router";
+import { ReportParams } from "./model/router_params";
+import { ReportComment } from "./report_comment";
 
-module.exports = React.createClass({
-    getInitialState: function() {
-        console.log("****");
-        return {
+export interface IssueReportProps extends RouteComponentProps<ReportParams, any> {
+    reportId: string;
+}
+
+export class IssueReport extends React.Component<IssueReportProps, any> {
+    constructor(props: IssueReportProps) {
+        super(props);
+
+        this.state = {
             report: {
                 reporter: {
                     username: ""
                 }
             }
-        }
-    },
-    componentDidMount: function() {
+        };
+    }
+
+    componentDidMount() {
         var self = this;
         $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId + "/reports/" + this.props.params.reportId, function(report) {
             $.getJSON("/api/programs/" + self.props.params.programId + "/issues/" + self.props.params.issueId + "/reports/" + report.id + "/comments", function(comments) {
@@ -22,8 +29,9 @@ module.exports = React.createClass({
                 self.setState({report: report});
             });
         });
-    },
-    markReportAsFixed: function(reportId) {
+    }
+    
+    markReportAsFixed(reportId) {
         $.post(
             "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/reports/" + reportId + "/fixed",
             "",
@@ -32,8 +40,9 @@ module.exports = React.createClass({
             },
             "json"
          );
-    },
-    render: function() {
+    }
+    
+    render() {
         var self = this;
         var reportComments = null;
         var report = this.state.report;
@@ -79,4 +88,4 @@ module.exports = React.createClass({
             </div>
         );
     }
-})
+}

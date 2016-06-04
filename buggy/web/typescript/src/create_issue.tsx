@@ -1,51 +1,66 @@
-var React = require("react");
+import * as React from "react";
+import { RouteComponentProps } from "react-router";
 
-module.exports = React.createClass({
-    getInitialState: function() {
-        return {
-            reproductionSteps: [],
-        }
-    },
-    addReproductionStep: function() {
+export interface ProgramParams {
+    programId: string;
+}
+
+export interface CreateIssueProps extends RouteComponentProps<ProgramParams, string> {
+}
+
+export class CreateIssue extends React.Component<CreateIssueProps, any> {
+    constructor(props: CreateIssueProps) {
+        super(props);
+
+        this.state = { reproductionSteps: [] }
+    }
+
+    addReproductionStep = () => {
         var currentReproductionSteps = this.state.reproductionSteps;
         currentReproductionSteps.push({
             instruction: ""
         });
         this.setState({reproductionSteps: currentReproductionSteps});
-    },
-    removeReproductionStep: function(index) {
+    }
+    
+    removeReproductionStep = (index: number) => {
         var currentReproductionSteps = this.state.reproductionSteps;
         this.setState(currentReproductionSteps.splice(index, 1));
-    },
-    createIssue: function(e) {
+    }
+    
+    createIssue = (e) => {
         e.preventDefault();
 
         var steps = [];
 
-        for (i = 0; i < this.state.reproductionSteps.length; i++) {
-            steps.push(this.refs["instruction" + i].value);
+        for (var i = 0; i < this.state.reproductionSteps.length; i++) {
+            steps.push((this.refs["instruction" + i] as any).value);
         }
 
         var data = {
-            title: this.refs.title.value,
-            description: this.refs.description.value,
+            title: (this.refs as any).title.value,
+            description: (this.refs as any).description.value,
             type: "Bug",
             reproductionSteps: steps,
             programId: parseInt(this.props.params.programId),
         };
 
         console.log(data);
+        console.log(this.props.params.programId);
 
         $.post(
-            "api/programs/" + this.props.params.programId + "/issues/new",
+            "/api/programs/" + this.props.params.programId + "/issues/new",
             JSON.stringify(data),
             function(data) {
                 console.log("Ye");
             },
             "json"
-        );
-    },
-    render: function() {
+        ).fail(function(e) {
+            console.log(e);
+        });
+    }
+    
+    render() {
         var self = this;
         var steps = this.state.reproductionSteps.map(function(step, index) {
             return (
@@ -97,4 +112,4 @@ module.exports = React.createClass({
             </div>
         );
     }
-});
+};

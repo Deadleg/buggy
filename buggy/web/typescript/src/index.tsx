@@ -1,9 +1,6 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
-var Router = require('react-router').Router
-var Route = require('react-router').Route
-var Link = require('react-router').Link
-var browserHistory = require('react-router').browserHistory
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { Router, Route, Link, browserHistory } from "react-router";
 
 var Home = React.createClass({
     getInitialState: function() {
@@ -42,16 +39,16 @@ var Home = React.createClass({
     }
 });
 
-var Issues = require("./issues.jsx");
-var Issue = require("./issue.jsx");
-var EditIssue = require("./edit_issue.jsx");
-var Program = require("./program.jsx");
-var CreateIssue = require("./create_issue.jsx");
-var CreateIssueReport = require("./create_issue_report.jsx");
-var CreateIssueComment = require("./create_issue_comment.jsx");
-var CreateIssueReportComment = require("./create_issue_report_comment.jsx");
-var IssueReport = require("./issue_report.jsx")
-var Login = require("./login.jsx")
+import { Issues } from "./issues";
+import { Issue } from "./issue";
+import { EditIssue } from "./edit_issue";
+import { Program } from "./program";
+import { CreateIssue } from "./create_issue";
+import { CreateIssueReport } from "./create_issue_report";
+import { CreateIssueComment } from "./create_issue_comment";
+import { CreateIssueReportComment } from "./create_issue_report_comment";
+import { IssueReport } from "./issue_report";
+import { Login } from "./login";
 
 ReactDOM.render((
     <Router history={browserHistory}>

@@ -1,18 +1,26 @@
-var React = require("react");
-var Link = require('react-router').Link
+import * as React from "react";
+import { ProgramParams } from "./model/router_params";
+import { Link, RouteComponentProps } from "react-router";
 
-module.exports = React.createClass({
-    getInitialState: function() {
-        return {programId: this.props.params.programId, issues: []};
-    },
-    componentDidMount: function() {
+export interface IssuesProps extends RouteComponentProps<ProgramParams, any> {
+}
+
+export class Issues extends React.Component<IssuesProps, any> {
+    constructor(props: IssuesProps) {
+        super(props);
+
+        this.state = {programId: this.props.params.programId, issues: []};
+    }
+
+    componentDidMount() {
         var self = this;
 
         $.getJSON("/api/programs/" + this.props.params.programId + "/issues", function(data) {
             self.setState({issues: data});
         });
-    },
-    render: function() {
+    }
+    
+    render() {
         var self = this;
         var content = this.state.issues.map(function (issue, index) {
             return (
@@ -38,4 +46,4 @@ module.exports = React.createClass({
             </div>
         );
     }
-});
+};

@@ -24,3 +24,5 @@ indexPage = do
         H.div ! A.id "content" $ ""
         H.script ! A.src "/assets/js/index.js" $ ""
         H.script ! A.src "/assets/js/user.js" $ ""
+        H.script ! A.src "/assets/js/login.js" $ ""
+

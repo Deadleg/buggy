@@ -8,5 +8,9 @@
     "react-dom": "^0.14.7",
     "react-router": "2.0.0",
     "react-tabs": "^0.5.3"
+  },
+  "devDependencies": {
+    "source-map-loader": "^0.1.5",
+    "ts-loader": "^0.8.2"
   }
 }

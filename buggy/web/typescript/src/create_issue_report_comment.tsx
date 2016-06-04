@@ -1,12 +1,19 @@
-var React = require("react");
+import * as React from "react";
+import { ReportParams } from "./model/router_params";
+import { RouteComponentProps } from "react-router";
 
-module.exports = React.createClass({
-    createComment: function(e) {
+export interface CreateIssueReportCommentProps extends RouteComponentProps<ReportParams, any> {
+    parentComment: string;
+}
+
+export class CreateIssueReportComment extends React.Component<CreateIssueReportCommentProps, any> {
+    createComment(e) {
         e.preventDefault();
 
         var data = {
-            comment: this.refs.comment.value,
-            userId: 1
+            comment: (this.refs["comment"] as HTMLInputElement).value,
+            userId: 1,
+            parentCommentId: null
         };
 
         if (this.props.parentComment) {
@@ -14,16 +21,20 @@ module.exports = React.createClass({
         }
         console.log(data);
 
+        var reportId = this.props.params.reportId;
+
         $.post(
-            "/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId + "/comments",
+            "/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId + "/reports/" + reportId + "/comments",
             JSON.stringify(data),
-            function(data) {
+            function(stuff) {
                 console.log("Ye");
+                console.log(stuff);
             },
             "json"
         );
-    },
-    render: function() {
+    }
+    
+    render() {
         return (
             <div>
                 <h1>New issue comment</h1>
@@ -37,4 +48,4 @@ module.exports = React.createClass({
             </div>
         );
     }
-});
+};
