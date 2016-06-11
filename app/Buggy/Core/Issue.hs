@@ -24,11 +24,15 @@ module Buggy.Core.Issue (
     reportIssueReportComment,
     getUserWatches,
     watchIssue,
-    getMyIssueStuff
+    getMyIssueStuff,
+    getTopPrograms
 ) where
 
 import qualified Buggy.Core.Types as T
 import qualified Buggy.Persistence.Postgre as P
+
+getTopPrograms :: IO ([T.ProgramSummary])
+getTopPrograms = P.getTopPrograms
 
 getMyIssueStuff :: Integer -> Integer -> Integer -> IO (T.MyIssue)
 getMyIssueStuff programId issueId userId = P.getMyIssue programId issueId userId

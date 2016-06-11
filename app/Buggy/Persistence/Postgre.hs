@@ -54,13 +54,15 @@ type IssueId = Integer
 getTopPrograms :: IO [ProgramSummary]
 getTopPrograms = do
     conn <- connectPostgreSQL connectionString
-    xs <- query_ conn "SELECT p.name, i.title, i.id FROM program_popularity ppop \
+    xs <- query_ conn "SELECT p.name, p.id, i.title, i.id FROM program_popularity ppop \
                      \INNER JOIN programs p ON p.id = ppop.program \
                      \LEFT JOIN issues i ON i.program = ppop.program \
-                     \WHERE ORDER BY p.score DESC LIMIT 5"
+                     \LEFT JOIN ( \
+                     \SELECT issue, score FROM issue_popularity ORDER BY score DESC LIMIT 5) ipop ON i.id = ipop.issue \
+                     \ORDER BY ppop.score DESC LIMIT 5"
     let programs = M.toList $ M.fromListWith (++)
-         [(programName :: Text, [(issueTitle :: Text, issueId :: IssueId)]) | (programName, issueTitle, issueId) <- xs]
-    return $ map (\(name, issues) -> ProgramSummary issues (length issues) name) programs
+         [((programName :: Text, programId :: Int), [IssueSummary (issueId :: IssueId) (issueTitle :: Text)]) | (programName, programId, issueTitle, issueId) <- xs]
+    return $ map (\((name, programId), issues) -> ProgramSummary issues (length issues) name programId) programs
 
 updateProgramPopularity :: ProgramId -> Integer -> IO ()
 updateProgramPopularity programId score = do

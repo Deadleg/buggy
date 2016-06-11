@@ -26,7 +26,8 @@ module Buggy.Web.Entry (
     signout,
     myIssueWatches,
     watchIssue,
-    getMyIssueStuffForProgram
+    getMyIssueStuffForProgram,
+    getPopularPrograms
 ) where
 
 import Buggy.Core.Types
@@ -61,6 +62,9 @@ instance (ToJSON a) => AuthenticationRequired (UserOperationsIO a) where
         case maybeUser of
             Nothing -> unauthorized $ toResponse ("Not logged in!" :: T.Text)
             Just user -> (lift $ runUserOperations (f user)) >>= mapUserOperation
+
+getPopularPrograms :: ServerPart Response
+getPopularPrograms = (liftIO L.getTopPrograms) >>= (ok . toResponse)
 
 getMyIssueStuffForProgram :: Integer -> Integer -> ServerPart Response
 getMyIssueStuffForProgram programId issueId = do

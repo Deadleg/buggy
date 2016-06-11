@@ -50,7 +50,7 @@
 	const react_router_1 = __webpack_require__(3);
 	var Home = React.createClass({
 	    getInitialState: function () {
-	        return { programs: [], user: {} };
+	        return { programs: [], user: {}, popular: [] };
 	    },
 	    componentDidMount: function () {
 	        var self = this;
@@ -60,12 +60,21 @@
 	            self.state.programs = data;
 	            self.setState(state);
 	        });
+	        $.getJSON("/api/programs/popular", (data) => {
+	            console.log(data);
+	            self.setState({ popular: data });
+	        }).fail((e) => {
+	            console.log(e);
+	        });
 	    },
 	    render: function () {
 	        var content = this.state.programs.map(function (program, index) {
 	            return (React.createElement("div", {className: "row", key: index}, React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + program.id + "/issue"}, program.name)), React.createElement("p", {className: "card-text"}, "Issues: ", program.issues))))));
 	        });
-	        return (React.createElement("div", {className: "container"}, content));
+	        var summaries = this.state.popular.map((summary, index) => {
+	            return (React.createElement("div", {className: "row", key: index}, React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + summary.id + "/issue"}, summary.name)), React.createElement("p", {className: "card-text"}, "Issues: ", summary.topIssues.length))))));
+	        });
+	        return (React.createElement("div", {className: "container"}, content, React.createElement("h2", null, "Popular"), summaries));
 	    }
 	});
 	const issues_1 = __webpack_require__(61);

@@ -1,10 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Router, Route, Link, browserHistory } from "react-router";
+import { ProgramSummaries } from "./program_summaries";
 
 var Home = React.createClass({
     getInitialState: function() {
-        return {programs: [], user: {}}
+        return {programs: [], user: {}, popular: []}
     },
     componentDidMount: function() {
         var self = this;
@@ -13,7 +14,13 @@ var Home = React.createClass({
             var state = self.state;
             self.state.programs = data;
             self.setState(state);
-        });
+       });
+       $.getJSON("/api/programs/popular", (data) => {
+           console.log(data);
+           self.setState({popular: data});
+       }).fail((e) => {
+           console.log(e);
+       });
     },
     render: function() {
         var content = this.state.programs.map(function (program, index) {
@@ -31,9 +38,29 @@ var Home = React.createClass({
                 </div>
             );
         });
+
+        var summaries = this.state.popular.map((summary, index) => {
+            return (
+                <div className="row" key={index}>
+                    <div className="col-sm-3">
+                        <div className="card">
+                            <img src="http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296" className="img-fluid card-img-top"/>
+                            <div className="card-block">
+                                <h4 className="card-title"><Link to={"/app/" + summary.id + "/issue"}>{summary.name}</Link></h4>
+                                <p className="card-text">Issues: {summary.topIssues.length}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        });
+
         return (
             <div className="container">
                 {content}
+
+                <h2>Popular</h2>
+                {summaries}
             </div>
         );
     }

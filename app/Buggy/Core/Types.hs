@@ -29,6 +29,7 @@ module Buggy.Core.Types (
     UserOperations(..),
     UserOperationsT(..),
     UserOperationsIO(..),
+    IssueSummary(..),
     ProgramSummary(..)
 ) where
 
@@ -117,14 +118,20 @@ instance (ToJSON a) => ToMessage a where
     toContentType _  = B.pack "application/json;charset=utf-8"
     toMessage        = encode
 
+data IssueSummary = IssueSummary Integer Text deriving (Eq, Show, Read)
+
+instance ToJSON IssueSummary where
+    toJSON (IssueSummary id title) = object ["issueId" .= id, "title" .= title]
+
 data ProgramSummary = ProgramSummary
-    { top5Issues :: [(Text, Integer)]
+    { top5Issues :: [IssueSummary]
     , numberOfIssuesThisWeek :: Int
     , name :: Text
+    , id :: Int
     } deriving (Eq, Show, Read)
 
 instance ToJSON ProgramSummary where
-    toJSON (ProgramSummary issues numIssues name) = object ["top5Issues" .= issues, "numIssuesThisWeek" .= numIssues, "name" .= name]
+    toJSON (ProgramSummary issues numIssues name id) = object ["topIssues" .= issues, "numIssuesThisWeek" .= numIssues, "name" .= name, "id" .= id]
 
 data IssueType = Bug | Feature | UX | Graphic deriving (Eq, Show, Read)
 
