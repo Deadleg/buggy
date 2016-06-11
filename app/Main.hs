@@ -50,6 +50,7 @@ main = do
         , dirs "api/programs" $ path $ \programId -> dir "issues" $ R.getIssuesForProgram programId
         , dirs "api/programs" $ path $ \programId -> R.getProgramJSON programId
         , dirs "api/programs/popular" $ R.getPopularPrograms
+        , dirs "api/issues/popular" $ R.getPopularIssues
         , dirs "api/programs" $ R.getAllPrograms
         , dirs "" $ indexPage
         ]

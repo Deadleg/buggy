@@ -33,6 +33,8 @@ mainTemplate user title body = toResponse $
                         H.ul ! A.class_ "nav navbar-nav" $ do
                             H.li ! A.class_ "nav-item" $ do
                                H.a ! A.class_ "nav-link" ! A.href "/browse" $ "Browse games"
+                            H.li ! A.class_ "nav-item" $ do
+                               H.a ! A.class_ "nav-link" ! A.href "/issues/create" $ "Report an issue"
                         H.ul ! A.class_ "nav navbar-nav pull-sm-right" $ do
                             case user of
                                 Nothing -> H.li ! A.class_ "nav-item" $ do

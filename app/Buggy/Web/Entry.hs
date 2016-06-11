@@ -27,7 +27,8 @@ module Buggy.Web.Entry (
     myIssueWatches,
     watchIssue,
     getMyIssueStuffForProgram,
-    getPopularPrograms
+    getPopularPrograms,
+    getPopularIssues
 ) where
 
 import Buggy.Core.Types
@@ -65,6 +66,9 @@ instance (ToJSON a) => AuthenticationRequired (UserOperationsIO a) where
 
 getPopularPrograms :: ServerPart Response
 getPopularPrograms = (liftIO L.getTopPrograms) >>= (ok . toResponse)
+
+getPopularIssues :: ServerPart Response
+getPopularIssues = (liftIO L.getPopularIssues) >>= (ok . toResponse)
 
 getMyIssueStuffForProgram :: Integer -> Integer -> ServerPart Response
 getMyIssueStuffForProgram programId issueId = do

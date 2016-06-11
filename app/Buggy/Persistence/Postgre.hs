@@ -34,7 +34,8 @@ module Buggy.Persistence.Postgre (
     getMyIssue,
     updateProgramPopularity,
     updateIssuePopularity,
-    getTopPrograms
+    getTopPrograms,
+    getPopularIssues
 ) where
 
 import Database.PostgreSQL.Simple
@@ -50,6 +51,22 @@ connectionString = "host='localhost' port=5433 user='buggy' password='buggy' dbn
 
 type ProgramId = Integer
 type IssueId = Integer
+
+getPopularIssues :: IO ([Issue])
+getPopularIssues = do
+    conn <- connectPostgreSQL connectionString
+    xs <- query_ conn "SELECT ipop.score, i.id, i.type, i.title, i.description, i.time_reported, i.status, u.id, u.username, r.instruction, i.edit_time, i.upvotes, i.program \
+                     \FROM issues i \
+                     \INNER JOIN ( \
+                     \   SELECT issue, score FROM issue_popularity ORDER BY score DESC LIMIT 5 \
+                     \) ipop ON i.id=ipop.issue \
+                     \INNER JOIN users u ON i.reporter=u.id \
+                     \LEFT JOIN (SELECT step_number, issue, instruction FROM reproduction_steps ORDER BY step_number ASC) r ON i.id=r.issue \
+                     \ORDER BY ipop.score DESC;"
+    let issues = M.toDescList $ M.fromListWith (++)
+                [((score :: Integer, issueId :: Integer, issueType :: String, title :: String, description :: String, timeReported :: LocalTime, status :: String, userId :: Integer, username :: Text, editTime :: Maybe LocalTime, upvotes :: Integer, programId), getReproStep (reproSteps :: Maybe String)) | (score, issueId, issueType, title, description, timeReported, status, userId, username, reproSteps, editTime, upvotes, programId) <- xs]
+    return $ map (\((_, issueId, issueType, title, description, timeReported, status, userId, username, editTime, upvotes, programId), reproSteps) ->
+            (Existing programId issueId (title :: String) (description :: String) (read issueType) (map (\step -> Step step) reproSteps) (timeReported :: LocalTime) (read status) (ExistingUser userId username) editTime upvotes)) issues
 
 getTopPrograms :: IO [ProgramSummary]
 getTopPrograms = do
@@ -124,6 +141,12 @@ selectPrograms = do
 getReproStep :: Maybe String -> [String]
 getReproStep Nothing = []
 getReproStep (Just x) = [x]
+
+instance (FromField a, FromField b, FromField c, FromField d, FromField e,
+          FromField f, FromField g, FromField h, FromField i, FromField j, FromField k, FromField l, FromField m) =>
+    FromRow (a,b,c,d,e,f,g,h,i,j,k,l,m) where
+    fromRow = (,,,,,,,,,,,,) <$> field <*> field <*> field <*> field <*> field <*> field
+                          <*> field <*> field <*> field <*> field <*> field <*> field <*> field
 
 instance (FromField a, FromField b, FromField c, FromField d, FromField e,
           FromField f, FromField g, FromField h, FromField i, FromField j, FromField k, FromField l) =>

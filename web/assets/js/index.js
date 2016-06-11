@@ -48,35 +48,6 @@
 	const React = __webpack_require__(1);
 	const ReactDOM = __webpack_require__(2);
 	const react_router_1 = __webpack_require__(3);
-	var Home = React.createClass({
-	    getInitialState: function () {
-	        return { programs: [], user: {}, popular: [] };
-	    },
-	    componentDidMount: function () {
-	        var self = this;
-	        $.getJSON("/api/programs", function (data) {
-	            console.log(data);
-	            var state = self.state;
-	            self.state.programs = data;
-	            self.setState(state);
-	        });
-	        $.getJSON("/api/programs/popular", (data) => {
-	            console.log(data);
-	            self.setState({ popular: data });
-	        }).fail((e) => {
-	            console.log(e);
-	        });
-	    },
-	    render: function () {
-	        var content = this.state.programs.map(function (program, index) {
-	            return (React.createElement("div", {className: "row", key: index}, React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + program.id + "/issue"}, program.name)), React.createElement("p", {className: "card-text"}, "Issues: ", program.issues))))));
-	        });
-	        var summaries = this.state.popular.map((summary, index) => {
-	            return (React.createElement("div", {className: "row", key: index}, React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + summary.id + "/issue"}, summary.name)), React.createElement("p", {className: "card-text"}, "Issues: ", summary.topIssues.length))))));
-	        });
-	        return (React.createElement("div", {className: "container"}, content, React.createElement("h2", null, "Popular"), summaries));
-	    }
-	});
 	const issues_1 = __webpack_require__(61);
 	const issue_1 = __webpack_require__(62);
 	const edit_issue_1 = __webpack_require__(77);
@@ -87,6 +58,52 @@
 	const create_issue_report_comment_1 = __webpack_require__(66);
 	const issue_report_1 = __webpack_require__(81);
 	const login_1 = __webpack_require__(82);
+	var Home = React.createClass({
+	    getInitialState: function () {
+	        return { programs: {}, user: {}, popular: [], popularIssues: [] };
+	    },
+	    componentDidMount: function () {
+	        var self = this;
+	        //$.getJSON("/api/programs", function(data) {
+	        //    console.log(data);
+	        //    var state = self.state;
+	        //    self.state.programs = data;
+	        //    self.setState(state);
+	        //});
+	        $.getJSON("/api/programs/popular", (data) => {
+	            console.log(data);
+	            self.setState({ popular: data });
+	        }).fail((e) => {
+	            console.log(e);
+	        });
+	        $.getJSON("/api/issues/popular", (data) => {
+	            console.log(data);
+	            data.map((issue) => {
+	                $.getJSON("/api/programs/" + issue.programId, (programData) => {
+	                    var programs = self.state.programs;
+	                    programs[issue.programId] = programData;
+	                    this.setState({ programs: programs });
+	                });
+	            });
+	            self.setState({ popularIssues: data });
+	        }).fail((e) => {
+	            console.log(e);
+	        });
+	    },
+	    render: function () {
+	        var self = this;
+	        var popularIssues = this.state.popularIssues.map((issue, index) => {
+	            return (React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + issue.programId + "/issue/" + issue.id}, issue.title)), React.createElement("p", {className: "card-text"}, self.state.programs[issue.programId].name), React.createElement("p", {className: "card-text"}, "Reported: ", issue.time)))));
+	        });
+	        var summaries = this.state.popular.map((summary, index) => {
+	            var issues = summary.topIssues.map((issue, index) => {
+	                return (React.createElement("div", {key: index}, React.createElement("p", {className: "card-text small"}, issue.title)));
+	            });
+	            return (React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + summary.id + "/issue"}, summary.name)), issues))));
+	        });
+	        return (React.createElement("div", {className: "container"}, React.createElement("h2", null, "Top issues"), React.createElement("div", {className: "row"}, popularIssues), React.createElement("h2", null, "Popular buggy games"), React.createElement("div", {className: "row"}, summaries)));
+	    }
+	});
 	ReactDOM.render((React.createElement(react_router_1.Router, {history: react_router_1.browserHistory}, React.createElement(react_router_1.Route, {path: "/", component: Home}), React.createElement(react_router_1.Route, {path: "/account/login", component: login_1.Login}), React.createElement(react_router_1.Route, {path: "/app/:programId", component: program_1.Program}, React.createElement(react_router_1.Route, {path: "/app/:programId/issue/new", component: create_issue_1.CreateIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/edit", component: edit_issue_1.EditIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId", component: issue_1.Issue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/new", component: create_issue_report_1.CreateIssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId", component: issue_report_1.IssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId/comments/new", component: create_issue_report_comment_1.CreateIssueReportComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/comments/new", component: create_issue_comment_1.CreateIssueComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue", component: issues_1.Issues})))), document.getElementById('content'));
 
 
