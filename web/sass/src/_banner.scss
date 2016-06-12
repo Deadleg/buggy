@@ -1,0 +1,38 @@
+.banner {
+    background: $banner-bg;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    color: $text-color-dark;
+
+    a {
+        // don't set visited
+        &:link, &:hover, &:active, &:visited {
+            color: darken($text-color-dark, 12%);
+            text-decoration: none;
+        }
+    }
+}
+
+footer {
+    background: $banner-bg;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    color: $text-color-dark;
+
+    a {
+        // don't set visited
+        &:link, &:hover, &:active, &:visited {
+            color: darken($text-color-dark, 12%);
+            text-decoration: none;
+        }
+    }
+}
+
+.footer-body {
+    padding-top: 1rem;
+}
+
+.banner-body {
+    padding-top: 1rem;
+}

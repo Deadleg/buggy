@@ -1,12 +1,16 @@
-$theme-bg: #1c1f25;
-$theme-bg-secondary: #464e5d;
+$theme-bg: #fafaff;
+$theme-bg-secondary: rgb(24, 34, 41);
 $banner-bg: $theme-bg-secondary;
 $btn-common-bg: #687389;
 $navbar-margin: 2rem;
-$text-color: #eeeeee;
+$text-color: #000000;
+$text-color-dark: #dddddd;
 $red: #e14141;
+$bottom-margin-md: 2rem;
 
 // bootstrap overrides
 $enable-flex: true;
 $enable-rounded: false;
 $list-group-bg: $theme-bg-secondary;
+
+$font-size-root: 14px;

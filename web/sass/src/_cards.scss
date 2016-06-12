@@ -1,0 +1,16 @@
+.card {
+    border: 0;
+}
+
+.card-light {
+    background-color: $theme-bg;
+    color: $text-color;
+
+    a {
+        // don't set visited
+        &:link, &:hover, &:active, &:visited {
+            color: darken($text-color, 12%);
+            text-decoration: none;
+        }
+    }
+}

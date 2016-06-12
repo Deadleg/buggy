@@ -1,11 +1,17 @@
 @import 'variables';
 @import 'bootstrap';
 @import 'utilities';
+@import 'banner';
 @import 'cards';
 @import 'navbar';
-@import 'banner';
 @import 'buttons';
 @import 'forms';
 @import 'lists';
 @import 'labels';
 @import 'main';
+
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic);
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+

@@ -1,13 +1,12 @@
 .navbar {
     background: $theme-bg-secondary;
     margin-bottom: $navbar-margin;
+    color: $text-color-dark;
 
     a {
-        color: $text-color;
-
         // don't set visited
         &:link, &:hover, &:active, &:visited {
-            color: darken($text-color, 12%);
+            color: darken($text-color-dark, 12%);
             text-decoration: none;
         }
     }

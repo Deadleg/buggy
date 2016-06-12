@@ -118,10 +118,10 @@ instance (ToJSON a) => ToMessage a where
     toContentType _  = B.pack "application/json;charset=utf-8"
     toMessage        = encode
 
-data IssueSummary = IssueSummary Integer Text deriving (Eq, Show, Read)
+data IssueSummary = IssueSummary Integer Text Integer deriving (Eq, Show, Read)
 
 instance ToJSON IssueSummary where
-    toJSON (IssueSummary id title) = object ["issueId" .= id, "title" .= title]
+    toJSON (IssueSummary id title upvotes) = object ["issueId" .= id, "title" .= title, "upvotes" .= upvotes]
 
 data ProgramSummary = ProgramSummary
     { top5Issues :: [IssueSummary]

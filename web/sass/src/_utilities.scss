@@ -4,6 +4,14 @@
     justify-content: center;
 }
 
+.align-right {
+    text-align: right;
+}
+
 .hide {
     display: none;
+}
+
+.bottom-margin-md {
+    margin-bottom: $bottom-margin-md
 }

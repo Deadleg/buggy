@@ -1,0 +1,14 @@
+{
+  "name": "buggy-sass",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "watch": "sass -I node_modules/bootstrap/scss --watch src:../assets/css"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bootstrap": "^4.0.0-alpha.2"
+  }
+}
