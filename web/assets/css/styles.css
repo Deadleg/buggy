@@ -2925,7 +2925,7 @@ input[type="button"].btn-block {
   background-color: #fff;
   border: 1px solid #e5e5e5; }
 
-.card-block {
+.card-block, .card-block-no-padding {
   padding: 1.25rem; }
 
 .card-title {
@@ -4616,6 +4616,10 @@ footer {
     color: black;
     text-decoration: none; }
 
+.card-block-no-padding {
+  padding-left: 0;
+  padding-right: 0; }
+
 .navbar {
   background: #182229;
   margin-bottom: 2rem;
@@ -4731,6 +4735,16 @@ footer {
 
 .label-group .label:not(:first-child) {
   margin-left: 0.5rem; }
+
+.blue-underline {
+  border-bottom-width: 1px;
+  border-bottom-color: #31b6a3;
+  border-bottom-style: solid; }
+
+.red-underline {
+  border-bottom-width: 1px;
+  border-bottom-color: #b63144;
+  border-bottom-style: solid; }
 
 body {
   background: #fafaff;

@@ -14,3 +14,9 @@
         }
     }
 }
+
+.card-block-no-padding {
+    @extend .card-block;
+    padding-left: 0;
+    padding-right: 0;
+}

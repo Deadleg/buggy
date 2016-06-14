@@ -58,9 +58,10 @@
 	const create_issue_report_comment_1 = __webpack_require__(66);
 	const issue_report_1 = __webpack_require__(81);
 	const login_1 = __webpack_require__(82);
+	const games_1 = __webpack_require__(83);
 	var Layout = React.createClass({
 	    render: function () {
-	        return (React.createElement("div", null, this.props.children, React.createElement("footer", null, React.createElement("div", {className: "container"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-4 col-sm-offset-8"}, React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/about"}, "About")), React.createElement("p", null, React.createElement("a", {href: "#"}, "Source")), React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/privacy"}, "Privacy")), React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/donate"}, "Donate"))))))));
+	        return (React.createElement("div", null, this.props.children, React.createElement("footer", null, React.createElement("div", {className: "container"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-4"}, React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/about"}, "About")), React.createElement("p", null, React.createElement("a", {href: "#"}, "Source")), React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/privacy"}, "Privacy")), React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/donate"}, "Donate"))))))));
 	    }
 	});
 	var Home = React.createClass({
@@ -69,12 +70,6 @@
 	    },
 	    componentDidMount: function () {
 	        var self = this;
-	        //$.getJSON("/api/programs", function(data) {
-	        //    console.log(data);
-	        //    var state = self.state;
-	        //    self.state.programs = data;
-	        //    self.setState(state);
-	        //});
 	        $.getJSON("/api/programs/popular", (data) => {
 	            console.log(data);
 	            self.setState({ popular: data });
@@ -98,18 +93,18 @@
 	    render: function () {
 	        var self = this;
 	        var popularIssues = this.state.popularIssues.map((issue, index) => {
-	            return (React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card card-light"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + issue.programId + "/issue/" + issue.id}, issue.title)), React.createElement("div", {className: "row"}, React.createElement("span", {className: "card-text col-sm-10"}, React.createElement("b", null, React.createElement(react_router_1.Link, {to: "/app/" + self.state.programs[issue.programId].id + "/issue"}, self.state.programs[issue.programId].name))), React.createElement("div", {className: "col-sm-2 align-right"}, issue.upvotes)), React.createElement("div", {className: "label-group"}, React.createElement("span", {className: "label label-default"}, issue.type), React.createElement("span", {className: "label label-default"}, issue.status)), React.createElement("p", {className: "card-text"}, issue.time)))));
+	            return (React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card card-light"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block-no-padding"}, React.createElement("h5", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + issue.programId + "/issue/" + issue.id}, issue.title)), React.createElement("div", {className: "row"}, React.createElement("span", {className: "card-text col-sm-10"}, React.createElement("b", null, React.createElement(react_router_1.Link, {to: "/app/" + self.state.programs[issue.programId].id + "/issue"}, self.state.programs[issue.programId].name))), React.createElement("div", {className: "col-sm-2 align-right"}, issue.upvotes)), React.createElement("div", {className: "label-group"}, React.createElement("span", {className: "label label-default"}, issue.type), React.createElement("span", {className: "label label-default"}, issue.status)), React.createElement("p", {className: "card-text"}, issue.time)))));
 	        });
 	        var summaries = this.state.popular.map((summary, index) => {
 	            var issues = summary.topIssues.map((issue, index2) => {
 	                return (React.createElement("div", {key: index2, className: "row"}, React.createElement("span", {className: "card-text col-sm-10"}, React.createElement(react_router_1.Link, {to: "/app/" + summary.id + "/issue/" + issue.issueId}, issue.title)), React.createElement("div", {className: "col-sm-2 align-right"}, issue.upvotes)));
 	            });
-	            return (React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card card-light"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + summary.id + "/issue"}, summary.name)), issues))));
+	            return (React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card card-light"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block"}, React.createElement("h5", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + summary.id + "/issue"}, summary.name)), issues))));
 	        });
-	        return (React.createElement("div", null, React.createElement("div", {className: "container"}, React.createElement("h2", {className: "bottom-margin-md"}, "Hot issues"), React.createElement("div", {className: "row"}, popularIssues)), React.createElement("div", {className: "banner"}, React.createElement("div", {className: "container"}, React.createElement("div", {className: "banner-body"}, React.createElement("h2", {className: "bottom-margin-md"}, "Popular games"), React.createElement("div", {className: "row"}, summaries))))));
+	        return (React.createElement("div", null, React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("h2", {className: "bottom-margin-md red-underline"}, "Hot issues"), React.createElement("div", {className: "row"}, popularIssues)), React.createElement("div", {className: "banner"}, React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "banner-body"}, React.createElement("h2", {className: "bottom-margin-md blue-underline"}, "Popular games"), React.createElement("div", {className: "row"}, summaries))))));
 	    }
 	});
-	ReactDOM.render((React.createElement(react_router_1.Router, {history: react_router_1.browserHistory}, React.createElement(react_router_1.Route, {component: Layout}, React.createElement(react_router_1.Route, {path: "/", component: Home}), React.createElement(react_router_1.Route, {path: "/account/login", component: login_1.Login}), React.createElement(react_router_1.Route, {path: "/app/:programId", component: program_1.Program}, React.createElement(react_router_1.Route, {path: "/app/:programId/issue/new", component: create_issue_1.CreateIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/edit", component: edit_issue_1.EditIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId", component: issue_1.Issue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/new", component: create_issue_report_1.CreateIssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId", component: issue_report_1.IssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId/comments/new", component: create_issue_report_comment_1.CreateIssueReportComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/comments/new", component: create_issue_comment_1.CreateIssueComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue", component: issues_1.Issues}))))), document.getElementById('content'));
+	ReactDOM.render((React.createElement(react_router_1.Router, {history: react_router_1.browserHistory}, React.createElement(react_router_1.Route, {component: Layout}, React.createElement(react_router_1.Route, {path: "/", component: Home}), React.createElement(react_router_1.Route, {path: "/browse", component: games_1.Games}), React.createElement(react_router_1.Route, {path: "/account/login", component: login_1.Login}), React.createElement(react_router_1.Route, {path: "/app/:programId", component: program_1.Program}, React.createElement(react_router_1.Route, {path: "/app/:programId/issue/new", component: create_issue_1.CreateIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/edit", component: edit_issue_1.EditIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId", component: issue_1.Issue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/new", component: create_issue_report_1.CreateIssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId", component: issue_report_1.IssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId/comments/new", component: create_issue_report_comment_1.CreateIssueReportComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/comments/new", component: create_issue_comment_1.CreateIssueComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue", component: issues_1.Issues}))))), document.getElementById('content'));
 
 
 /***/ },
@@ -6609,6 +6604,38 @@
 	    }
 	}
 	exports.Login = Login;
+	;
+
+
+/***/ },
+/* 83 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const React = __webpack_require__(1);
+	const react_router_1 = __webpack_require__(3);
+	class Games extends React.Component {
+	    constructor(props) {
+	        super(props);
+	        this.state = {
+	            programs: [],
+	        };
+	    }
+	    componentDidMount() {
+	        var self = this;
+	        $.getJSON("/api/programs", function (data) {
+	            console.log(data);
+	            self.setState({ programs: data });
+	        });
+	    }
+	    render() {
+	        var programs = this.state.programs.map((program, index) => {
+	            return (React.createElement("div", {className: "col-sm-3", key: index}, React.createElement("div", {className: "card card-light"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block-no-padding"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + program.id + "/issue"}, program.name)), React.createElement("p", {className: "card-text"}, "Issues: ", program.issues)))));
+	        });
+	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row"}, programs)));
+	    }
+	}
+	exports.Games = Games;
 	;
 
 

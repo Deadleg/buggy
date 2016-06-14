@@ -12,6 +12,7 @@ import { CreateIssueComment } from "./create_issue_comment";
 import { CreateIssueReportComment } from "./create_issue_report_comment";
 import { IssueReport } from "./issue_report";
 import { Login } from "./login";
+import { Games } from "./games";
 
 var Layout = React.createClass({
     render: function() {
@@ -22,7 +23,7 @@ var Layout = React.createClass({
                 <footer>
                     <div className="container">
                         <div className="row">
-                            <div className="col-sm-4 col-sm-offset-8">
+                            <div className="col-sm-4">
                                 <p><Link to="/about">About</Link></p>
                                 <p><a href="#">Source</a></p>
                                 <p><Link to="/privacy">Privacy</Link></p>
@@ -42,13 +43,6 @@ var Home = React.createClass({
     },
     componentDidMount: function() {
         var self = this;
-        //$.getJSON("/api/programs", function(data) {
-        //    console.log(data);
-        //    var state = self.state;
-        //    self.state.programs = data;
-        //    self.setState(state);
-        //});
-
         $.getJSON("/api/programs/popular", (data) => {
             console.log(data);
             self.setState({popular: data});
@@ -77,8 +71,8 @@ var Home = React.createClass({
                 <div className="col-sm-3">
                     <div className="card card-light">
                         <img src="http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296" className="img-fluid card-img-top"/>
-                        <div className="card-block">
-                            <h4 className="card-title"><Link to={"/app/" + issue.programId + "/issue/" + issue.id}>{issue.title}</Link></h4>
+                        <div className="card-block-no-padding">
+                            <h5 className="card-title"><Link to={"/app/" + issue.programId + "/issue/" + issue.id}>{issue.title}</Link></h5>
                             <div className="row">
                                 <span className="card-text col-sm-10"><b><Link to={"/app/" + self.state.programs[issue.programId].id + "/issue"}>{self.state.programs[issue.programId].name}</Link></b></span>
                                 <div className="col-sm-2 align-right">
@@ -113,7 +107,7 @@ var Home = React.createClass({
                     <div className="card card-light">
                         <img src="http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296" className="img-fluid card-img-top"/>
                         <div className="card-block">
-                            <h4 className="card-title"><Link to={"/app/" + summary.id + "/issue"}>{summary.name}</Link></h4>
+                            <h5 className="card-title"><Link to={"/app/" + summary.id + "/issue"}>{summary.name}</Link></h5>
                             {issues}
                         </div>
                     </div>
@@ -123,17 +117,17 @@ var Home = React.createClass({
 
         return (
             <div>
-                <div className="container">
-                    <h2 className="bottom-margin-md">Hot issues</h2>
+                <div className="container bottom-margin-md">
+                    <h2 className="bottom-margin-md red-underline">Hot issues</h2>
                     <div className="row">
                         {popularIssues}
                     </div>
                 </div>
 
                 <div className="banner">
-                    <div className="container">
+                    <div className="container bottom-margin-md">
                         <div className="banner-body">
-                            <h2 className="bottom-margin-md">Popular games</h2>
+                            <h2 className="bottom-margin-md blue-underline">Popular games</h2>
                             <div className="row">
                                 {summaries}
                             </div>
@@ -149,6 +143,7 @@ ReactDOM.render((
     <Router history={browserHistory}>
         <Route component={Layout}>
             <Route path="/" component={Home}/>
+            <Route path="/browse" component={Games}/>
             <Route path="/account/login" component={Login}/>
             <Route path="/app/:programId" component={Program}>
                 <Route path="/app/:programId/issue/new" component={CreateIssue} />
