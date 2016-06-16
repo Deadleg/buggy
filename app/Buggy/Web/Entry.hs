@@ -15,7 +15,11 @@ module Buggy.Web.Entry (
     issueFixed,
     updateIssueReport,
     createIssueComment,
-    updateIssueComment, getIssueComment, getIssueComments, createIssueReportComment, updateIssueReportComment,
+    updateIssueComment,
+    getIssueComment,
+    getIssueComments,
+    createIssueReportComment,
+    updateIssueReportComment,
     getIssueReportComment,
     getIssueReportComments,
     reportIssueReportComment,
@@ -31,8 +35,9 @@ module Buggy.Web.Entry (
     getPopularIssues
 ) where
 
-import Buggy.Core.Types
+import Buggy.Core.Types hiding (id)
 import Buggy.Web.Types
+import Buggy.Web.Util (getBuggyCookie)
 import Happstack.Server
 import Happstack.Server.Types
 import Control.Monad (when, mzero, liftM)
@@ -77,22 +82,12 @@ getMyIssueStuffForProgram programId issueId = do
     doAuthenticated maybeCookie (\user ->
         lift $ L.getMyIssueStuff programId issueId (getUserId user) :: UserOperationsIO MyIssue)
 
-getBuggyCookie :: [(String, Cookie)] -> Maybe Cookie
-getBuggyCookie cookies
-    | search == [] = Nothing
-    | otherwise = Just $ snd (head search)
-    where search = filter (\x -> fst x == "buggy-user") cookies
-
 myIssueWatches :: ServerPart Response
 myIssueWatches = do
-    cookie <- lookCookieValue "buggy-user"
-    user <- liftIO $ A.getBuggyUser (T.pack cookie)
-    case user of
-        Just u -> do
-            watches <- liftIO $ L.getUserWatches (getUserId u)
-            ok $ toResponse watches
-        Nothing -> do
-            ok $ toResponse ("" :: T.Text)
+    req <- askRq
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user ->
+        lift $ L.getUserWatches (getUserId user) :: UserOperationsIO [Issue])
 
 watchIssue :: Integer -> ServerPart Response
 watchIssue issueId = do
@@ -115,9 +110,9 @@ signout = do
 
 getMeBasic :: ServerPart Response
 getMeBasic = do
-    cookie <- lookCookieValue "buggy-user"
-    user <- liftIO $ A.getBuggyUser (T.pack cookie)
-    ok $ toResponse user
+    req <- askRq
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> return user :: UserOperationsIO User)
 
 getAllPrograms :: ServerPart Response
 getAllPrograms = do
@@ -144,21 +139,27 @@ getIssueForProgram programId issueId = do
 
 createIssue :: Integer -> ServerPart Response
 createIssue programId = do
+    req <- askRq
     body <- getBody
-    let issue = eitherDecode body :: Either String Issue
-    case issue of
-        Left s -> liftIO $ putStrLn s
-        Right issue -> liftIO $ L.createIssue issue
-    ok $ toResponse ("" :: String)
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        let issue = eitherDecode body :: Either String Issue
+        case issue of
+            Left s -> liftIO $ putStrLn s
+            Right issue -> liftIO $ L.createIssue issue
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 createIssueReport :: Integer -> Integer -> ServerPart Response
 createIssueReport programId issueId = do
+    req <- askRq
     body <- getBody
-    let issue = eitherDecode body :: Either String IssueReport
-    case issue of
-        Left s -> liftIO $ putStrLn s
-        Right issue -> liftIO $ L.createIssueReport issue
-    ok $ toResponse ("" :: String)
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        let issue = eitherDecode body :: Either String IssueReport
+        case issue of
+            Left s -> liftIO $ putStrLn s
+            Right issue -> liftIO $ L.createIssueReport issue
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 getIssueReports :: Integer -> Integer -> ServerPart Response
 getIssueReports programId issueId = do
@@ -177,50 +178,68 @@ getProgramJSON programId = do
 
 updateIssue :: Integer -> Integer -> ServerPart Response
 updateIssue programId issueId = do
+    req <- askRq
     body <- getBody
-    let issue = eitherDecode body :: Either String Issue
-    case issue of
-        Left s -> liftIO $ putStrLn s
-        Right issue -> liftIO $ L.updateIssue issue
-    ok $ toResponse ("" :: String)
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        let issue = eitherDecode body :: Either String Issue
+        case issue of
+            Left s -> liftIO $ putStrLn s
+            Right issue -> liftIO $ L.updateIssue issue
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 updateIssueReport :: Integer -> Integer -> Integer -> ServerPart Response
 updateIssueReport programId issueId reportId = do
+    req <- askRq
     body <- getBody
-    let issue = eitherDecode body :: Either String IssueReport
-    case issue of
-        Left s -> liftIO $ putStrLn s
-        Right issue -> liftIO $ L.updateIssueReport issue
-    ok $ toResponse ("" :: String)
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        let issue = eitherDecode body :: Either String IssueReport
+        case issue of
+            Left s -> liftIO $ putStrLn s
+            Right issue -> liftIO $ L.updateIssueReport issue
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 issueReportFixed :: Integer -> Integer -> Integer -> ServerPart Response
 issueReportFixed programId issueId reportId = do
-    liftIO $ L.issueReportFixed programId issueId reportId
-
-    ok $ toResponse ("" :: String)
+    req <- askRq
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        liftIO $ L.issueReportFixed programId issueId reportId
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 issueFixed :: Integer -> Integer -> ServerPart Response
 issueFixed programId issueId = do
-    liftIO $ L.issueFixed programId issueId
-    ok $ toResponse ("" :: String)
+    req <- askRq
+    body <- getBody
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        liftIO $ L.issueFixed programId issueId
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 createIssueComment :: Integer -> Integer -> ServerPart Response
 createIssueComment programId issueId = do
+    req <- askRq
     body <- getBody
-    let issue = eitherDecode body :: Either String IssueComment
-    case issue of
-        Left s -> liftIO $ putStrLn s
-        Right issue -> liftIO $ L.createIssueComment issueId issue
-    ok $ toResponse ("" :: String)
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        let issue = eitherDecode body :: Either String IssueComment
+        case issue of
+            Left s -> liftIO $ putStrLn s
+            Right issue -> liftIO $ L.createIssueComment issueId issue
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 updateIssueComment :: Integer -> ServerPart Response
 updateIssueComment commentId = do
+    req <- askRq
     body <- getBody
-    let issue = eitherDecode body :: Either String IssueComment
-    case issue of
-        Left s -> liftIO $ putStrLn s
-        Right issue -> liftIO $ L.updateIssueComment commentId issue
-    ok $ toResponse ("" :: String)
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        let issue = eitherDecode body :: Either String IssueComment
+        case issue of
+            Left s -> liftIO $ putStrLn s
+            Right issue -> liftIO $ L.updateIssueComment commentId issue
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 getIssueComment :: Integer -> ServerPart Response
 getIssueComment commentId = do
@@ -234,21 +253,27 @@ getIssueComments programId issueId = do
 
 createIssueReportComment :: Integer -> Integer -> Integer -> ServerPart Response
 createIssueReportComment programId issueId reportId = do
+    req <- askRq
     body <- getBody
-    let issue = eitherDecode body :: Either String IssueReportComment
-    case issue of
-        Left s -> liftIO $ putStrLn s
-        Right issue -> liftIO $ L.createIssueReportComment reportId issue
-    ok $ toResponse ("" :: String)
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        let issue = eitherDecode body :: Either String IssueReportComment
+        case issue of
+            Left s -> liftIO $ putStrLn s
+            Right issue -> liftIO $ L.createIssueReportComment reportId issue
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 updateIssueReportComment :: Integer -> ServerPart Response
 updateIssueReportComment commentId = do
+    req <- askRq
     body <- getBody
-    let issue = eitherDecode body :: Either String IssueReportComment
-    case issue of
-        Left s -> liftIO $ putStrLn s
-        Right issue -> liftIO $ L.updateIssueReportComment commentId issue
-    ok $ toResponse ("" :: String)
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        let issue = eitherDecode body :: Either String IssueReportComment
+        case issue of
+            Left s -> liftIO $ putStrLn s
+            Right issue -> liftIO $ L.updateIssueReportComment commentId issue
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 getIssueReportComment :: Integer -> ServerPart Response
 getIssueReportComment commentId = do
@@ -262,21 +287,27 @@ getIssueReportComments programId issueId reportId = do
 
 reportIssueReportComment :: Integer -> Integer -> Integer -> Integer -> ServerPart Response
 reportIssueReportComment programId issueId reportId commentId = do
+    req <- askRq
     body <- getBody
-    let issue = eitherDecode body :: Either String IssueReportCommentReport
-    case issue of
-        Left s -> liftIO $ putStrLn s
-        Right issue -> liftIO $ L.reportIssueReportComment programId issueId reportId commentId issue
-    ok $ toResponse ("" :: T.Text)
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        let issue = eitherDecode body :: Either String IssueReportCommentReport
+        case issue of
+            Left s -> liftIO $ putStrLn s
+            Right issue -> liftIO $ L.reportIssueReportComment programId issueId reportId commentId issue
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 reportIssueComment :: Integer -> Integer -> Integer -> ServerPart Response
 reportIssueComment programId issueId commentId = do
+    req <- askRq
     body <- getBody
-    let issue = eitherDecode body :: Either String IssueCommentReport
-    case issue of
-        Left s -> liftIO $ putStrLn s
-        Right issue -> liftIO $ L.reportIssueComment programId issueId commentId issue
-    ok $ toResponse ("" :: T.Text)
+    let maybeCookie = getBuggyCookie (rqCookies req)
+    doAuthenticated maybeCookie (\user -> do
+        let issue = eitherDecode body :: Either String IssueCommentReport
+        case issue of
+            Left s -> liftIO $ putStrLn s
+            Right issue -> liftIO $ L.reportIssueComment programId issueId commentId issue
+        return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 workingHeader = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" :: T.Text
 
