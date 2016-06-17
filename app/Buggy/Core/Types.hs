@@ -30,7 +30,8 @@ module Buggy.Core.Types (
     UserOperationsT(..),
     UserOperationsIO(..),
     IssueSummary(..),
-    ProgramSummary(..)
+    ProgramSummary(..),
+    badOperation
 ) where
 
 import Data.Time
@@ -49,6 +50,9 @@ import Happstack.Server (Cookie)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.ByteString.Lazy as L
+
+badOperation :: ErrorCode -> Text -> UserOperationsIO a
+badOperation errorCode text = (UserOperationsT . return) (BadRequest errorCode text)
 
 type ErrorCode = Int
 

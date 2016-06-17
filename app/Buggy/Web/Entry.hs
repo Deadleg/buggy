@@ -145,9 +145,10 @@ createIssue programId = do
     doAuthenticated maybeCookie (\user -> do
         let issue = eitherDecode body :: Either String Issue
         case issue of
-            Left s -> liftIO $ putStrLn s
-            Right issue -> liftIO $ L.createIssue issue
-        return ("" :: T.Text) :: UserOperationsIO T.Text)
+            Left s -> badOperation 400 (T.pack s)
+            Right issue -> do
+                liftIO $ L.createIssue issue
+                return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 createIssueReport :: Integer -> Integer -> ServerPart Response
 createIssueReport programId issueId = do
@@ -157,9 +158,10 @@ createIssueReport programId issueId = do
     doAuthenticated maybeCookie (\user -> do
         let issue = eitherDecode body :: Either String IssueReport
         case issue of
-            Left s -> liftIO $ putStrLn s
-            Right issue -> liftIO $ L.createIssueReport issue
-        return ("" :: T.Text) :: UserOperationsIO T.Text)
+            Left s -> badOperation 400 (T.pack s)
+            Right issue -> do
+                liftIO $ L.createIssueReport issue
+                return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 getIssueReports :: Integer -> Integer -> ServerPart Response
 getIssueReports programId issueId = do
@@ -184,9 +186,10 @@ updateIssue programId issueId = do
     doAuthenticated maybeCookie (\user -> do
         let issue = eitherDecode body :: Either String Issue
         case issue of
-            Left s -> liftIO $ putStrLn s
-            Right issue -> liftIO $ L.updateIssue issue
-        return ("" :: T.Text) :: UserOperationsIO T.Text)
+            Left s -> badOperation 400 (T.pack s)
+            Right issue -> do
+                liftIO $ L.updateIssue issue
+                return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 updateIssueReport :: Integer -> Integer -> Integer -> ServerPart Response
 updateIssueReport programId issueId reportId = do
@@ -196,9 +199,10 @@ updateIssueReport programId issueId reportId = do
     doAuthenticated maybeCookie (\user -> do
         let issue = eitherDecode body :: Either String IssueReport
         case issue of
-            Left s -> liftIO $ putStrLn s
-            Right issue -> liftIO $ L.updateIssueReport issue
-        return ("" :: T.Text) :: UserOperationsIO T.Text)
+            Left s -> badOperation 400 (T.pack s)
+            Right issue -> do
+                liftIO $ L.updateIssueReport issue
+                return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 issueReportFixed :: Integer -> Integer -> Integer -> ServerPart Response
 issueReportFixed programId issueId reportId = do
@@ -225,9 +229,10 @@ createIssueComment programId issueId = do
     doAuthenticated maybeCookie (\user -> do
         let issue = eitherDecode body :: Either String IssueComment
         case issue of
-            Left s -> liftIO $ putStrLn s
-            Right issue -> liftIO $ L.createIssueComment issueId issue
-        return ("" :: T.Text) :: UserOperationsIO T.Text)
+            Left s -> badOperation 400 (T.pack s)
+            Right issue -> do
+                liftIO $ L.createIssueComment issueId issue
+                return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 updateIssueComment :: Integer -> ServerPart Response
 updateIssueComment commentId = do
@@ -237,9 +242,10 @@ updateIssueComment commentId = do
     doAuthenticated maybeCookie (\user -> do
         let issue = eitherDecode body :: Either String IssueComment
         case issue of
-            Left s -> liftIO $ putStrLn s
-            Right issue -> liftIO $ L.updateIssueComment commentId issue
-        return ("" :: T.Text) :: UserOperationsIO T.Text)
+            Left s -> badOperation 400 (T.pack s)
+            Right issue -> do
+                liftIO $ L.updateIssueComment commentId issue
+                return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 getIssueComment :: Integer -> ServerPart Response
 getIssueComment commentId = do
@@ -259,9 +265,10 @@ createIssueReportComment programId issueId reportId = do
     doAuthenticated maybeCookie (\user -> do
         let issue = eitherDecode body :: Either String IssueReportComment
         case issue of
-            Left s -> liftIO $ putStrLn s
-            Right issue -> liftIO $ L.createIssueReportComment reportId issue
-        return ("" :: T.Text) :: UserOperationsIO T.Text)
+            Left s -> badOperation 400 (T.pack s)
+            Right issue -> do
+                liftIO $ L.createIssueReportComment reportId issue
+                return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 updateIssueReportComment :: Integer -> ServerPart Response
 updateIssueReportComment commentId = do
@@ -271,9 +278,10 @@ updateIssueReportComment commentId = do
     doAuthenticated maybeCookie (\user -> do
         let issue = eitherDecode body :: Either String IssueReportComment
         case issue of
-            Left s -> liftIO $ putStrLn s
-            Right issue -> liftIO $ L.updateIssueReportComment commentId issue
-        return ("" :: T.Text) :: UserOperationsIO T.Text)
+            Left s -> badOperation 400 (T.pack s)
+            Right issue -> do
+                liftIO $ L.updateIssueReportComment commentId issue
+                return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 getIssueReportComment :: Integer -> ServerPart Response
 getIssueReportComment commentId = do
@@ -293,9 +301,10 @@ reportIssueReportComment programId issueId reportId commentId = do
     doAuthenticated maybeCookie (\user -> do
         let issue = eitherDecode body :: Either String IssueReportCommentReport
         case issue of
-            Left s -> liftIO $ putStrLn s
-            Right issue -> liftIO $ L.reportIssueReportComment programId issueId reportId commentId issue
-        return ("" :: T.Text) :: UserOperationsIO T.Text)
+            Left s -> badOperation 400 (T.pack s)
+            Right issue -> do
+                liftIO $ L.reportIssueReportComment programId issueId reportId commentId issue
+                return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 reportIssueComment :: Integer -> Integer -> Integer -> ServerPart Response
 reportIssueComment programId issueId commentId = do
@@ -305,9 +314,10 @@ reportIssueComment programId issueId commentId = do
     doAuthenticated maybeCookie (\user -> do
         let issue = eitherDecode body :: Either String IssueCommentReport
         case issue of
-            Left s -> liftIO $ putStrLn s
-            Right issue -> liftIO $ L.reportIssueComment programId issueId commentId issue
-        return ("" :: T.Text) :: UserOperationsIO T.Text)
+            Left s -> badOperation 400 (T.pack s)
+            Right issue -> do
+                liftIO $ L.reportIssueComment programId issueId commentId issue
+                return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 workingHeader = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" :: T.Text
 
