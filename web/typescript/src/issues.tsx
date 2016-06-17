@@ -32,14 +32,14 @@ export class Issues extends React.Component<IssuesProps, any> {
                                 <span className="label label-default">{issue.type}</span>
                                 <span className="label label-default">{issue.status}</span>
                             </div>
-                            <p className="card-text">Reported on {issue.time}</p>
+                            <p className="card-text">Reported on {moment(issue.time).format("DD-MM-YYYY")}</p>
                         </div>
                     </div>
                 </div>
             );
         });
         return (
-            <div className="container">
+            <div className="container bottom-margin-md">
                 <div className="row">
                     {content}
                 </div>

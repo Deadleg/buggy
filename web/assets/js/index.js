@@ -93,7 +93,7 @@
 	    render: function () {
 	        var self = this;
 	        var popularIssues = this.state.popularIssues.map((issue, index) => {
-	            return (React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card card-light"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block-no-padding"}, React.createElement("h5", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + issue.programId + "/issue/" + issue.id}, issue.title)), React.createElement("div", {className: "row"}, React.createElement("span", {className: "card-text col-sm-10"}, React.createElement("b", null, React.createElement(react_router_1.Link, {to: "/app/" + self.state.programs[issue.programId].id + "/issue"}, self.state.programs[issue.programId].name))), React.createElement("div", {className: "col-sm-2 align-right"}, issue.upvotes)), React.createElement("div", {className: "label-group"}, React.createElement("span", {className: "label label-default"}, issue.type), React.createElement("span", {className: "label label-default"}, issue.status)), React.createElement("p", {className: "card-text"}, issue.time)))));
+	            return (React.createElement("div", {className: "col-sm-3"}, React.createElement("div", {className: "card card-light"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block-no-padding"}, React.createElement("h5", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + issue.programId + "/issue/" + issue.id}, issue.title)), React.createElement("div", {className: "row"}, React.createElement("div", {className: "label-group col-sm-6"}, React.createElement("span", {className: "label label-default"}, issue.type), React.createElement("span", {className: "label label-default"}, issue.status)), React.createElement("div", {className: "card-text col-sm-6 text-sm-right"}, moment(issue.time).format("DD-MM-YYYY"))), React.createElement("div", {className: "row"}, React.createElement("span", {className: "card-text col-sm-10"}, React.createElement("b", null, React.createElement(react_router_1.Link, {to: "/app/" + self.state.programs[issue.programId].id + "/issue"}, self.state.programs[issue.programId].name))), React.createElement("div", {className: "col-sm-2 text-sm-right"}, issue.upvotes))))));
 	        });
 	        var summaries = this.state.popular.map((summary, index) => {
 	            var issues = summary.topIssues.map((issue, index2) => {
@@ -5320,9 +5320,9 @@
 	    render() {
 	        var self = this;
 	        var content = this.state.issues.map(function (issue, index) {
-	            return (React.createElement("div", {className: "col-sm-4", key: index}, React.createElement("div", {className: "card"}, React.createElement("div", {className: "card-block"}, React.createElement("div", {className: "card-title font-weight-bold"}, React.createElement(react_router_1.Link, {to: "/app/" + self.props.params.programId + "/issue/" + issue.id}, issue.title)), React.createElement("div", {className: "label-group"}, React.createElement("span", {className: "label label-default"}, issue.type), React.createElement("span", {className: "label label-default"}, issue.status)), React.createElement("p", {className: "card-text"}, "Reported on ", issue.time)))));
+	            return (React.createElement("div", {className: "col-sm-4", key: index}, React.createElement("div", {className: "card"}, React.createElement("div", {className: "card-block"}, React.createElement("div", {className: "card-title font-weight-bold"}, React.createElement(react_router_1.Link, {to: "/app/" + self.props.params.programId + "/issue/" + issue.id}, issue.title)), React.createElement("div", {className: "label-group"}, React.createElement("span", {className: "label label-default"}, issue.type), React.createElement("span", {className: "label label-default"}, issue.status)), React.createElement("p", {className: "card-text"}, "Reported on ", moment(issue.time).format("DD-MM-YYYY"))))));
 	        });
-	        return (React.createElement("div", {className: "container"}, React.createElement("div", {className: "row"}, content)));
+	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row"}, content)));
 	    }
 	}
 	exports.Issues = Issues;
@@ -6630,7 +6630,20 @@
 	    }
 	    render() {
 	        var programs = this.state.programs.map((program, index) => {
-	            return (React.createElement("div", {className: "col-sm-3", key: index}, React.createElement("div", {className: "card card-light"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block-no-padding"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + program.id + "/issue"}, program.name)), React.createElement("p", {className: "card-text"}, "Issues: ", program.issues)))));
+	            var color;
+	            if (program.issues < 10) {
+	                color = "#31b661";
+	            }
+	            else if (program.issues < 100) {
+	                color = "#4bcf7b";
+	            }
+	            else if (program.issues < 500) {
+	                color = "#cf4b5e";
+	            }
+	            else {
+	                color = "#b63144";
+	            }
+	            return (React.createElement("div", {className: "col-sm-3", key: index}, React.createElement("div", {className: "card card-light"}, React.createElement("img", {src: "http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296", className: "img-fluid card-img-top"}), React.createElement("div", {className: "card-block-no-padding"}, React.createElement("h4", {className: "card-title"}, React.createElement(react_router_1.Link, {to: "/app/" + program.id + "/issue"}, program.name)), React.createElement("p", {className: "card-text"}, React.createElement("span", {style: { color: color }}, program.issues), " issues")))));
 	        });
 	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row"}, programs)));
 	    }

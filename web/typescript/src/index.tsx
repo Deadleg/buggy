@@ -74,16 +74,18 @@ var Home = React.createClass({
                         <div className="card-block-no-padding">
                             <h5 className="card-title"><Link to={"/app/" + issue.programId + "/issue/" + issue.id}>{issue.title}</Link></h5>
                             <div className="row">
+                                <div className="label-group col-sm-6">
+                                    <span className="label label-default">{issue.type}</span>
+                                    <span className="label label-default">{issue.status}</span>
+                                </div>
+                                <div className="card-text col-sm-6 text-sm-right">{moment(issue.time).format("DD-MM-YYYY")}</div>
+                            </div>
+                            <div className="row">
                                 <span className="card-text col-sm-10"><b><Link to={"/app/" + self.state.programs[issue.programId].id + "/issue"}>{self.state.programs[issue.programId].name}</Link></b></span>
-                                <div className="col-sm-2 align-right">
+                                <div className="col-sm-2 text-sm-right">
                                     {issue.upvotes}
                                 </div>
                             </div>
-                            <div className="label-group">
-                                <span className="label label-default">{issue.type}</span>
-                                <span className="label label-default">{issue.status}</span>
-                            </div>
-                            <p className="card-text">{issue.time}</p>
                         </div>
                     </div>
                 </div>
