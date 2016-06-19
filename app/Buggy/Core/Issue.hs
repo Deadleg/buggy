@@ -53,8 +53,8 @@ getPrograms = P.selectPrograms
 getIssues :: Integer -> IO ([T.Issue])
 getIssues programId = P.selectIssues programId
 
-createIssue :: T.Issue -> IO ()
-createIssue issue = P.insertIssue issue
+createIssue :: T.Issue -> IO (T.NewIssueResponse)
+createIssue issue = P.insertIssue issue >>= (\id -> return $ T.NewIssueResponse id)
 
 createIssueReport :: T.IssueReport -> IO ()
 createIssueReport issue = P.insertIssueReport issue

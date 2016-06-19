@@ -75,40 +75,48 @@ export class CreateIssueReport extends React.Component<CreateIssueProps, any> {
             );
         });
         return (
-            <div>
-                <h1>New issue report</h1>
-                <form method="post" onSubmit={this.createIssue}>
-                    <div className="input-field col s12">
-                        <textarea className="materialize-textarea" placeholder="Your report" ref="description"></textarea>
-                        <label>Description</label>
+            <div className="container bottom-margin-md">
+                <div className="row">
+                    <div className="col-sm-12">
+                        <h1>New issue report</h1>
                     </div>
-                    <div className="input-field col s12">
-                        <textarea className="materialize-textarea" placeholder="Your computer/software specs" ref="specs"></textarea>
-                        <label>Specs</label>
+                    <div className="col-sm-6">
+                        <form method="post" onSubmit={this.createIssue}>
+                            <fieldset>
+                                <label>Description</label>
+                                <textarea className="form-control" placeholder="Your report" ref="description"></textarea>
+                            </fieldset>
+                            <fieldset>
+                                <label>Specs</label>
+                                <textarea className="form-control" placeholder="Your computer/software specs" ref="specs"></textarea>
+                            </fieldset>
+                            <fieldset>
+                                <label>Status</label>
+                                <select defaultValue="" className="form-control" ref="status">
+                                    <option value="" disabled></option>
+                                    <option value="Broken">Broken</option>
+                                    <option value="Working">Working</option>
+                                    <option value="PartiallyWorking">Partially working</option>
+                                    <option value="Works">Works</option>
+                                    <option value="NoWork">Does not work</option>
+                                </select>
+                            </fieldset>
+                            <fieldset>
+                                <label>Type</label>
+                                <select defaultValue="" className="form-control" ref="type">
+                                    <option value="" disabled></option>
+                                    <option value="Fix">Fix</option>
+                                    <option value="PartialFix">Partial Fix</option>
+                                    <option value="Report">Report</option>
+                                </select>
+                            </fieldset>
+                            {labels}
+                            <div style={{"marginTop": "2rem"}}>
+                                <button type="submit" className="btn btn-common">Submit</button>
+                            </div>
+                        </form>
                     </div>
-                    <div className="input-field col s6">
-                        <select defaultValue="" className="browser-default" ref="status">
-                            <option value="" disabled></option>
-                            <option value="Broken">Broken</option>
-                            <option value="Working">Working</option>
-                            <option value="PartiallyWorking">Partially working</option>
-                            <option value="Works">Works</option>
-                            <option value="NoWork">Does not work</option>
-                        </select>
-                        <label>Status</label>
-                    </div>
-                    <div className="input-field col s6">
-                        <select defaultValue="" className="browser-default" ref="type">
-                            <option value="" disabled></option>
-                            <option value="Fix">Fix</option>
-                            <option value="PartialFix">Partial Fix</option>
-                            <option value="Report">Report</option>
-                        </select>
-                        <label>Type</label>
-                    </div>
-                    {labels}
-                    <button type="submit" className="waves-effect waves-light btn">Submit</button>
-                </form>
+                </div>
             </div>
         );
     }

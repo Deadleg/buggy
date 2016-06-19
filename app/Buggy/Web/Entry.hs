@@ -147,8 +147,8 @@ createIssue programId = do
         case issue of
             Left s -> badOperation 400 (T.pack s)
             Right issue -> do
-                liftIO $ L.createIssue issue
-                return ("" :: T.Text) :: UserOperationsIO T.Text)
+                response <- liftIO $ L.createIssue issue
+                return response :: UserOperationsIO NewIssueResponse)
 
 createIssueReport :: Integer -> Integer -> ServerPart Response
 createIssueReport programId issueId = do

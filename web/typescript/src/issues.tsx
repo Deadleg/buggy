@@ -24,20 +24,30 @@ export class Issues extends React.Component<IssuesProps, any> {
         var self = this;
         var content = this.state.issues.map(function (issue, index) {
             return (
-                <div className="col-sm-4" key={index}>
-                    <div className="card">
-                        <div className="card-block">
-                            <div className="card-title font-weight-bold"><Link to={"/app/" + self.props.params.programId + "/issue/" + issue.id}>{issue.title}</Link></div>
-                            <div className="label-group">
-                                <span className="label label-default">{issue.type}</span>
-                                <span className="label label-default">{issue.status}</span>
+                <div className="col-sm-12 bottom-margin-md" key={index}>
+                    <div className="row">
+                        <div className="col-sm-12">
+                            <div className="upvotes">
+                                {issue.upvotes}
                             </div>
-                            <p className="card-text">Reported on {moment(issue.time).format("DD-MM-YYYY")}</p>
+                            <Link className="" to={"/app/" + self.props.params.programId + "/issue/" + issue.id}>
+                                {issue.title}
+                            </Link>
                         </div>
                     </div>
+                    <div className="label-group">
+                        <span className="label label-default">{issue.type}</span>
+                        <span className="label label-default">{issue.status}</span>
+                    </div>
+                    <p className="card-text">
+                        <small>
+                            Reported on {moment(issue.time).format("DD-MM-YYYY")}
+                        </small>
+                    </p>
                 </div>
             );
         });
+
         return (
             <div className="container bottom-margin-md">
                 <div className="row">

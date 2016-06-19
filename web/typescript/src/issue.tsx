@@ -170,7 +170,7 @@ export class Issue extends React.Component<IssueProps, any> {
                     </div>
                 </div>
                 <div className="row" style={{"marginTop":"2rem", "marginBottom": "2rem"}}>
-                    <div className="col-sm-12 btn-group-spaced" id="issueTabs">
+                    <div className="col-sm-12 btn-group-spaced" /*id="issueTabs"*/>
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}>Add report</Link></button>
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/comments/new"}>Add comment</Link></button>
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}>Edit issue</Link></button>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { RouteComponentProps } from "react-router";
+import { RouteComponentProps, browserHistory } from "react-router";
 
 export interface ProgramParams {
     programId: string;
@@ -47,12 +47,14 @@ export class CreateIssue extends React.Component<CreateIssueProps, any> {
 
         console.log(data);
         console.log(this.props.params.programId);
+        var self = this;
 
         $.post(
             "/api/programs/" + this.props.params.programId + "/issues/new",
             JSON.stringify(data),
             function(data) {
-                console.log("Ye");
+                console.log(data);
+                browserHistory.push('/app/' + self.props.params.programId + '/issue/' + data.id);
             },
             "json"
         ).fail(function(e) {
@@ -76,7 +78,7 @@ export class CreateIssue extends React.Component<CreateIssueProps, any> {
             );
         });
         return (
-            <div className="container">
+            <div className="container bottom-margin-md">
                 <div className="row">
                     <div className="col-sm-12">
                         <h1>New issue</h1>
@@ -103,7 +105,7 @@ export class CreateIssue extends React.Component<CreateIssueProps, any> {
                             </fieldset>
                             {steps}
                             <button type="button" className="btn btn-common" onClick={this.addReproductionStep}>Add step</button>
-                            <div className="col s12" style={{"marginTop": "2rem"}}>
+                            <div style={{"marginTop": "2rem"}}>
                                 <button type="submit" className="btn btn-common">Submit</button>
                             </div>
                         </form>

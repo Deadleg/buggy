@@ -31,7 +31,8 @@ module Buggy.Core.Types (
     UserOperationsIO(..),
     IssueSummary(..),
     ProgramSummary(..),
-    badOperation
+    badOperation,
+    NewIssueResponse(..)
 ) where
 
 import Data.Time
@@ -145,6 +146,13 @@ data LoginType = Google | Steam deriving (Eq, Show, Read)
 
 data ReproductionStep = Step { getStepDescription :: String 
                              } deriving (Eq, Show, Read)
+
+data NewIssueResponse = NewIssueResponse
+    { newIssueId :: Int
+    } deriving (Eq, Show, Read)
+
+instance ToJSON NewIssueResponse where
+    toJSON (NewIssueResponse id) = object ["id" .= id]
 
 data NewUser = NewUser
                 { username :: Text

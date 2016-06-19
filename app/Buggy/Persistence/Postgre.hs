@@ -174,12 +174,12 @@ selectIssues programId = do
     return $ map (\((issueId, issueType, title, description, timeReported, status, userId, username, editTime, upvotes), reproSteps) ->
             (Existing programId issueId (title :: String) (description :: String) (read issueType) (map (\step -> Step step) reproSteps) (timeReported :: LocalTime) (read status) (ExistingUser userId username) editTime upvotes)) issues
 
-insertIssue :: Issue -> IO ()
+insertIssue :: Issue -> IO (Int)
 insertIssue (New programId title description issueType reproductionSteps status reporter) = do
     conn <- connectPostgreSQL connectionString
     [Only issueId] <- query conn "INSERT INTO issues (program, type, reporter, status, title, description, time_reported) VALUES (? , ?, ?, ?, ?, ?, NOW()) RETURNING id;" (programId :: Integer, (show issueType :: String), reporter :: Integer, (show status :: String), title :: String, description :: String)
     x <- executeMany conn "INSERT INTO reproduction_steps (issue, step_number, instruction) VALUES (?, ?, ?);" $ map (\(stepNumber, step) ->  (issueId :: Int, stepNumber, getStepDescription step)) (zip [1..length reproductionSteps] reproductionSteps)
-    return ()
+    return issueId
 
 selectIssue :: Integer -> Integer -> IO (Issue)
 selectIssue programId issueId = do

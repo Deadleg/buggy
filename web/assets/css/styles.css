@@ -4743,6 +4743,12 @@ footer {
   border-bottom-color: #b63144;
   border-bottom-style: solid; }
 
+.upvotes {
+  color: #aaaaaa;
+  font-weight: bold;
+  width: 2rem;
+  display: inline-block; }
+
 body {
   background: #fafaff;
   color: #000000; }

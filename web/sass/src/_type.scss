@@ -9,3 +9,10 @@
     border-bottom-color: $red-highlight;
     border-bottom-style: solid;
 }
+
+.upvotes {
+    color: $count-color;
+    font-weight: bold;
+    width: 2rem;
+    display: inline-block;
+}

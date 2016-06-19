@@ -72,7 +72,12 @@ var Home = React.createClass({
                     <div className="card card-light">
                         <img src="http://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1452221296" className="img-fluid card-img-top"/>
                         <div className="card-block-no-padding">
-                            <h5 className="card-title"><Link to={"/app/" + issue.programId + "/issue/" + issue.id}>{issue.title}</Link></h5>
+                            <h5 className="card-title">
+                                <div className="upvotes">{issue.upvotes}</div>
+                                <Link to={"/app/" + issue.programId + "/issue/" + issue.id}>
+                                    {issue.title}
+                                </Link>
+                            </h5>
                             <div className="row">
                                 <div className="label-group col-sm-6">
                                     <span className="label label-default">{issue.type}</span>
@@ -81,10 +86,13 @@ var Home = React.createClass({
                                 <div className="card-text col-sm-6 text-sm-right">{moment(issue.time).format("DD-MM-YYYY")}</div>
                             </div>
                             <div className="row">
-                                <span className="card-text col-sm-10"><b><Link to={"/app/" + self.state.programs[issue.programId].id + "/issue"}>{self.state.programs[issue.programId].name}</Link></b></span>
-                                <div className="col-sm-2 text-sm-right">
-                                    {issue.upvotes}
-                                </div>
+                                <span className="card-text col-sm-10">
+                                    <b>
+                                        <Link to={"/app/" + self.state.programs[issue.programId].id + "/issue"}>
+                                            {self.state.programs[issue.programId].name}
+                                        </Link>
+                                    </b>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -95,11 +103,11 @@ var Home = React.createClass({
         var summaries = this.state.popular.map((summary, index) => {
             var issues = summary.topIssues.map((issue, index2) => {
                 return (
-                    <div key={index2} className="row">
-                        <span className="card-text col-sm-10"><Link to={"/app/" + summary.id + "/issue/" + issue.issueId}>{issue.title}</Link></span>
-                        <div className="col-sm-2 align-right">
+                    <div key={index2}>
+                        <div className="upvotes">
                             {issue.upvotes}
                         </div>
+                        <span className="card-text"><Link to={"/app/" + summary.id + "/issue/" + issue.issueId}>{issue.title}</Link></span>
                     </div>
                 );
             });
@@ -149,13 +157,13 @@ ReactDOM.render((
             <Route path="/account/login" component={Login}/>
             <Route path="/app/:programId" component={Program}>
                 <Route path="/app/:programId/issue/new" component={CreateIssue} />
-                <Route path="/app/:programId/issue/:issueId/edit" component={EditIssue} />
-                <Route path="/app/:programId/issue/:issueId" component={Issue} />
-                <Route path="/app/:programId/issue/:issueId/report/new" component={CreateIssueReport} />
-                <Route path="/app/:programId/issue/:issueId/report/:reportId" component={IssueReport} />
-                <Route path="/app/:programId/issue/:issueId/report/:reportId/comments/new" component={CreateIssueReportComment} />
-                <Route path="/app/:programId/issue/:issueId/comments/new" component={CreateIssueComment} />
                 <Route path="/app/:programId/issue" component={Issues} />
+                <Route path="/app/:programId/issue/:issueId/edit" component={EditIssue} />
+                <Route path="/app/:programId/issue/:issueId/report/new" component={CreateIssueReport} />
+                <Route path="/app/:programId/issue/:issueId/report/:reportId/comments/new" component={CreateIssueReportComment} />
+                <Route path="/app/:programId/issue/:issueId/report/:reportId" component={IssueReport} />
+                <Route path="/app/:programId/issue/:issueId/comments/new" component={CreateIssueComment} />
+                <Route path="/app/:programId/issue/:issueId" component={Issue} />
            </Route>
        </Route>
     </Router>),
