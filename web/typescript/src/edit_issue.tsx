@@ -15,7 +15,7 @@ export class EditIssue extends React.Component<EditIssueProps, any> {
         }
     }
 
-    componentWillMount() {
+    componentWillMount = () => {
         var self = this;
         $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId, function(data) {
             console.log(data);
@@ -23,11 +23,7 @@ export class EditIssue extends React.Component<EditIssueProps, any> {
         });
     }
     
-    componentDidMount() {
-        ($('select') as any).material_select();
-    }
-    
-    addReproductionStep() {
+    addReproductionStep = () => {
         var currentReproductionSteps = this.state.reproductionSteps;
         currentReproductionSteps.push({
             instruction: ""
@@ -35,12 +31,12 @@ export class EditIssue extends React.Component<EditIssueProps, any> {
         this.setState({reproductionSteps: currentReproductionSteps});
     }
     
-    removeReproductionStep(index) {
+    removeReproductionStep = (index) => {
         var currentReproductionSteps = this.state.reproductionSteps;
         this.setState(currentReproductionSteps.splice(index, 1));
     }
     
-    updateIssue(e) {
+    updateIssue = (e) => {
         e.preventDefault();
 
         var steps = [];
@@ -52,8 +48,8 @@ export class EditIssue extends React.Component<EditIssueProps, any> {
         var data = {
             programId: this.state.issue.programId,
             id: this.state.issue.id,
-            title: (this.refs["title"] as HTMLInputElement).value,
-            description: (this.refs["description"] as HTMLInputElement).value,
+            title: this.state.issue.title,
+            description: this.state.issue.description,
             type: "Bug",
             reproductionSteps: steps,
         };
@@ -67,55 +63,68 @@ export class EditIssue extends React.Component<EditIssueProps, any> {
         });
     }
     
-    updateDescription() {
-        this.setState({issue: {description: (this.refs["description"] as HTMLInputElement).value}});
+    updateDescription = (e) => {
+        var issue = this.state.issue;
+        issue.description = (e.target as HTMLInputElement).value;
+        this.setState({issue: issue});
     }
-    
-    updateTitle() {
-        this.setState({issue: {title: (this.refs["title"] as HTMLInputElement).value}});
+
+    updateTitle = (e) => {
+        var issue = this.state.issue;
+        issue.title = (e.target as HTMLInputElement).value;
+        this.setState({issue: issue});
     }
-    
+
     render() {
         var self = this;
         var steps = this.state.reproductionSteps.map(function(step, index) {
             return (
                 <div key={index}>
-                    <div className="input-field col s9">
-                        <input type="text" placeholder="What did you do?" defaultValue={step.instruction.length > 0 ? step.instruction : null} ref={"instruction" + index} />
-                        <label className="active">Step {index + 1}</label>
-                    </div>
-                    <button className="waves-effect waves-light btn col s3 red" type="button" onClick={self.removeReproductionStep.bind(self, index)}>Delete</button>
+                    <fieldset className="form-group">
+                        <label>Step {index + 1}</label>
+                        <input className="form-control" type="text" placeholder="What did you do?" defaultValue={step.instruction.length > 0 ? step.instruction : null} ref={"instruction" + index} />
+                        <div className="btn-group form-sequence-buttons pull-sm-right">
+                            <button className="btn btn-red" type="button" onClick={self.removeReproductionStep.bind(self, index)}>Delete</button>
+                        </div>
+                    </fieldset>
                 </div>
             );
         });
+
         return (
-            <div>
-                <h1>Edit issue</h1>
-                <form method="post" onSubmit={this.updateIssue}>
-                    <div className="input-field col s12">
-                        <input type="text" placeholder="A short descriptive title" ref="title" value={this.state.issue.title} onChange={this.updateTitle}></input>
-                        <label>Title</label>
+            <div className="container bottom-margin-md">
+                <div className="row">
+                    <div className="col-sm-12">
+                        <h1>Edit issue</h1>
                     </div>
-                    <div className="input-field col s12">
-                        <textarea className="materialize-textarea" placeholder="A description of the problem" ref="description" value={this.state.issue.description} onChange={this.updateDescription}></textarea>
-                        <label>Description</label>
+                    <div className="col-sm-6">
+                        <form method="post" onSubmit={this.updateIssue}>
+                            <fieldset>
+                                <label>Title</label>
+                                <input className="form-control" type="text" placeholder="A short descriptive title" value={this.state.issue.title} onChange={this.updateTitle}></input>
+                            </fieldset>
+                            <fieldset>
+                                <label>Description</label>
+                                <textarea className="form-control" placeholder="A description of the problem" value={this.state.issue.description} onChange={this.updateDescription}></textarea>
+                            </fieldset>
+                            <fieldset>
+                                <label>Issue type</label>
+                                <select className="form-control" ref="type" defaultValue={this.state.issue.type}>
+                                    <option value="" disabled></option>
+                                    <option value="Bug">Bug</option>
+                                    <option value="Feature">Feature</option>
+                                    <option value="UX">UX</option>
+                                    <option value="Graphic">Graphic</option>
+                                </select>
+                            </fieldset>
+                            {steps}
+                            <button type="button" className="btn btn-common" onClick={this.addReproductionStep}>Add step</button>
+                            <div style={{"marginTop": "2rem"}}>
+                                <button type="submit" className="btn btn-common">Submit</button>
+                            </div>
+                        </form>
                     </div>
-                    <div className="input-field col s6">
-                        <select ref="type" defaultValue={this.state.issue.type}>
-                            <option value="" disabled></option>
-                            <option value="Bug">Bug</option>
-                            <option value="Feature">Feature</option>
-                            <option value="UX">UX</option>
-                            <option value="Graphic">Graphic</option>
-                        </select>
-                        <label>Issue type</label>
-                    </div>
-                    {steps}
-                    <div className="col s12">
-                        <button type="button" className="waves-effect waves-light btn" onClick={this.addReproductionStep}>Add step</button>
-                    </div>
-                    <button type="submit" className="waves-effect waves-light btn">Submit</button>
-                </form>
+                </div>
             </div>
         );
     }

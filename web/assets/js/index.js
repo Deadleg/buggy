@@ -6327,65 +6327,66 @@
 	class EditIssue extends React.Component {
 	    constructor(props) {
 	        super(props);
+	        this.componentWillMount = () => {
+	            var self = this;
+	            $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId, function (data) {
+	                console.log(data);
+	                self.setState({ issue: data, reproductionSteps: data.reproductionSteps });
+	            });
+	        };
+	        this.addReproductionStep = () => {
+	            var currentReproductionSteps = this.state.reproductionSteps;
+	            currentReproductionSteps.push({
+	                instruction: ""
+	            });
+	            this.setState({ reproductionSteps: currentReproductionSteps });
+	        };
+	        this.removeReproductionStep = (index) => {
+	            var currentReproductionSteps = this.state.reproductionSteps;
+	            this.setState(currentReproductionSteps.splice(index, 1));
+	        };
+	        this.updateIssue = (e) => {
+	            e.preventDefault();
+	            var steps = [];
+	            for (var i = 0; i < this.state.reproductionSteps.length; i++) {
+	                steps.push(this.refs["instruction" + i].value);
+	            }
+	            var data = {
+	                programId: this.state.issue.programId,
+	                id: this.state.issue.id,
+	                title: this.state.issue.title,
+	                description: this.state.issue.description,
+	                type: "Bug",
+	                reproductionSteps: steps,
+	            };
+	            console.log(data);
+	            $.ajax({
+	                url: "/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId,
+	                type: "PUT",
+	                data: JSON.stringify(data),
+	            });
+	        };
+	        this.updateDescription = (e) => {
+	            var issue = this.state.issue;
+	            issue.description = e.target.value;
+	            this.setState({ issue: issue });
+	        };
+	        this.updateTitle = (e) => {
+	            var issue = this.state.issue;
+	            issue.title = e.target.value;
+	            this.setState({ issue: issue });
+	        };
 	        this.state = {
 	            reproductionSteps: [],
 	            issue: {}
 	        };
 	    }
-	    componentWillMount() {
-	        var self = this;
-	        $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId, function (data) {
-	            console.log(data);
-	            self.setState({ issue: data, reproductionSteps: data.reproductionSteps });
-	        });
-	    }
-	    componentDidMount() {
-	        $('select').material_select();
-	    }
-	    addReproductionStep() {
-	        var currentReproductionSteps = this.state.reproductionSteps;
-	        currentReproductionSteps.push({
-	            instruction: ""
-	        });
-	        this.setState({ reproductionSteps: currentReproductionSteps });
-	    }
-	    removeReproductionStep(index) {
-	        var currentReproductionSteps = this.state.reproductionSteps;
-	        this.setState(currentReproductionSteps.splice(index, 1));
-	    }
-	    updateIssue(e) {
-	        e.preventDefault();
-	        var steps = [];
-	        for (var i = 0; i < this.state.reproductionSteps.length; i++) {
-	            steps.push(this.refs["instruction" + i].value);
-	        }
-	        var data = {
-	            programId: this.state.issue.programId,
-	            id: this.state.issue.id,
-	            title: this.refs["title"].value,
-	            description: this.refs["description"].value,
-	            type: "Bug",
-	            reproductionSteps: steps,
-	        };
-	        console.log(data);
-	        $.ajax({
-	            url: "/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId,
-	            type: "PUT",
-	            data: JSON.stringify(data),
-	        });
-	    }
-	    updateDescription() {
-	        this.setState({ issue: { description: this.refs["description"].value } });
-	    }
-	    updateTitle() {
-	        this.setState({ issue: { title: this.refs["title"].value } });
-	    }
 	    render() {
 	        var self = this;
 	        var steps = this.state.reproductionSteps.map(function (step, index) {
-	            return (React.createElement("div", {key: index}, React.createElement("div", {className: "input-field col s9"}, React.createElement("input", {type: "text", placeholder: "What did you do?", defaultValue: step.instruction.length > 0 ? step.instruction : null, ref: "instruction" + index}), React.createElement("label", {className: "active"}, "Step ", index + 1)), React.createElement("button", {className: "waves-effect waves-light btn col s3 red", type: "button", onClick: self.removeReproductionStep.bind(self, index)}, "Delete")));
+	            return (React.createElement("div", {key: index}, React.createElement("fieldset", {className: "form-group"}, React.createElement("label", null, "Step ", index + 1), React.createElement("input", {className: "form-control", type: "text", placeholder: "What did you do?", defaultValue: step.instruction.length > 0 ? step.instruction : null, ref: "instruction" + index}), React.createElement("div", {className: "btn-group form-sequence-buttons pull-sm-right"}, React.createElement("button", {className: "btn btn-red", type: "button", onClick: self.removeReproductionStep.bind(self, index)}, "Delete")))));
 	        });
-	        return (React.createElement("div", null, React.createElement("h1", null, "Edit issue"), React.createElement("form", {method: "post", onSubmit: this.updateIssue}, React.createElement("div", {className: "input-field col s12"}, React.createElement("input", {type: "text", placeholder: "A short descriptive title", ref: "title", value: this.state.issue.title, onChange: this.updateTitle}), React.createElement("label", null, "Title")), React.createElement("div", {className: "input-field col s12"}, React.createElement("textarea", {className: "materialize-textarea", placeholder: "A description of the problem", ref: "description", value: this.state.issue.description, onChange: this.updateDescription}), React.createElement("label", null, "Description")), React.createElement("div", {className: "input-field col s6"}, React.createElement("select", {ref: "type", defaultValue: this.state.issue.type}, React.createElement("option", {value: "", disabled: true}), React.createElement("option", {value: "Bug"}, "Bug"), React.createElement("option", {value: "Feature"}, "Feature"), React.createElement("option", {value: "UX"}, "UX"), React.createElement("option", {value: "Graphic"}, "Graphic")), React.createElement("label", null, "Issue type")), steps, React.createElement("div", {className: "col s12"}, React.createElement("button", {type: "button", className: "waves-effect waves-light btn", onClick: this.addReproductionStep}, "Add step")), React.createElement("button", {type: "submit", className: "waves-effect waves-light btn"}, "Submit"))));
+	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("h1", null, "Edit issue")), React.createElement("div", {className: "col-sm-6"}, React.createElement("form", {method: "post", onSubmit: this.updateIssue}, React.createElement("fieldset", null, React.createElement("label", null, "Title"), React.createElement("input", {className: "form-control", type: "text", placeholder: "A short descriptive title", value: this.state.issue.title, onChange: this.updateTitle})), React.createElement("fieldset", null, React.createElement("label", null, "Description"), React.createElement("textarea", {className: "form-control", placeholder: "A description of the problem", value: this.state.issue.description, onChange: this.updateDescription})), React.createElement("fieldset", null, React.createElement("label", null, "Issue type"), React.createElement("select", {className: "form-control", ref: "type", defaultValue: this.state.issue.type}, React.createElement("option", {value: "", disabled: true}), React.createElement("option", {value: "Bug"}, "Bug"), React.createElement("option", {value: "Feature"}, "Feature"), React.createElement("option", {value: "UX"}, "UX"), React.createElement("option", {value: "Graphic"}, "Graphic"))), steps, React.createElement("button", {type: "button", className: "btn btn-common", onClick: this.addReproductionStep}, "Add step"), React.createElement("div", {style: { "marginTop": "2rem" }}, React.createElement("button", {type: "submit", className: "btn btn-common"}, "Submit")))))));
 	    }
 	}
 	exports.EditIssue = EditIssue;
