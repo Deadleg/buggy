@@ -3433,7 +3433,7 @@ a.label:focus, a.label:hover {
   display: block;
   padding: .75rem 1.25rem;
   margin-bottom: -1px;
-  background-color: #182229;
+  background-color: #fafaff;
   border: 1px solid #ddd; }
   .list-group-item:last-child {
     margin-bottom: 0; }
@@ -4705,7 +4705,7 @@ footer {
 
 .common-list {
   counter-reset: li;
-  background: #182229;
+  background: #fafaff;
   margin-left: 0;
   padding-left: 0;
   margin-top: 0.5rem;
@@ -4719,11 +4719,12 @@ footer {
   .common-list-item:before {
     content: counter(li);
     counter-increment: li;
-    background: white;
+    background: #fafaff;
     color: black;
     margin-right: 0.5rem;
-    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+    padding: 0.5rem 0.2rem 0.5rem 0.2rem;
     display: inline-block;
+    font-weight: bold;
     line-height: 1.5; }
 
 .list-number {

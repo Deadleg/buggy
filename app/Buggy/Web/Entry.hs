@@ -337,7 +337,7 @@ loginGoogle = do
             maybeUser <- liftIO $ A.getUser (username newUser)
             when (isNothing maybeUser) (liftIO $ A.newLogin newUser >> return ())
             let cookie = A.googleLogin newUser
-            addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
+            addCookie (MaxAge 360) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
     ok $ toResponse ("" :: T.Text)
 
 loginSteam :: ServerPart Response
@@ -349,5 +349,5 @@ loginSteam = do
     maybeUser <- liftIO $ A.getUser (username newUser)
     when (isNothing maybeUser) (liftIO $ A.newLogin newUser >> return ())
     let cookie = A.steamLogin newUser
-    addCookie (MaxAge 60) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
+    addCookie (MaxAge 360) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
     seeOther ("/" :: T.Text) (toResponse ("Logging you in..." :: T.Text))

@@ -114,9 +114,9 @@ export class Issue extends React.Component<IssueProps, any> {
             return (
                 <div key={index} className="col-sm-4" style={{"marginBottom": "1rem"}}>
                     <div style={{"marginBottom": "1rem"}}>
-                        <div className="card">
-                            <div className="card-block">
-                                <div>{report.description}</div>
+                        <div className="card card-light">
+                            <div className="card-block-no-padding">
+                                <h5 className="card-title">{report.description}</h5>
                                 <p>{report.specs}</p>
                                 <div className="label-group">
                                     <div className="label label-default">{report.status}</div>
@@ -124,7 +124,7 @@ export class Issue extends React.Component<IssueProps, any> {
                                     <div className="label label-default">{report.confirmed ? "Confirmed" : "Unconfirmed"}</div>
                                 </div>
                                 <div><small>Reported by {report.reporter.username}</small></div>
-                                <div><small>At {report.time}</small></div>
+                                <div><small>At {moment(report.time).format("DD-MM-YYYY")}</small></div>
                                 <div className="btn-group-spaced" style={{"marginBottom": "1rem"}}>
                                     <button className="btn btn-common" onClick={self.markReportAsFixed.bind(self, index)}>Mark as fixed</button>
                                     <div className="btn btn-common">
@@ -140,12 +140,12 @@ export class Issue extends React.Component<IssueProps, any> {
 
         var edited;
         if (this.state.issue.lastEdited) {
-            edited = <div><small>Edit time: {this.state.issue.lastEdited}</small></div>
+            edited = <div><small>Edit time: {moment(this.state.issue.lastEdited).format("DD-MM-YYYY HH:mm")}</small></div>
         }
 
         return (
-            <div className="container">
-                <div className="row">
+            <div className="container bottom-margin-md">
+                <div className="row bottom-margin-md">
                     <div className="col-sm-6">
                         <h3>{this.state.issue.title}</h3>
                         <div className="label-group" style={{"marginBottom": "1rem"}}>
@@ -157,42 +157,34 @@ export class Issue extends React.Component<IssueProps, any> {
                 </div>
                 <div className="row">
                     <div className="col-sm-6">
+                        <h5>Reproduction steps</h5>
                         <ol className="common-list">
                             {steps}
                         </ol>
                     </div>
                 </div>
-                <div className="row">
+                <div className="row bottom-margin-md">
                     <div className="col-sm-6">
                         <div><small>Reported by: {this.state.issue.reporter.username}</small></div>
-                        <div><small>At {this.state.issue.time}</small></div>
+                        <div><small>At {moment(this.state.issue.time).format("DD-MM-YYYY")}</small></div>
                         {edited}
                     </div>
                 </div>
                 <div className="row" style={{"marginTop":"2rem", "marginBottom": "2rem"}}>
                     <div className="col-sm-12 btn-group-spaced" /*id="issueTabs"*/>
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}>Add report</Link></button>
-                        <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/comments/new"}>Add comment</Link></button>
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}>Edit issue</Link></button>
                         <button className="btn btn-common" onClick={this.watchIssue}>Watch</button>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-sm-12">
-                        <Tabs className="no-border">
-                            <TabList>
-                                <Tab className="btn btn-common">Reports</Tab>
-                                <Tab className="btn btn-common">Comments</Tab>
-                            </TabList>
-                            <TabPanel>
-                                <div className="row">
-                                    {reports}
-                                </div>
-                            </TabPanel>
-                            <TabPanel>
-                                {comments}
-                            </TabPanel>
-                        </Tabs>
+                        <h2 className="bottom-margin-md red-underline">Reports</h2>
+                        <div className="row">
+                            {reports}
+                        </div>
+                        <h2 className="bottom-margin-md blue-underline">Comments</h2>
+                        {comments}
                     </div>
                 </div>
             </div>

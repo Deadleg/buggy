@@ -16,12 +16,7 @@ export class CreateIssueReport extends React.Component<CreateIssueProps, any> {
         }
     }
 
-    componentDidMount() {
-        var self = this;
-        ($('select') as any).material_select(); // TODO proper type
-    }
-    
-    addLabel() {
+    addLabel = () => {
         var labels = this.state.labels;
         labels.push({
                 text: ($(this.refs["label"]).children("option:selected")[0] as HTMLInputElement).textContent,
@@ -30,12 +25,12 @@ export class CreateIssueReport extends React.Component<CreateIssueProps, any> {
         this.setState({labels: labels});
     }
     
-    removeLabel(index) {
+    removeLabel = (index) => {
         var labels = this.state.labels;
         this.setState(labels.splice(index, 1));
     }
     
-    createIssue(e) {
+    createIssue = (e) => {
         e.preventDefault();
 
         var labels = this.state.labels.map(function(x) {
@@ -61,7 +56,9 @@ export class CreateIssueReport extends React.Component<CreateIssueProps, any> {
                 console.log("Ye");
             },
             "json"
-        );
+        ).fail((e) => {
+            console.log(e);
+        });
     }
     
     render() {

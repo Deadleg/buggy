@@ -24,7 +24,7 @@ export class Issues extends React.Component<IssuesProps, any> {
         var self = this;
         var content = this.state.issues.map(function (issue, index) {
             return (
-                <div className="col-sm-12 bottom-margin-md" key={index}>
+                <div key={index} className="bottom-margin-md">
                     <div className="row">
                         <div className="col-sm-12">
                             <div className="upvotes">
@@ -51,7 +51,9 @@ export class Issues extends React.Component<IssuesProps, any> {
         return (
             <div className="container bottom-margin-md">
                 <div className="row">
-                    {content}
+                    <div className="col-sm-6 bottom-margin-md">
+                        {content}
+                    </div>
                 </div>
             </div>
         );

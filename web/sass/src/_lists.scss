@@ -16,11 +16,12 @@
     &:before {
         content: counter(li);
         counter-increment: li;
-        background: white;
+        background: $theme-bg;
         color: black;
         margin-right: 0.5rem;
-        padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+        padding: 0.5rem 0.2rem 0.5rem 0.2rem;
         display: inline-block;
+        font-weight: bold;
         line-height: $line-height;
     }
 }
