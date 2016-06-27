@@ -26,6 +26,7 @@ mainTemplate user title body = toResponse $
             H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js" $ ""
             H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js" $ ""
             H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js" $ ""
+            H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.min.js" $ ""
         H.body $ do
             H.nav $ do
                 H.nav ! A.class_ "navbar navbar-full" $ do

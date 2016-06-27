@@ -35,7 +35,8 @@ module Buggy.Persistence.Postgre (
     updateProgramPopularity,
     updateIssuePopularity,
     getTopPrograms,
-    getPopularIssues
+    getPopularIssues,
+    getIssueStats
 ) where
 
 import Database.PostgreSQL.Simple
@@ -51,6 +52,18 @@ connectionString = "host='localhost' port=5433 user='buggy' password='buggy' dbn
 
 type ProgramId = Integer
 type IssueId = Integer
+
+getIssueStats :: ProgramId -> IO (IssueStats)
+getIssueStats programId = do
+    conn <- connectPostgreSQL connectionString
+    xs <- query conn "SELECT \
+                    \date_trunc('month', i.time_reported) as mon, \
+                    \COUNT(*) as total_issues, \
+                    \COUNT(*) filter (where i.status='Fixed') as fixed_issues \
+                    \FROM issues i WHERE i.program = ? GROUP BY mon;" [programId]
+    let data_ = [(time :: LocalTime, issues :: Int, fixed :: Int) | (time, issues, fixed) <- xs] -- Identity map. Do for types.
+    let (dates, issues, fixed) = unzip3 data_
+    return $ IssueStats issues dates fixed
 
 getPopularIssues :: IO ([Issue])
 getPopularIssues = do

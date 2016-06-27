@@ -40,6 +40,7 @@ main = do
                                                                                                            R.getIssueComments programId issueId
         , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "comments" $ do method POST
                                                                                                            R.createIssueComment programId issueId
+        , dirs "api/programs" $ path $ \programId -> dir "stats" $ R.getIssueStats programId
         , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "reports" $ path $ \reportId -> do method PUT
                                                                                                                               R.updateIssueReport programId issueId reportId
         , dirs "api/programs" $ path $ \programId -> dir "issues" $ path $ \issueId -> dir "reports" $ R.getIssueReports programId issueId

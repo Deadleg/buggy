@@ -32,7 +32,8 @@ module Buggy.Core.Types (
     IssueSummary(..),
     ProgramSummary(..),
     badOperation,
-    NewIssueResponse(..)
+    NewIssueResponse(..),
+    IssueStats(..)
 ) where
 
 import Data.Time
@@ -172,6 +173,15 @@ data User = ExistingUser
                 , getUserSteamId :: Maybe Text
                 , getUserLoginType :: LoginType
                 } deriving (Eq, Show, Read)
+
+data IssueStats = IssueStats
+    { getNumIssuesCreated :: [Int]
+    , getTimeline :: [LocalTime]
+    , getNumIssuesFixed :: [Int]
+    } deriving (Eq, Show, Read)
+
+instance ToJSON IssueStats where
+    toJSON (IssueStats created times fixed) =  object ["created" .= created, "times" .= times, "fixed" .= fixed]
 
 instance ToJSON User where
     toJSON (ExistingUser id name) = object ["id" .= id, "username" .= name]

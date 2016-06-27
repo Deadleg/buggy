@@ -32,7 +32,8 @@ module Buggy.Web.Entry (
     watchIssue,
     getMyIssueStuffForProgram,
     getPopularPrograms,
-    getPopularIssues
+    getPopularIssues,
+    getIssueStats
 ) where
 
 import Buggy.Core.Types hiding (id)
@@ -318,6 +319,9 @@ reportIssueComment programId issueId commentId = do
             Right issue -> do
                 liftIO $ L.reportIssueComment programId issueId commentId issue
                 return ("" :: T.Text) :: UserOperationsIO T.Text)
+
+getIssueStats :: Integer -> ServerPart Response
+getIssueStats programId = (liftIO $ L.getIssueStats programId) >>= (ok . toResponse)
 
 workingHeader = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" :: T.Text
 

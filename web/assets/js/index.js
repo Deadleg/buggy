@@ -5309,12 +5309,56 @@
 	class Issues extends React.Component {
 	    constructor(props) {
 	        super(props);
-	        this.state = { programId: this.props.params.programId, issues: [] };
+	        this.state = { programId: this.props.params.programId, issues: [], stats: {} };
 	    }
 	    componentDidMount() {
 	        var self = this;
 	        $.getJSON("/api/programs/" + this.props.params.programId + "/issues", function (data) {
 	            self.setState({ issues: data });
+	        });
+	        $.getJSON("/api/programs/" + this.props.params.programId + "/stats", function (data) {
+	            console.log(data);
+	            var element = document.getElementById('stats');
+	            var chart = new Chart(element, {
+	                type: 'line',
+	                data: {
+	                    labels: data.times,
+	                    datasets: [{
+	                            label: 'Issues reported',
+	                            data: data.created,
+	                            borderColor: 'rgba(207, 75, 84, 0.8)',
+	                            backgroundColor: 'rgba(207, 75, 84, 0.1)'
+	                        }, {
+	                            label: 'Issues fixed',
+	                            data: data.fixed,
+	                            borderColor: 'rgba(75, 160, 207, 0.8)',
+	                            backgroundColor: 'rgba(75, 160, 207, 0.1)'
+	                        }]
+	                },
+	                options: {
+	                    responsive: true,
+	                    scales: {
+	                        yAxes: [{
+	                                ticks: {
+	                                    beginAtZero: true
+	                                }
+	                            }],
+	                        xAxes: [{
+	                                type: 'time',
+	                                time: {
+	                                    displayFormats: {
+	                                        month: 'MMM'
+	                                    }
+	                                }
+	                            }]
+	                    },
+	                    title: {
+	                        display: true,
+	                        text: 'Issues created and fixed per month'
+	                    }
+	                }
+	            });
+	            self.setState({ stats: data });
 	        });
 	    }
 	    render() {
@@ -5322,7 +5366,7 @@
 	        var content = this.state.issues.map(function (issue, index) {
 	            return (React.createElement("div", {key: index, className: "bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("div", {className: "upvotes"}, issue.upvotes), React.createElement(react_router_1.Link, {className: "", to: "/app/" + self.props.params.programId + "/issue/" + issue.id}, issue.title))), React.createElement("div", {className: "label-group"}, React.createElement("span", {className: "label label-default"}, issue.type), React.createElement("span", {className: "label label-default"}, issue.status)), React.createElement("p", {className: "card-text"}, React.createElement("small", null, "Reported on ", moment(issue.time).format("DD-MM-YYYY")))));
 	        });
-	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-6 bottom-margin-md"}, content))));
+	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12 bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-4 bottom-margin-md"}, React.createElement("canvas", {id: "stats", width: "100", height: "100"}))))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-6 bottom-margin-md"}, content))));
 	    }
 	}
 	exports.Issues = Issues;
