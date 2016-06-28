@@ -81,7 +81,21 @@ export class Issue extends React.Component<IssueProps, any> {
             console.log("watch failed", data);
         });
     }
-    
+
+    markAsFixed = () => {
+        var self = this;
+        $.post(
+            "/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId + "/fixed"
+        ).done(() => {
+            $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId, function(data) {
+                console.log(data);
+                self.setState({issue: data});
+            });
+        }).fail(function(data) {
+            console.log("watch failed", data);
+        });
+    }
+
     render() {
         var steps = this.state.issue.reproductionSteps.map(function(step, index) {
             return (
@@ -175,6 +189,7 @@ export class Issue extends React.Component<IssueProps, any> {
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}>Add report</Link></button>
                         <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}>Edit issue</Link></button>
                         <button className="btn btn-common" onClick={this.watchIssue}>Watch</button>
+                        <button className="btn btn-common" onClick={this.markAsFixed}>Mark as fixed</button>
                     </div>
                 </div>
                 <div className="row">

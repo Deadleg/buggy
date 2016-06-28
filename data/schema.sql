@@ -30,6 +30,7 @@ CREATE TABLE issues (
     title         VARCHAR(80) NOT NULL,
     description   TEXT NOT NULL,
     time_reported TIMESTAMP NOT NULL,
+    time_fixed    TIMESTAMP,
     edit_time     TIMESTAMP,
     upvotes       INTEGER NOT NULL DEFAULT 0,
     CONSTRAINT status

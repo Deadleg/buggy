@@ -45,20 +45,28 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
 	const React = __webpack_require__(1);
 	const ReactDOM = __webpack_require__(2);
 	const react_router_1 = __webpack_require__(3);
 	const issues_1 = __webpack_require__(61);
 	const issue_1 = __webpack_require__(62);
-	const edit_issue_1 = __webpack_require__(77);
-	const program_1 = __webpack_require__(78);
-	const create_issue_1 = __webpack_require__(79);
-	const create_issue_report_1 = __webpack_require__(80);
+	const edit_issue_1 = __webpack_require__(67);
+	const program_1 = __webpack_require__(68);
+	const create_issue_1 = __webpack_require__(69);
+	const create_issue_report_1 = __webpack_require__(70);
 	const create_issue_comment_1 = __webpack_require__(64);
 	const create_issue_report_comment_1 = __webpack_require__(66);
-	const issue_report_1 = __webpack_require__(81);
-	const login_1 = __webpack_require__(82);
-	const games_1 = __webpack_require__(83);
+	const issue_report_1 = __webpack_require__(71);
+	const login_1 = __webpack_require__(72);
+	const games_1 = __webpack_require__(74);
+	const react_redux_1 = __webpack_require__(75);
+	const User = __webpack_require__(76);
+	const redux_1 = __webpack_require__(78);
+	__export(__webpack_require__(73));
+	const store = redux_1.createStore(User.updateUser);
 	var Layout = React.createClass({
 	    render: function () {
 	        return (React.createElement("div", null, this.props.children, React.createElement("footer", null, React.createElement("div", {className: "container"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-4"}, React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/about"}, "About")), React.createElement("p", null, React.createElement("a", {href: "#"}, "Source")), React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/privacy"}, "Privacy")), React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/donate"}, "Donate"))))))));
@@ -104,7 +112,7 @@
 	        return (React.createElement("div", null, React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("h2", {className: "bottom-margin-md red-underline"}, "Hot issues"), React.createElement("div", {className: "row"}, popularIssues)), React.createElement("div", {className: "banner"}, React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "banner-body"}, React.createElement("h2", {className: "bottom-margin-md blue-underline"}, "Popular games"), React.createElement("div", {className: "row"}, summaries))))));
 	    }
 	});
-	ReactDOM.render((React.createElement(react_router_1.Router, {history: react_router_1.browserHistory}, React.createElement(react_router_1.Route, {component: Layout}, React.createElement(react_router_1.Route, {path: "/", component: Home}), React.createElement(react_router_1.Route, {path: "/browse", component: games_1.Games}), React.createElement(react_router_1.Route, {path: "/account/login", component: login_1.Login}), React.createElement(react_router_1.Route, {path: "/app/:programId", component: program_1.Program}, React.createElement(react_router_1.Route, {path: "/app/:programId/issue/new", component: create_issue_1.CreateIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue", component: issues_1.Issues}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/edit", component: edit_issue_1.EditIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/new", component: create_issue_report_1.CreateIssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId/comments/new", component: create_issue_report_comment_1.CreateIssueReportComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId", component: issue_report_1.IssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/comments/new", component: create_issue_comment_1.CreateIssueComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId", component: issue_1.Issue}))))), document.getElementById('content'));
+	ReactDOM.render((React.createElement(react_redux_1.Provider, {store: store}, React.createElement(react_router_1.Router, {history: react_router_1.browserHistory}, React.createElement(react_router_1.Route, {component: Layout}, React.createElement(react_router_1.Route, {path: "/", component: Home}), React.createElement(react_router_1.Route, {path: "/browse", component: games_1.Games}), React.createElement(react_router_1.Route, {path: "/account/login", component: login_1.Login}), React.createElement(react_router_1.Route, {path: "/app/:programId", component: program_1.Program}, React.createElement(react_router_1.Route, {path: "/app/:programId/issue/new", component: create_issue_1.CreateIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue", component: issues_1.Issues}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/edit", component: edit_issue_1.EditIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/new", component: create_issue_report_1.CreateIssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId/comments/new", component: create_issue_report_comment_1.CreateIssueReportComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId", component: issue_report_1.IssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/comments/new", component: create_issue_comment_1.CreateIssueComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId", component: issue_1.Issue})))))), document.getElementById('content'));
 
 
 /***/ },
@@ -5333,6 +5341,11 @@
 	                            data: data.fixed,
 	                            borderColor: 'rgba(75, 160, 207, 0.8)',
 	                            backgroundColor: 'rgba(75, 160, 207, 0.1)'
+	                        }, {
+	                            label: 'Total open issues',
+	                            data: data.cumulativeIssues,
+	                            borderColor: 'rgba(75, 207, 155, 0.8)',
+	                            backgroundColor: 'rgba(75, 207, 155, 0.1)'
 	                        }]
 	                },
 	                options: {
@@ -5358,6 +5371,26 @@
 	                    }
 	                }
 	            });
+	            var element2 = document.getElementById('status-graph');
+	            var chart2 = new Chart(element2, {
+	                type: 'pie',
+	                data: {
+	                    labels: data.statusTypes,
+	                    datasets: [{
+	                            label: 'Issues reported',
+	                            data: data.statusNumbers,
+	                            borderColor: ['rgba(207, 75, 84, 0.8)', 'rgba(75, 160, 207, 0.8)', 'rgba(75, 207, 155, 0.8)', 'rgba(155, 75, 207, 0.8)', 'rgba(207, 89, 75, 0.8)'],
+	                            backgroundColor: ['rgba(207, 75, 84, 0.2)', 'rgba(75, 160, 207, 0.2)', 'rgba(75, 207, 155, 0.2)', 'rgba(155, 75, 207, 0.2)', 'rgba(207, 89, 75, 0.2)']
+	                        }]
+	                },
+	                options: {
+	                    responsive: true,
+	                    title: {
+	                        display: true,
+	                        text: 'Issue types'
+	                    }
+	                }
+	            });
 	            self.setState({ stats: data });
 	        });
 	    }
@@ -5366,7 +5399,7 @@
 	        var content = this.state.issues.map(function (issue, index) {
 	            return (React.createElement("div", {key: index, className: "bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("div", {className: "upvotes"}, issue.upvotes), React.createElement(react_router_1.Link, {className: "", to: "/app/" + self.props.params.programId + "/issue/" + issue.id}, issue.title))), React.createElement("div", {className: "label-group"}, React.createElement("span", {className: "label label-default"}, issue.type), React.createElement("span", {className: "label label-default"}, issue.status)), React.createElement("p", {className: "card-text"}, React.createElement("small", null, "Reported on ", moment(issue.time).format("DD-MM-YYYY")))));
 	        });
-	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12 bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-4 bottom-margin-md"}, React.createElement("canvas", {id: "stats", width: "100", height: "100"}))))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-6 bottom-margin-md"}, content))));
+	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12 bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-4 bottom-margin-md"}, React.createElement("canvas", {id: "stats", width: "100", height: "100"})), React.createElement("div", {className: "col-sm-4 bottom-margin-md vertical-flex-parent"}, React.createElement("div", null, React.createElement("h5", {className: "text-sm-center"}, "Total issues"), React.createElement("p", {className: "text-sm-center"}, "523"), React.createElement("h5", {className: "text-sm-center"}, "Issues reported in the last month"), React.createElement("p", {className: "text-sm-center"}, "125"), React.createElement("h5", {className: "text-sm-center"}, "Issues fixed in the last month"), React.createElement("p", {className: "text-sm-center"}, "52"))), React.createElement("div", {className: "col-sm-4 bottom-margin-md"}, React.createElement("canvas", {id: "status-graph", width: "100", height: "100"}))))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-6 bottom-margin-md"}, content))));
 	    }
 	}
 	exports.Issues = Issues;
@@ -5385,6 +5418,17 @@
 	class Issue extends React.Component {
 	    constructor(props) {
 	        super(props);
+	        this.markAsFixed = () => {
+	            var self = this;
+	            $.post("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId + "/fixed").done(() => {
+	                $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId, function (data) {
+	                    console.log(data);
+	                    self.setState({ issue: data });
+	                });
+	            }).fail(function (data) {
+	                console.log("watch failed", data);
+	            });
+	        };
 	        this.state = {
 	            issue: {
 	                description: "",
@@ -5461,7 +5505,7 @@
 	        if (this.state.issue.lastEdited) {
 	            edited = React.createElement("div", null, React.createElement("small", null, "Edit time: ", moment(this.state.issue.lastEdited).format("DD-MM-YYYY HH:mm")));
 	        }
-	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row bottom-margin-md"}, React.createElement("div", {className: "col-sm-6"}, React.createElement("h3", null, this.state.issue.title), React.createElement("div", {className: "label-group", style: { "marginBottom": "1rem" }}, React.createElement("span", {className: "label label-default"}, this.state.issue.type), React.createElement("span", {className: "label label-default"}, this.state.issue.status)), React.createElement("div", null, this.state.issue.description))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-6"}, React.createElement("h5", null, "Reproduction steps"), React.createElement("ol", {className: "common-list"}, steps))), React.createElement("div", {className: "row bottom-margin-md"}, React.createElement("div", {className: "col-sm-6"}, React.createElement("div", null, React.createElement("small", null, "Reported by: ", this.state.issue.reporter.username)), React.createElement("div", null, React.createElement("small", null, "At ", moment(this.state.issue.time).format("DD-MM-YYYY"))), edited)), React.createElement("div", {className: "row", style: { "marginTop": "2rem", "marginBottom": "2rem" }}, React.createElement("div", {className: "col-sm-12 btn-group-spaced"}, React.createElement("button", {className: "btn btn-common"}, React.createElement(react_router_1.Link, {to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}, "Add report")), React.createElement("button", {className: "btn btn-common"}, React.createElement(react_router_1.Link, {to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}, "Edit issue")), React.createElement("button", {className: "btn btn-common", onClick: this.watchIssue}, "Watch"))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("h2", {className: "bottom-margin-md red-underline"}, "Reports"), React.createElement("div", {className: "row"}, reports), React.createElement("h2", {className: "bottom-margin-md blue-underline"}, "Comments"), comments))));
+	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row bottom-margin-md"}, React.createElement("div", {className: "col-sm-6"}, React.createElement("h3", null, this.state.issue.title), React.createElement("div", {className: "label-group", style: { "marginBottom": "1rem" }}, React.createElement("span", {className: "label label-default"}, this.state.issue.type), React.createElement("span", {className: "label label-default"}, this.state.issue.status)), React.createElement("div", null, this.state.issue.description))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-6"}, React.createElement("h5", null, "Reproduction steps"), React.createElement("ol", {className: "common-list"}, steps))), React.createElement("div", {className: "row bottom-margin-md"}, React.createElement("div", {className: "col-sm-6"}, React.createElement("div", null, React.createElement("small", null, "Reported by: ", this.state.issue.reporter.username)), React.createElement("div", null, React.createElement("small", null, "At ", moment(this.state.issue.time).format("DD-MM-YYYY"))), edited)), React.createElement("div", {className: "row", style: { "marginTop": "2rem", "marginBottom": "2rem" }}, React.createElement("div", {className: "col-sm-12 btn-group-spaced"}, React.createElement("button", {className: "btn btn-common"}, React.createElement(react_router_1.Link, {to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}, "Add report")), React.createElement("button", {className: "btn btn-common"}, React.createElement(react_router_1.Link, {to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}, "Edit issue")), React.createElement("button", {className: "btn btn-common", onClick: this.watchIssue}, "Watch"), React.createElement("button", {className: "btn btn-common", onClick: this.markAsFixed}, "Mark as fixed"))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("h2", {className: "bottom-margin-md red-underline"}, "Reports"), React.createElement("div", {className: "row"}, reports), React.createElement("h2", {className: "bottom-margin-md blue-underline"}, "Comments"), comments))));
 	    }
 	}
 	exports.Issue = Issue;
@@ -5590,17 +5634,7 @@
 
 
 /***/ },
-/* 67 */,
-/* 68 */,
-/* 69 */,
-/* 70 */,
-/* 71 */,
-/* 72 */,
-/* 73 */,
-/* 74 */,
-/* 75 */,
-/* 76 */,
-/* 77 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5675,7 +5709,7 @@
 
 
 /***/ },
-/* 78 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5709,7 +5743,7 @@
 
 
 /***/ },
-/* 79 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5767,7 +5801,7 @@
 
 
 /***/ },
-/* 80 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5827,7 +5861,7 @@
 
 
 /***/ },
-/* 81 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5876,14 +5910,35 @@
 
 
 /***/ },
-/* 82 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	const React = __webpack_require__(1);
+	const react_router_1 = __webpack_require__(3);
 	class Login extends React.Component {
+	    constructor() {
+	        super();
+	        this.googleSignIn = function (googleUser) {
+	            var profile = googleUser.getBasicProfile();
+	            var data = {
+	                token: googleUser.getAuthResponse().id_token
+	            };
+	            $.post("/api/account/login/google", JSON.stringify(data)).fail(function (e) {
+	                console.log(e);
+	            });
+	            console.log(profile.getName());
+	            console.log(googleUser.getAuthResponse().id_token);
+	            react_router_1.browserHistory.push('/');
+	        };
+	        this.componentDidMount = () => {
+	            gapi.signin2.render('google-signin', {
+	                'onsuccess': this.googleSignIn
+	            });
+	        };
+	    }
 	    render() {
-	        return (React.createElement("div", {className: "container"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("div", {className: "g-signin2", "data-onsuccess": "onSignIn"}))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("a", {href: "https://steamcommunity.com/openid/login?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&amp;openid.mode=checkid_setup&amp;openid.return_to=http%3A%2F%2Flocalhost:8000%2Flogin%2Fsteam&amp;openid.realm=http%3A%2F%2Flocalhost:8000&amp;openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fextensions%2Fsreg%2F1.1&amp;openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&amp;openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"}, React.createElement("img", {src: "https://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_small.png"}))))));
+	        return (React.createElement("div", {className: "container"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("div", {id: "google-signin"}))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("a", {href: "https://steamcommunity.com/openid/login?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&amp;openid.mode=checkid_setup&amp;openid.return_to=http%3A%2F%2Flocalhost:8000%2Flogin%2Fsteam&amp;openid.realm=http%3A%2F%2Flocalhost:8000&amp;openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fextensions%2Fsreg%2F1.1&amp;openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&amp;openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"}, React.createElement("img", {src: "https://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_small.png"}))))));
 	    }
 	}
 	exports.Login = Login;
@@ -5891,7 +5946,24 @@
 
 
 /***/ },
-/* 83 */
+/* 73 */
+/***/ function(module, exports) {
+
+	"use strict";
+	function signOut() {
+	    var auth2 = gapi.auth2.getAuthInstance();
+	    auth2.signOut().then(function () {
+	        console.log("signed out");
+	        $("signin-link").text("sign-out");
+	        $("signin-link").attr("href", "$/account/login");
+	        $("signin-link").unbind("click");
+	    });
+	}
+	exports.signOut = signOut;
+
+
+/***/ },
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5934,6 +6006,57 @@
 	exports.Games = Games;
 	;
 
+
+/***/ },
+/* 75 */
+/***/ function(module, exports) {
+
+	module.exports = ReactRedux;
+
+/***/ },
+/* 76 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const actions = __webpack_require__(77);
+	const initialState = {
+	    name: null,
+	    id: null
+	};
+	function signinUser(userdata) {
+	    return {
+	        type: actions.SIGNIN_USER,
+	        userdata: userdata
+	    };
+	}
+	exports.signinUser = signinUser;
+	function updateUser(state = initialState, action) {
+	    switch (action.type) {
+	        case actions.SIGNIN_USER:
+	            return Object.assign({}, state, {
+	                name: action.userdata.username,
+	                id: action.userdata.id
+	            });
+	        default:
+	            return state;
+	    }
+	}
+	exports.updateUser = updateUser;
+
+
+/***/ },
+/* 77 */
+/***/ function(module, exports) {
+
+	"use strict";
+	exports.SIGNIN_USER = "SIGNIN_USER";
+
+
+/***/ },
+/* 78 */
+/***/ function(module, exports) {
+
+	module.exports = Redux;
 
 /***/ }
 /******/ ]);

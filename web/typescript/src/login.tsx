@@ -1,12 +1,41 @@
 import * as React from "react";
+import { browserHistory } from "react-router";
 
 export class Login extends React.Component<{}, {}> {
+    constructor() {
+        super();
+    }
+
+    googleSignIn = function(googleUser) {
+        var profile = googleUser.getBasicProfile();
+        var data = {
+            token: googleUser.getAuthResponse().id_token
+        }
+
+        $.post(
+            "/api/account/login/google",
+            JSON.stringify(data)
+        ).fail(function(e) {
+            console.log(e);
+        });
+        console.log(profile.getName());
+        console.log(googleUser.getAuthResponse().id_token);
+        browserHistory.push('/');
+    }
+
+    componentDidMount = () => {
+          gapi.signin2.render('google-signin', {
+            'onsuccess': this.googleSignIn
+          });
+    }
+
     render() {
+
         return (
             <div className="container">
                 <div className="row">
                     <div className="col-sm-12">
-                        <div className="g-signin2" data-onsuccess="onSignIn"></div>
+                        <div id="google-signin" /*data-onsuccess={onSignIn}*/></div>
                     </div>
                 </div>
                 <div className="row">

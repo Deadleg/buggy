@@ -44,6 +44,7 @@ import Happstack.Server
 import Data.List (groupBy)
 import Data.Text (Text)
 import Data.Maybe (isNothing, fromJust)
+import Data.Scientific (Scientific)
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Class
@@ -141,7 +142,7 @@ instance ToJSON ProgramSummary where
 
 data IssueType = Bug | Feature | UX | Graphic deriving (Eq, Show, Read)
 
-data StatusType = Fixed | Open | Workaround | Reproducible | NotEnoughInformation deriving (Eq, Show, Read)
+data StatusType = Fixed | Open | Closed | Reproducible | NotEnoughInformation deriving (Eq, Show, Read)
 
 data LoginType = Google | Steam deriving (Eq, Show, Read)
 
@@ -178,10 +179,13 @@ data IssueStats = IssueStats
     { getNumIssuesCreated :: [Int]
     , getTimeline :: [LocalTime]
     , getNumIssuesFixed :: [Int]
+    , cumulativeIssues :: [Scientific]
+    , issueStatuses :: [Int]
+    , issueStatusTypes :: [StatusType]
     } deriving (Eq, Show, Read)
 
 instance ToJSON IssueStats where
-    toJSON (IssueStats created times fixed) =  object ["created" .= created, "times" .= times, "fixed" .= fixed]
+    toJSON (IssueStats created times fixed cumIssues statuses statusTypes) =  object ["created" .= created, "times" .= times, "fixed" .= fixed, "cumulativeIssues" .= cumIssues, "statusTypes" .= statusTypes, "statusNumbers" .= statuses]
 
 instance ToJSON User where
     toJSON (ExistingUser id name) = object ["id" .= id, "username" .= name]

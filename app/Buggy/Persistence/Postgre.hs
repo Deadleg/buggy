@@ -39,13 +39,14 @@ module Buggy.Persistence.Postgre (
     getIssueStats
 ) where
 
-import Database.PostgreSQL.Simple
+import Database.PostgreSQL.Simple hiding (Fixed)
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.FromField
 import Buggy.Core.Types
-import Data.Time
 import Control.Monad
+import Data.Time
 import Data.Text (Text)
+import Data.Scientific (Scientific)
 import qualified Data.Map as M
 
 connectionString = "host='localhost' port=5433 user='buggy' password='buggy' dbname='buggy'"
@@ -59,11 +60,22 @@ getIssueStats programId = do
     xs <- query conn "SELECT \
                     \date_trunc('month', i.time_reported) as mon, \
                     \COUNT(*) as total_issues, \
-                    \COUNT(*) filter (where i.status='Fixed') as fixed_issues \
+                    \COUNT(*) filter (where i.status='Fixed') as fixed_issues, \
+                    \SUM(COUNT(*) filter (where i.status!='Fixed')) OVER (ORDER BY date_trunc('month', i.time_reported)) as cum_total \
                     \FROM issues i WHERE i.program = ? GROUP BY mon;" [programId]
-    let data_ = [(time :: LocalTime, issues :: Int, fixed :: Int) | (time, issues, fixed) <- xs] -- Identity map. Do for types.
-    let (dates, issues, fixed) = unzip3 data_
-    return $ IssueStats issues dates fixed
+    let data_ = [(time :: LocalTime, issues :: Int) | (time, issues, _, _) <- xs] -- Identity map. Do for types.
+    let data2_ = [(fixed :: Int, cumTotal :: Scientific) | (_, _, fixed, cumTotal) <- xs] -- Identity map. Do for types.
+    let (dates, issues) = unzip data_
+    let (fixed, cumTotal) = unzip data2_
+
+    [(totalFixed, totalOpen, totalClosed, totalReproducible, totalNotEnoughInfo)] <- query conn "SELECT \
+                    \COUNT(*) filter (where i.status='Fixed') as fixed, \
+                    \COUNT(*) filter (where i.status='Open') as fixed, \
+                    \COUNT(*) filter (where i.status='Closed') as fixed, \
+                    \COUNT(*) filter (where i.status='Reproducible') as fixed, \
+                    \COUNT(*) filter (where i.status='NotEnoughInformation') as fixed \
+                    \FROM issues i WHERE i.program = ?;" [programId]
+    return $ IssueStats issues dates fixed cumTotal [totalFixed, totalOpen, totalClosed, totalReproducible, totalNotEnoughInfo] [Fixed, Open, Closed, Reproducible, NotEnoughInformation]
 
 getPopularIssues :: IO ([Issue])
 getPopularIssues = do
@@ -243,7 +255,7 @@ updateIssueAsFixed :: Integer -> Integer -> IO ()
 updateIssueAsFixed programId issueId = do
     conn <- connectPostgreSQL connectionString
     execute conn "UPDATE issues SET status='Fixed' WHERE id=?" [issueId]
-    execute conn "UPDATE issue_reports SET confimed=FALSE WHERE issue=?" [issueId]
+    execute conn "UPDATE issue_reports SET confirmed=FALSE WHERE issue=?" [issueId]
     return ()
 
 insertIssueComment :: Integer -> IssueComment -> IO ()

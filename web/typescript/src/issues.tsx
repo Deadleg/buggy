@@ -39,6 +39,11 @@ export class Issues extends React.Component<IssuesProps, any> {
                         data: data.fixed,
                         borderColor: 'rgba(75, 160, 207, 0.8)',
                         backgroundColor: 'rgba(75, 160, 207, 0.1)'
+                    },{
+                        label: 'Total open issues',
+                        data: data.cumulativeIssues,
+                        borderColor: 'rgba(75, 207, 155, 0.8)',
+                        backgroundColor: 'rgba(75, 207, 155, 0.1)'
                     }]
                 },
                 options: {
@@ -61,6 +66,27 @@ export class Issues extends React.Component<IssuesProps, any> {
                     title: {
                         display: true,
                         text: 'Issues created and fixed per month'
+                    }
+                }
+            });
+
+            var element2 = document.getElementById('status-graph');
+            var chart2 = new Chart(element2, {
+                type: 'pie',
+                data: {
+                    labels: data.statusTypes,
+                    datasets: [{
+                        label: 'Issues reported',
+                        data: data.statusNumbers,
+                        borderColor: ['rgba(207, 75, 84, 0.8)', 'rgba(75, 160, 207, 0.8)', 'rgba(75, 207, 155, 0.8)', 'rgba(155, 75, 207, 0.8)', 'rgba(207, 89, 75, 0.8)'],
+                        backgroundColor: ['rgba(207, 75, 84, 0.2)', 'rgba(75, 160, 207, 0.2)', 'rgba(75, 207, 155, 0.2)', 'rgba(155, 75, 207, 0.2)', 'rgba(207, 89, 75, 0.2)']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Issue types'
                     }
                 }
             });
@@ -103,6 +129,19 @@ export class Issues extends React.Component<IssuesProps, any> {
                         <div className="row">
                             <div className="col-sm-4 bottom-margin-md">
                                 <canvas id="stats" width="100" height="100"></canvas>
+                            </div>
+                            <div className="col-sm-4 bottom-margin-md vertical-flex-parent">
+                                <div>
+                                    <h5 className="text-sm-center">Total issues</h5>
+                                    <p className="text-sm-center">523</p>
+                                    <h5 className="text-sm-center">Issues reported in the last month</h5>
+                                    <p className="text-sm-center">125</p>
+                                    <h5 className="text-sm-center">Issues fixed in the last month</h5>
+                                    <p className="text-sm-center">52</p>
+                                </div>
+                            </div>
+                            <div className="col-sm-4 bottom-margin-md">
+                                <canvas id="status-graph" width="100" height="100"></canvas>
                             </div>
                         </div>
                     </div>

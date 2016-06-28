@@ -21,12 +21,14 @@ mainTemplate user title body = toResponse $
             H.meta ! A.name "google-signin-client_id" ! A.content "931217227366-grrs673cmh7rn4q1foglmnmqjq12dipl.apps.googleusercontent.com"
             H.link ! A.rel "stylesheet" ! A.href "/assets/css/styles.css"
             H.script ! A.src "https://code.jquery.com/jquery-2.1.4.min.js" $ ""
-            H.script ! A.src "https://apis.google.com/js/platform.js" ! A.async "" ! A.defer "" $ ""
+            H.script ! A.src "https://apis.google.com/js/platform.js" $ ""
             H.script ! A.src "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" $ ""
             H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js" $ ""
             H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js" $ ""
             H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js" $ ""
             H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.min.js" $ ""
+            H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/redux/3.5.2/redux.min.js" $ ""
+            H.script ! A.src "https://cdnjs.cloudflare.com/ajax/libs/react-redux/4.4.5/react-redux.min.js" $ ""
         H.body $ do
             H.nav $ do
                 H.nav ! A.class_ "navbar navbar-full" $ do
