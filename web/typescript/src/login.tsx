@@ -1,12 +1,15 @@
 import * as React from "react";
+import { signinUser } from "./user";
 import { browserHistory } from "react-router";
+import { connect } from "react-redux";
 
-export class Login extends React.Component<{}, {}> {
+export class Login extends React.Component<any, any> {
     constructor() {
         super();
     }
 
-    googleSignIn = function(googleUser) {
+    googleSignIn = (googleUser) => {
+        var self = this;
         var profile = googleUser.getBasicProfile();
         var data = {
             token: googleUser.getAuthResponse().id_token
@@ -15,12 +18,23 @@ export class Login extends React.Component<{}, {}> {
         $.post(
             "/api/account/login/google",
             JSON.stringify(data)
-        ).fail(function(e) {
+        ).done((data) => {
+            $.getJSON("/api/account/me/basic", function(data) {
+                console.log(data);
+                $("#signin-link").attr('href', '/account/signout');
+                $("#signin-link").text(data.username);
+                self.props.addUser(data);
+                browserHistory.push('/');
+            }).fail(function(e) {
+                console.log(e);
+            });
+        })
+        .fail(function(e) {
             console.log(e);
         });
+
+
         console.log(profile.getName());
-        console.log(googleUser.getAuthResponse().id_token);
-        browserHistory.push('/');
     }
 
     componentDidMount = () => {
@@ -30,12 +44,11 @@ export class Login extends React.Component<{}, {}> {
     }
 
     render() {
-
         return (
             <div className="container">
                 <div className="row">
                     <div className="col-sm-12">
-                        <div id="google-signin" /*data-onsuccess={onSignIn}*/></div>
+                        <div id="google-signin"></div>
                     </div>
                 </div>
                 <div className="row">
@@ -47,3 +60,11 @@ export class Login extends React.Component<{}, {}> {
         );
     }
 };
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addUser: (userdata) => { dispatch(signinUser(userdata)); }
+    };
+}
+
+export const LoginContainer = connect(null, mapDispatchToProps)(Login);

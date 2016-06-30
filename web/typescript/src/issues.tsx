@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ProgramParams } from "./model/router_params";
+import { connect } from "react-redux";
 import { Link, RouteComponentProps } from "react-router";
 
 declare var Chart;
@@ -7,7 +8,7 @@ declare var Chart;
 export interface IssuesProps extends RouteComponentProps<ProgramParams, any> {
 }
 
-export class Issues extends React.Component<IssuesProps, any> {
+export class Issues extends React.Component<any, any> {
     constructor(props: IssuesProps) {
         super(props);
 
@@ -110,12 +111,12 @@ export class Issues extends React.Component<IssuesProps, any> {
                         </div>
                     </div>
                     <div className="label-group">
-                        <span className="label label-default">{issue.type}</span>
-                        <span className="label label-default">{issue.status}</span>
+                        <span className="label border-red">{issue.type}</span>
+                        <span className="label border-blue">{issue.status}</span>
                     </div>
                     <p className="card-text">
                         <small>
-                            Reported on {moment(issue.time).format("DD-MM-YYYY")}
+                            {issue.reporter.username} reported on {moment(issue.time).format("DD-MM-YYYY")}
                         </small>
                     </p>
                 </div>
@@ -127,10 +128,10 @@ export class Issues extends React.Component<IssuesProps, any> {
                 <div className="row">
                     <div className="col-sm-12 bottom-margin-md">
                         <div className="row">
-                            <div className="col-sm-4 bottom-margin-md">
+                            <div className="col-sm-4">
                                 <canvas id="stats" width="100" height="100"></canvas>
                             </div>
-                            <div className="col-sm-4 bottom-margin-md vertical-flex-parent">
+                            <div className="col-sm-4 vertical-flex-parent" style={{"height": "354px"}}>
                                 <div>
                                     <h5 className="text-sm-center">Total issues</h5>
                                     <p className="text-sm-center">523</p>
@@ -140,7 +141,7 @@ export class Issues extends React.Component<IssuesProps, any> {
                                     <p className="text-sm-center">52</p>
                                 </div>
                             </div>
-                            <div className="col-sm-4 bottom-margin-md">
+                            <div className="col-sm-4">
                                 <canvas id="status-graph" width="100" height="100"></canvas>
                             </div>
                         </div>
@@ -155,3 +156,11 @@ export class Issues extends React.Component<IssuesProps, any> {
         );
     }
 };
+
+const mapStateToProps = (state) => {
+    return {
+        user: state.user
+    }
+}
+
+export const IssuesContainer = connect(mapStateToProps)(Issues);

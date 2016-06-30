@@ -57,11 +57,11 @@ getPrograms = P.selectPrograms
 getIssues :: Integer -> IO ([T.Issue])
 getIssues programId = P.selectIssues programId
 
-createIssue :: T.Issue -> IO (T.NewIssueResponse)
-createIssue issue = P.insertIssue issue >>= (\id -> return $ T.NewIssueResponse id)
+createIssue :: T.Issue -> Integer -> IO (T.NewIssueResponse)
+createIssue issue userId = P.insertIssue issue userId >>= (\id -> return $ T.NewIssueResponse id)
 
-createIssueReport :: T.IssueReport -> IO ()
-createIssueReport issue = P.insertIssueReport issue
+createIssueReport :: T.IssueReport -> Integer -> IO ()
+createIssueReport issue userId = P.insertIssueReport issue userId
 
 getIssueReport :: Integer -> Integer -> Integer -> IO (T.IssueReport)
 getIssueReport programId issueId reportId = P.selectIssueReport programId issueId reportId

@@ -2,9 +2,11 @@ import * as React from "react";
 import { Link, RouteComponentProps } from "react-router";
 import { ReportParams } from "./model/router_params";
 import { ReportComment } from "./report_comment";
+import { connect } from "react-redux";
+import { UserState } from "./user";
 
 export interface IssueReportProps extends RouteComponentProps<ReportParams, any> {
-    reportId: string;
+    user: UserState;
 }
 
 export class IssueReport extends React.Component<IssueReportProps, any> {
@@ -57,6 +59,12 @@ export class IssueReport extends React.Component<IssueReportProps, any> {
             });
         }
 
+        var markAsFixedButton;
+        if (this.props.user && report.reporter.id === this.props.user.id) {
+            markAsFixedButton =
+                    <button className="btn btn-common" onClick={self.markReportAsFixed.bind(self, self.props.params.reportId)}>Mark as fixed</button>
+        }
+
         return (
             <div className="container">
                 <div className="row">
@@ -74,7 +82,7 @@ export class IssueReport extends React.Component<IssueReportProps, any> {
                                     <div><small>Reported by {report.reporter.username}</small></div>
                                     <div><small>At {report.time}</small></div>
                                     <div className="btn-group-spaced" style={{"marginBottom": "1rem"}}>
-                                        <button className="btn btn-common" onClick={self.markReportAsFixed.bind(self, self.props.params.reportId)}>Mark as fixed</button>
+                                        { markAsFixedButton }
                                         <div className="btn btn-common">
                                             <Link to={"/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + self.props.params.reportId}>Comment</Link>
                                         </div>
@@ -89,3 +97,11 @@ export class IssueReport extends React.Component<IssueReportProps, any> {
         );
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        user: state.user
+    }
+}
+
+export const IssueReportContainer = connect(mapStateToProps)(IssueReport);

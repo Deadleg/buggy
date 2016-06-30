@@ -1,3 +1,32 @@
+.label {
+    &.border-red {
+        font-weight: normal;
+        background-color: $theme-bg;
+        color: $text-color;
+        border: 1px solid $red-highlight;
+        border-radius: 10rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    &.border-blue {
+        font-weight: normal;
+        background-color: $theme-bg;
+        color: $text-color;
+        border: 1px solid $blue-highlight;
+        border-radius: 10rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    &.border-purple {
+        font-weight: normal;
+        background-color: $theme-bg;
+        color: $text-color;
+        border: 1px solid $purple-highlight;
+        border-radius: 10rem;
+        padding: 0.2rem 0.5rem;
+    }
+}
+
 .label-group {
     .label:not(:first-child) {
         margin-left: 0.5rem;

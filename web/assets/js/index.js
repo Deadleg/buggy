@@ -52,21 +52,29 @@
 	const ReactDOM = __webpack_require__(2);
 	const react_router_1 = __webpack_require__(3);
 	const issues_1 = __webpack_require__(61);
-	const issue_1 = __webpack_require__(62);
-	const edit_issue_1 = __webpack_require__(67);
-	const program_1 = __webpack_require__(68);
-	const create_issue_1 = __webpack_require__(69);
-	const create_issue_report_1 = __webpack_require__(70);
-	const create_issue_comment_1 = __webpack_require__(64);
-	const create_issue_report_comment_1 = __webpack_require__(66);
-	const issue_report_1 = __webpack_require__(71);
-	const login_1 = __webpack_require__(72);
-	const games_1 = __webpack_require__(74);
-	const react_redux_1 = __webpack_require__(75);
-	const User = __webpack_require__(76);
-	const redux_1 = __webpack_require__(78);
-	__export(__webpack_require__(73));
+	const issue_1 = __webpack_require__(63);
+	const edit_issue_1 = __webpack_require__(68);
+	const program_1 = __webpack_require__(69);
+	const create_issue_1 = __webpack_require__(70);
+	const create_issue_report_1 = __webpack_require__(71);
+	const create_issue_comment_1 = __webpack_require__(65);
+	const create_issue_report_comment_1 = __webpack_require__(67);
+	const issue_report_1 = __webpack_require__(72);
+	const login_1 = __webpack_require__(73);
+	const games_1 = __webpack_require__(76);
+	const react_redux_1 = __webpack_require__(62);
+	const User = __webpack_require__(74);
+	const redux_1 = __webpack_require__(77);
+	__export(__webpack_require__(78));
 	const store = redux_1.createStore(User.updateUser);
+	$.getJSON("/api/account/me/basic", function (data) {
+	    console.log(data);
+	    $("#signin-link").attr('href', '/account/signout');
+	    $("#signin-link").text(data.username);
+	    store.dispatch(User.signinUser(data));
+	}).fail(function (e) {
+	    console.log(e);
+	});
 	var Layout = React.createClass({
 	    render: function () {
 	        return (React.createElement("div", null, this.props.children, React.createElement("footer", null, React.createElement("div", {className: "container"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-4"}, React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/about"}, "About")), React.createElement("p", null, React.createElement("a", {href: "#"}, "Source")), React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/privacy"}, "Privacy")), React.createElement("p", null, React.createElement(react_router_1.Link, {to: "/donate"}, "Donate"))))))));
@@ -112,7 +120,7 @@
 	        return (React.createElement("div", null, React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("h2", {className: "bottom-margin-md red-underline"}, "Hot issues"), React.createElement("div", {className: "row"}, popularIssues)), React.createElement("div", {className: "banner"}, React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "banner-body"}, React.createElement("h2", {className: "bottom-margin-md blue-underline"}, "Popular games"), React.createElement("div", {className: "row"}, summaries))))));
 	    }
 	});
-	ReactDOM.render((React.createElement(react_redux_1.Provider, {store: store}, React.createElement(react_router_1.Router, {history: react_router_1.browserHistory}, React.createElement(react_router_1.Route, {component: Layout}, React.createElement(react_router_1.Route, {path: "/", component: Home}), React.createElement(react_router_1.Route, {path: "/browse", component: games_1.Games}), React.createElement(react_router_1.Route, {path: "/account/login", component: login_1.Login}), React.createElement(react_router_1.Route, {path: "/app/:programId", component: program_1.Program}, React.createElement(react_router_1.Route, {path: "/app/:programId/issue/new", component: create_issue_1.CreateIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue", component: issues_1.Issues}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/edit", component: edit_issue_1.EditIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/new", component: create_issue_report_1.CreateIssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId/comments/new", component: create_issue_report_comment_1.CreateIssueReportComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId", component: issue_report_1.IssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/comments/new", component: create_issue_comment_1.CreateIssueComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId", component: issue_1.Issue})))))), document.getElementById('content'));
+	ReactDOM.render((React.createElement(react_redux_1.Provider, {store: store}, React.createElement(react_router_1.Router, {history: react_router_1.browserHistory}, React.createElement(react_router_1.Route, {component: Layout}, React.createElement(react_router_1.Route, {path: "/", component: Home}), React.createElement(react_router_1.Route, {path: "/browse", component: games_1.Games}), React.createElement(react_router_1.Route, {path: "/account/login", component: login_1.LoginContainer}), React.createElement(react_router_1.Route, {path: "/app/:programId", component: program_1.Program}, React.createElement(react_router_1.Route, {path: "/app/:programId/issue/new", component: create_issue_1.CreateIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue", component: issues_1.IssuesContainer}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/edit", component: edit_issue_1.EditIssue}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/new", component: create_issue_report_1.CreateIssueReport}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId/comments/new", component: create_issue_report_comment_1.CreateIssueReportComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/report/:reportId", component: issue_report_1.IssueReportContainer}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId/comments/new", component: create_issue_comment_1.CreateIssueComment}), React.createElement(react_router_1.Route, {path: "/app/:programId/issue/:issueId", component: issue_1.IssueContainer})))))), document.getElementById('content'));
 
 
 /***/ },
@@ -5313,6 +5321,7 @@
 
 	"use strict";
 	const React = __webpack_require__(1);
+	const react_redux_1 = __webpack_require__(62);
 	const react_router_1 = __webpack_require__(3);
 	class Issues extends React.Component {
 	    constructor(props) {
@@ -5397,24 +5406,37 @@
 	    render() {
 	        var self = this;
 	        var content = this.state.issues.map(function (issue, index) {
-	            return (React.createElement("div", {key: index, className: "bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("div", {className: "upvotes"}, issue.upvotes), React.createElement(react_router_1.Link, {className: "", to: "/app/" + self.props.params.programId + "/issue/" + issue.id}, issue.title))), React.createElement("div", {className: "label-group"}, React.createElement("span", {className: "label label-default"}, issue.type), React.createElement("span", {className: "label label-default"}, issue.status)), React.createElement("p", {className: "card-text"}, React.createElement("small", null, "Reported on ", moment(issue.time).format("DD-MM-YYYY")))));
+	            return (React.createElement("div", {key: index, className: "bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("div", {className: "upvotes"}, issue.upvotes), React.createElement(react_router_1.Link, {className: "", to: "/app/" + self.props.params.programId + "/issue/" + issue.id}, issue.title))), React.createElement("div", {className: "label-group"}, React.createElement("span", {className: "label border-red"}, issue.type), React.createElement("span", {className: "label border-blue"}, issue.status)), React.createElement("p", {className: "card-text"}, React.createElement("small", null, issue.reporter.username, " reported on ", moment(issue.time).format("DD-MM-YYYY")))));
 	        });
-	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12 bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-4 bottom-margin-md"}, React.createElement("canvas", {id: "stats", width: "100", height: "100"})), React.createElement("div", {className: "col-sm-4 bottom-margin-md vertical-flex-parent"}, React.createElement("div", null, React.createElement("h5", {className: "text-sm-center"}, "Total issues"), React.createElement("p", {className: "text-sm-center"}, "523"), React.createElement("h5", {className: "text-sm-center"}, "Issues reported in the last month"), React.createElement("p", {className: "text-sm-center"}, "125"), React.createElement("h5", {className: "text-sm-center"}, "Issues fixed in the last month"), React.createElement("p", {className: "text-sm-center"}, "52"))), React.createElement("div", {className: "col-sm-4 bottom-margin-md"}, React.createElement("canvas", {id: "status-graph", width: "100", height: "100"}))))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-6 bottom-margin-md"}, content))));
+	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12 bottom-margin-md"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-4"}, React.createElement("canvas", {id: "stats", width: "100", height: "100"})), React.createElement("div", {className: "col-sm-4 vertical-flex-parent", style: { "height": "354px" }}, React.createElement("div", null, React.createElement("h5", {className: "text-sm-center"}, "Total issues"), React.createElement("p", {className: "text-sm-center"}, "523"), React.createElement("h5", {className: "text-sm-center"}, "Issues reported in the last month"), React.createElement("p", {className: "text-sm-center"}, "125"), React.createElement("h5", {className: "text-sm-center"}, "Issues fixed in the last month"), React.createElement("p", {className: "text-sm-center"}, "52"))), React.createElement("div", {className: "col-sm-4"}, React.createElement("canvas", {id: "status-graph", width: "100", height: "100"}))))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-6 bottom-margin-md"}, content))));
 	    }
 	}
 	exports.Issues = Issues;
 	;
+	const mapStateToProps = (state) => {
+	    return {
+	        user: state.user
+	    };
+	};
+	exports.IssuesContainer = react_redux_1.connect(mapStateToProps)(Issues);
 
 
 /***/ },
 /* 62 */
+/***/ function(module, exports) {
+
+	module.exports = ReactRedux;
+
+/***/ },
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	const React = __webpack_require__(1);
 	const react_router_1 = __webpack_require__(3);
-	const comment_1 = __webpack_require__(63);
-	const report_comment_1 = __webpack_require__(65);
+	const comment_1 = __webpack_require__(64);
+	const report_comment_1 = __webpack_require__(66);
+	const react_redux_1 = __webpack_require__(62);
 	class Issue extends React.Component {
 	    constructor(props) {
 	        super(props);
@@ -5474,9 +5496,24 @@
 	            console.log(data);
 	            self.setState({ comments: data });
 	        });
-	        $("#issueTabs a").click(function (e) {
-	            e.preventDefault();
-	            $(this).tab('show');
+	        var element = document.getElementById('reports-graph');
+	        var chart = new Chart(element, {
+	            type: 'pie',
+	            data: {
+	                labels: ['Fixed', 'Broken', 'Working', 'PartiallyWorking'],
+	                datasets: [{
+	                        data: [12, 221, 152, 2],
+	                        borderColor: ['rgba(207, 75, 84, 0.8)', 'rgba(75, 160, 207, 0.8)', 'rgba(75, 207, 155, 0.8)', 'rgba(155, 75, 207, 0.8)', 'rgba(207, 89, 75, 0.8)'],
+	                        backgroundColor: ['rgba(207, 75, 84, 0.2)', 'rgba(75, 160, 207, 0.2)', 'rgba(75, 207, 155, 0.2)', 'rgba(155, 75, 207, 0.2)', 'rgba(207, 89, 75, 0.2)']
+	                    }]
+	            },
+	            options: {
+	                responsive: true,
+	                title: {
+	                    display: true,
+	                    text: 'Report status'
+	                }
+	            }
 	        });
 	    }
 	    watchIssue() {
@@ -5499,26 +5536,55 @@
 	                    return (React.createElement("div", {key: index}, React.createElement(report_comment_1.ReportComment, {params: self.props.params, reportId: report.id, comment: comment})));
 	                });
 	            }
-	            return (React.createElement("div", {key: index, className: "col-sm-4", style: { "marginBottom": "1rem" }}, React.createElement("div", {style: { "marginBottom": "1rem" }}, React.createElement("div", {className: "card card-light"}, React.createElement("div", {className: "card-block-no-padding"}, React.createElement("h5", {className: "card-title"}, report.description), React.createElement("p", null, report.specs), React.createElement("div", {className: "label-group"}, React.createElement("div", {className: "label label-default"}, report.status), React.createElement("div", {className: "label label-default"}, report.type), React.createElement("div", {className: "label label-default"}, report.confirmed ? "Confirmed" : "Unconfirmed")), React.createElement("div", null, React.createElement("small", null, "Reported by ", report.reporter.username)), React.createElement("div", null, React.createElement("small", null, "At ", moment(report.time).format("DD-MM-YYYY"))), React.createElement("div", {className: "btn-group-spaced", style: { "marginBottom": "1rem" }}, React.createElement("button", {className: "btn btn-common", onClick: self.markReportAsFixed.bind(self, index)}, "Mark as fixed"), React.createElement("div", {className: "btn btn-common"}, React.createElement(react_router_1.Link, {to: "/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + report.id}, "Comments"))))))));
+	            var markAsFixedButton;
+	            if (self.props.user && report.reporter.id === self.props.user.id) {
+	                markAsFixedButton =
+	                    React.createElement("button", {className: "btn btn-common", onClick: self.markReportAsFixed.bind(self, index)}, "Mark as fixed");
+	            }
+	            return (React.createElement("div", {key: index, className: "col-sm-4", style: { "marginBottom": "1rem" }}, React.createElement("div", {style: { "marginBottom": "1rem" }}, React.createElement("div", {className: "card card-light"}, React.createElement("div", {className: "card-block-no-padding"}, React.createElement("h5", {className: "card-title"}, report.description), React.createElement("p", null, report.specs), React.createElement("div", {className: "label-group"}, React.createElement("div", {className: "label border-blue"}, report.status), React.createElement("div", {className: "label border-red"}, report.type), React.createElement("div", {className: "label border-purple"}, report.confirmed ? "Confirmed" : "Unconfirmed")), React.createElement("div", null, React.createElement("small", null, report.reporter.username, " at ", moment(report.time).format("DD/MM/YYYY"))))))));
 	        });
 	        var edited;
 	        if (this.state.issue.lastEdited) {
 	            edited = React.createElement("div", null, React.createElement("small", null, "Edit time: ", moment(this.state.issue.lastEdited).format("DD-MM-YYYY HH:mm")));
 	        }
-	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row bottom-margin-md"}, React.createElement("div", {className: "col-sm-6"}, React.createElement("h3", null, this.state.issue.title), React.createElement("div", {className: "label-group", style: { "marginBottom": "1rem" }}, React.createElement("span", {className: "label label-default"}, this.state.issue.type), React.createElement("span", {className: "label label-default"}, this.state.issue.status)), React.createElement("div", null, this.state.issue.description))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-6"}, React.createElement("h5", null, "Reproduction steps"), React.createElement("ol", {className: "common-list"}, steps))), React.createElement("div", {className: "row bottom-margin-md"}, React.createElement("div", {className: "col-sm-6"}, React.createElement("div", null, React.createElement("small", null, "Reported by: ", this.state.issue.reporter.username)), React.createElement("div", null, React.createElement("small", null, "At ", moment(this.state.issue.time).format("DD-MM-YYYY"))), edited)), React.createElement("div", {className: "row", style: { "marginTop": "2rem", "marginBottom": "2rem" }}, React.createElement("div", {className: "col-sm-12 btn-group-spaced"}, React.createElement("button", {className: "btn btn-common"}, React.createElement(react_router_1.Link, {to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}, "Add report")), React.createElement("button", {className: "btn btn-common"}, React.createElement(react_router_1.Link, {to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}, "Edit issue")), React.createElement("button", {className: "btn btn-common", onClick: this.watchIssue}, "Watch"), React.createElement("button", {className: "btn btn-common", onClick: this.markAsFixed}, "Mark as fixed"))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("h2", {className: "bottom-margin-md red-underline"}, "Reports"), React.createElement("div", {className: "row"}, reports), React.createElement("h2", {className: "bottom-margin-md blue-underline"}, "Comments"), comments))));
+	        var watchButton;
+	        if (this.props.user) {
+	            watchButton =
+	                React.createElement("button", {className: "btn btn-u-purple", onClick: this.watchIssue}, "Watch");
+	        }
+	        var markAsFixedButton;
+	        if (this.props.user && this.state.issue.status !== "Fixed") {
+	            markAsFixedButton =
+	                React.createElement("button", {className: "btn btn-u-green", onClick: this.markAsFixed}, "Mark as fixed");
+	        }
+	        var editButton;
+	        if (this.props.user && this.state.issue.reporter.id === this.props.user.id) {
+	            editButton =
+	                React.createElement("button", {className: "btn btn-u-blue"}, React.createElement(react_router_1.Link, {to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}, "Edit issue"));
+	        }
+	        return (React.createElement("div", {className: "container bottom-margin-md"}, React.createElement("div", {className: "row bottom-margin-md"}, React.createElement("div", {className: "col-sm-6"}, React.createElement("div", {className: "row bottom-margin-md"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("h3", null, this.state.issue.title), React.createElement("div", {className: "label-group", style: { "marginBottom": "1rem" }}, React.createElement("span", {className: "label border-red"}, this.state.issue.type), React.createElement("span", {className: "label border-blue"}, this.state.issue.status)), React.createElement("div", null, this.state.issue.description))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("h5", null, "Reproduction steps"), React.createElement("ol", {className: "common-list"}, steps))), React.createElement("div", {className: "row bottom-margin-md"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("div", null, React.createElement("small", null, this.state.issue.reporter.username, " at ", moment(this.state.issue.time).format("DD-MM-YYYY"))), edited)), React.createElement("div", {className: "row", style: { "marginTop": "2rem", "marginBottom": "2rem" }}, React.createElement("div", {className: "col-sm-12 btn-group-spaced"}, React.createElement("button", {className: "btn btn-u-red"}, React.createElement(react_router_1.Link, {to: "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}, "Add report")), editButton, markAsFixedButton, watchButton))), React.createElement("div", {className: "col-sm-6"}, React.createElement("canvas", {id: "reports-graph"}))), React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12"}, React.createElement("h2", {className: "bottom-margin-md red-underline"}, "Reports"), React.createElement("div", {className: "row"}, reports), React.createElement("h2", {className: "bottom-margin-md blue-underline"}, "Comments"), comments))));
 	    }
 	}
 	exports.Issue = Issue;
 	;
+	const mapStateToProps = (state) => {
+	    return {
+	        user: state.user
+	    };
+	};
+	const mapDispatchToProps = (dispatch) => {
+	    return {};
+	};
+	exports.IssueContainer = react_redux_1.connect(mapStateToProps, mapDispatchToProps)(Issue);
 
 
 /***/ },
-/* 63 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	const React = __webpack_require__(1);
-	const create_issue_comment_1 = __webpack_require__(64);
+	const create_issue_comment_1 = __webpack_require__(65);
 	class Comment extends React.Component {
 	    constructor(props) {
 	        super(props);
@@ -5542,7 +5608,7 @@
 
 
 /***/ },
-/* 64 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5575,12 +5641,12 @@
 
 
 /***/ },
-/* 65 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	const React = __webpack_require__(1);
-	const create_issue_report_comment_1 = __webpack_require__(66);
+	const create_issue_report_comment_1 = __webpack_require__(67);
 	class ReportComment extends React.Component {
 	    constructor(props) {
 	        super(props);
@@ -5602,7 +5668,7 @@
 
 
 /***/ },
-/* 66 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5634,7 +5700,7 @@
 
 
 /***/ },
-/* 67 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5709,7 +5775,7 @@
 
 
 /***/ },
-/* 68 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5743,7 +5809,7 @@
 
 
 /***/ },
-/* 69 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5801,7 +5867,7 @@
 
 
 /***/ },
-/* 70 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5861,13 +5927,14 @@
 
 
 /***/ },
-/* 71 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	const React = __webpack_require__(1);
 	const react_router_1 = __webpack_require__(3);
-	const report_comment_1 = __webpack_require__(65);
+	const report_comment_1 = __webpack_require__(66);
+	const react_redux_1 = __webpack_require__(62);
 	class IssueReport extends React.Component {
 	    constructor(props) {
 	        super(props);
@@ -5903,33 +5970,56 @@
 	                return (React.createElement("div", {key: index}, React.createElement(report_comment_1.ReportComment, {params: self.props.params, reportId: report.id, comment: comment})));
 	            });
 	        }
-	        return (React.createElement("div", {className: "container"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12", style: { "marginBottom": "1rem" }}, React.createElement("div", {style: { "marginBottom": "1rem" }}, React.createElement("div", {className: "card"}, React.createElement("div", {className: "card-block"}, React.createElement("div", null, report.description), React.createElement("p", null, report.specs), React.createElement("div", {className: "label-group"}, React.createElement("div", {className: "label label-default"}, report.status), React.createElement("div", {className: "label label-default"}, report.type), React.createElement("div", {className: "label label-default"}, report.confirmed ? "Confirmed" : "Unconfirmed")), React.createElement("div", null, React.createElement("small", null, "Reported by ", report.reporter.username)), React.createElement("div", null, React.createElement("small", null, "At ", report.time)), React.createElement("div", {className: "btn-group-spaced", style: { "marginBottom": "1rem" }}, React.createElement("button", {className: "btn btn-common", onClick: self.markReportAsFixed.bind(self, self.props.params.reportId)}, "Mark as fixed"), React.createElement("div", {className: "btn btn-common"}, React.createElement(react_router_1.Link, {to: "/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + self.props.params.reportId}, "Comment")))))))), reportComments));
+	        var markAsFixedButton;
+	        if (this.props.user && report.reporter.id === this.props.user.id) {
+	            markAsFixedButton =
+	                React.createElement("button", {className: "btn btn-common", onClick: self.markReportAsFixed.bind(self, self.props.params.reportId)}, "Mark as fixed");
+	        }
+	        return (React.createElement("div", {className: "container"}, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-12", style: { "marginBottom": "1rem" }}, React.createElement("div", {style: { "marginBottom": "1rem" }}, React.createElement("div", {className: "card"}, React.createElement("div", {className: "card-block"}, React.createElement("div", null, report.description), React.createElement("p", null, report.specs), React.createElement("div", {className: "label-group"}, React.createElement("div", {className: "label label-default"}, report.status), React.createElement("div", {className: "label label-default"}, report.type), React.createElement("div", {className: "label label-default"}, report.confirmed ? "Confirmed" : "Unconfirmed")), React.createElement("div", null, React.createElement("small", null, "Reported by ", report.reporter.username)), React.createElement("div", null, React.createElement("small", null, "At ", report.time)), React.createElement("div", {className: "btn-group-spaced", style: { "marginBottom": "1rem" }}, markAsFixedButton, React.createElement("div", {className: "btn btn-common"}, React.createElement(react_router_1.Link, {to: "/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + self.props.params.reportId}, "Comment")))))))), reportComments));
 	    }
 	}
 	exports.IssueReport = IssueReport;
+	const mapStateToProps = (state) => {
+	    return {
+	        user: state.user
+	    };
+	};
+	exports.IssueReportContainer = react_redux_1.connect(mapStateToProps)(IssueReport);
 
 
 /***/ },
-/* 72 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	const React = __webpack_require__(1);
+	const user_1 = __webpack_require__(74);
 	const react_router_1 = __webpack_require__(3);
+	const react_redux_1 = __webpack_require__(62);
 	class Login extends React.Component {
 	    constructor() {
 	        super();
-	        this.googleSignIn = function (googleUser) {
+	        this.googleSignIn = (googleUser) => {
+	            var self = this;
 	            var profile = googleUser.getBasicProfile();
 	            var data = {
 	                token: googleUser.getAuthResponse().id_token
 	            };
-	            $.post("/api/account/login/google", JSON.stringify(data)).fail(function (e) {
+	            $.post("/api/account/login/google", JSON.stringify(data)).done((data) => {
+	                $.getJSON("/api/account/me/basic", function (data) {
+	                    console.log(data);
+	                    $("#signin-link").attr('href', '/account/signout');
+	                    $("#signin-link").text(data.username);
+	                    self.props.addUser(data);
+	                    react_router_1.browserHistory.push('/');
+	                }).fail(function (e) {
+	                    console.log(e);
+	                });
+	            })
+	                .fail(function (e) {
 	                console.log(e);
 	            });
 	            console.log(profile.getName());
-	            console.log(googleUser.getAuthResponse().id_token);
-	            react_router_1.browserHistory.push('/');
 	        };
 	        this.componentDidMount = () => {
 	            gapi.signin2.render('google-signin', {
@@ -5943,27 +6033,53 @@
 	}
 	exports.Login = Login;
 	;
-
-
-/***/ },
-/* 73 */
-/***/ function(module, exports) {
-
-	"use strict";
-	function signOut() {
-	    var auth2 = gapi.auth2.getAuthInstance();
-	    auth2.signOut().then(function () {
-	        console.log("signed out");
-	        $("signin-link").text("sign-out");
-	        $("signin-link").attr("href", "$/account/login");
-	        $("signin-link").unbind("click");
-	    });
-	}
-	exports.signOut = signOut;
+	const mapDispatchToProps = (dispatch) => {
+	    return {
+	        addUser: (userdata) => { dispatch(user_1.signinUser(userdata)); }
+	    };
+	};
+	exports.LoginContainer = react_redux_1.connect(null, mapDispatchToProps)(Login);
 
 
 /***/ },
 /* 74 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	const actions_1 = __webpack_require__(75);
+	const initialState = {
+	    user: null
+	};
+	function signinUser(user) {
+	    return {
+	        type: actions_1.SIGNIN_USER,
+	        user: user
+	    };
+	}
+	exports.signinUser = signinUser;
+	function updateUser(state = initialState, action) {
+	    switch (action.type) {
+	        case actions_1.SIGNIN_USER:
+	            return Object.assign({}, state, {
+	                user: action.user,
+	            });
+	        default:
+	            return state;
+	    }
+	}
+	exports.updateUser = updateUser;
+
+
+/***/ },
+/* 75 */
+/***/ function(module, exports) {
+
+	"use strict";
+	exports.SIGNIN_USER = "SIGNIN_USER";
+
+
+/***/ },
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -6008,55 +6124,27 @@
 
 
 /***/ },
-/* 75 */
-/***/ function(module, exports) {
-
-	module.exports = ReactRedux;
-
-/***/ },
-/* 76 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	const actions = __webpack_require__(77);
-	const initialState = {
-	    name: null,
-	    id: null
-	};
-	function signinUser(userdata) {
-	    return {
-	        type: actions.SIGNIN_USER,
-	        userdata: userdata
-	    };
-	}
-	exports.signinUser = signinUser;
-	function updateUser(state = initialState, action) {
-	    switch (action.type) {
-	        case actions.SIGNIN_USER:
-	            return Object.assign({}, state, {
-	                name: action.userdata.username,
-	                id: action.userdata.id
-	            });
-	        default:
-	            return state;
-	    }
-	}
-	exports.updateUser = updateUser;
-
-
-/***/ },
 /* 77 */
 /***/ function(module, exports) {
 
-	"use strict";
-	exports.SIGNIN_USER = "SIGNIN_USER";
-
+	module.exports = Redux;
 
 /***/ },
 /* 78 */
 /***/ function(module, exports) {
 
-	module.exports = Redux;
+	"use strict";
+	function signOut() {
+	    var auth2 = gapi.auth2.getAuthInstance();
+	    auth2.signOut().then(function () {
+	        console.log("signed out");
+	        $("signin-link").text("sign-out");
+	        $("signin-link").attr("href", "$/account/login");
+	        $("signin-link").unbind("click");
+	    });
+	}
+	exports.signOut = signOut;
+
 
 /***/ }
 /******/ ]);

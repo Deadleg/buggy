@@ -76,7 +76,7 @@ CREATE TABLE issue_reports (
     CONSTRAINT report_type  CHECK (type in ('Fix', 'PartialFix', 'Report')),
     CONSTRAINT status_value CHECK 
         ((type = 'Report' 
-            AND status IN ('Fixed', 'Broken', 'Working', 'PartiallyWorking')) 
+            AND status IN ('Fixed', 'Broken', 'Working', 'PartiallyWorking'))
         OR ((type = 'Fix' OR type = 'PartialFix') 
             AND status IN ('Works', 'NoWork')))
 );

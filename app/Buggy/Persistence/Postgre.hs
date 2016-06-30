@@ -199,24 +199,28 @@ selectIssues programId = do
     return $ map (\((issueId, issueType, title, description, timeReported, status, userId, username, editTime, upvotes), reproSteps) ->
             (Existing programId issueId (title :: String) (description :: String) (read issueType) (map (\step -> Step step) reproSteps) (timeReported :: LocalTime) (read status) (ExistingUser userId username) editTime upvotes)) issues
 
-insertIssue :: Issue -> IO (Int)
-insertIssue (New programId title description issueType reproductionSteps status reporter) = do
+insertIssue :: Issue -> Integer -> IO (Int)
+insertIssue (New programId title description issueType reproductionSteps status _) userId = do
     conn <- connectPostgreSQL connectionString
-    [Only issueId] <- query conn "INSERT INTO issues (program, type, reporter, status, title, description, time_reported) VALUES (? , ?, ?, ?, ?, ?, NOW()) RETURNING id;" (programId :: Integer, (show issueType :: String), reporter :: Integer, (show status :: String), title :: String, description :: String)
-    x <- executeMany conn "INSERT INTO reproduction_steps (issue, step_number, instruction) VALUES (?, ?, ?);" $ map (\(stepNumber, step) ->  (issueId :: Int, stepNumber, getStepDescription step)) (zip [1..length reproductionSteps] reproductionSteps)
+    [Only issueId] <- query conn "INSERT INTO issues (program, type, reporter, status, title, description, time_reported) \
+    \VALUES (? , ?, ?, ?, ?, ?, NOW()) RETURNING id;" (programId :: Integer, (show issueType :: String), userId :: Integer, (show status :: String), title :: String, description :: String)
+    x <- executeMany conn "INSERT INTO reproduction_steps (issue, step_number, instruction) VALUES (?, ?, ?);" $
+            map (\(stepNumber, step) -> (issueId :: Int, stepNumber, getStepDescription step)) (zip [1..length reproductionSteps] reproductionSteps)
     return issueId
 
 selectIssue :: Integer -> Integer -> IO (Issue)
 selectIssue programId issueId = do
     conn <- connectPostgreSQL connectionString
     [(issueType, title, description, timeReported, status, userId, username, editTime, upvotes)] <- query conn "SELECT i.type, i.title, i.description, i.time_reported, i.status, u.id, u.username, i.edit_time, i.upvotes FROM issues i INNER JOIN users u  ON i.reporter=u.id WHERE i.id=? and i.program=?" (issueId, programId)
-    reproSteps <- query conn "SELECT instruction FROM reproduction_steps WHERE issue=? ORDER BY step_number ASC;" [issueId]
+    reproSteps <- query conn "SELECT instruction \
+    \FROM reproduction_steps \
+    \WHERE issue=? ORDER BY step_number ASC;" [issueId]
     return (Existing programId issueId (title :: String) (description :: String) (read issueType) (map (\(Only i) -> Step i) reproSteps) (timeReported :: LocalTime) (read status) (ExistingUser userId username) editTime upvotes)
 
-insertIssueReport :: IssueReport -> IO ()
-insertIssueReport (NewIssueReport desc specs issueId programId reporter status _type) = do
+insertIssueReport :: IssueReport -> Integer -> IO ()
+insertIssueReport (NewIssueReport desc specs issueId programId reporter status _type) userId = do
     conn <- connectPostgreSQL connectionString
-    execute conn "INSERT INTO issue_reports (issue, description, reporter, computer_info, status, type, time_reported) VALUES (?, ?, ?, ?, ?, ?, NOW());" (issueId, desc, reporter, specs, status, _type)
+    execute conn "INSERT INTO issue_reports (issue, description, reporter, computer_info, status, type, time_reported) VALUES (?, ?, ?, ?, ?, ?, NOW());" (issueId, desc, userId, specs, status, _type)
     return ()
 
 selectIssueReport :: Integer -> Integer -> Integer -> IO (IssueReport)

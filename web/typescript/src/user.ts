@@ -1,33 +1,37 @@
-import * as actions from "./actions";
+import { SIGNIN_USER } from "./actions";
 
-export interface SigninUser {
+export interface Action {}
+
+export interface SigninUser extends Action {
     type: string;
-    userdata: any;
+    user: UserState;
 }
 
-interface UserState {
-    name: string;
+export interface UserState {
+    username: string;
     id: number;
 }
 
-const initialState: UserState = {
-    name: null,
-    id: null
+export interface StoreState {
+    user: UserState
 }
 
-export function signinUser(userdata): SigninUser {
+const initialState: StoreState = {
+    user: null
+}
+
+export function signinUser(user : UserState): SigninUser {
     return {
-        type: actions.SIGNIN_USER,
-        userdata: userdata
+        type: SIGNIN_USER,
+        user: user
     }
 }
 
 export function updateUser(state = initialState, action) {
     switch (action.type) {
-        case actions.SIGNIN_USER:
+        case SIGNIN_USER:
             return Object.assign({}, state, {
-                name: action.userdata.username,
-                id: action.userdata.id
+                user: action.user,
             })
         default:
             return state;

@@ -2,16 +2,16 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Router, Route, Link, browserHistory } from "react-router";
 import { ProgramSummaries } from "./program_summaries";
-import { Issues } from "./issues";
-import { Issue } from "./issue";
+import { IssuesContainer } from "./issues";
+import { IssueContainer } from "./issue";
 import { EditIssue } from "./edit_issue";
 import { Program } from "./program";
 import { CreateIssue } from "./create_issue";
 import { CreateIssueReport } from "./create_issue_report";
 import { CreateIssueComment } from "./create_issue_comment";
 import { CreateIssueReportComment } from "./create_issue_report_comment";
-import { IssueReport } from "./issue_report";
-import { Login } from "./login";
+import { IssueReportContainer } from "./issue_report";
+import { LoginContainer } from "./login";
 import { Games } from "./games";
 import { Provider } from 'react-redux';
 import * as User from "./user";
@@ -19,6 +19,15 @@ import { createStore } from 'redux';
 export * from './loginFunctions';
 
 const store = createStore(User.updateUser);
+
+$.getJSON("/api/account/me/basic", function(data) {
+    console.log(data);
+    $("#signin-link").attr('href', '/account/signout');
+    $("#signin-link").text(data.username);
+    store.dispatch(User.signinUser(data));
+}).fail(function(e) {
+    console.log(e);
+});
 
 var Layout = React.createClass({
     render: function() {
@@ -161,16 +170,16 @@ ReactDOM.render((
             <Route component={Layout}>
                 <Route path="/" component={Home}/>
                 <Route path="/browse" component={Games}/>
-                <Route path="/account/login" component={Login}/>
+                <Route path="/account/login" component={LoginContainer}/>
                 <Route path="/app/:programId" component={Program}>
                     <Route path="/app/:programId/issue/new" component={CreateIssue} />
-                    <Route path="/app/:programId/issue" component={Issues} />
+                    <Route path="/app/:programId/issue" component={IssuesContainer} />
                     <Route path="/app/:programId/issue/:issueId/edit" component={EditIssue} />
                     <Route path="/app/:programId/issue/:issueId/report/new" component={CreateIssueReport} />
                     <Route path="/app/:programId/issue/:issueId/report/:reportId/comments/new" component={CreateIssueReportComment} />
-                    <Route path="/app/:programId/issue/:issueId/report/:reportId" component={IssueReport} />
+                    <Route path="/app/:programId/issue/:issueId/report/:reportId" component={IssueReportContainer} />
                     <Route path="/app/:programId/issue/:issueId/comments/new" component={CreateIssueComment} />
-                    <Route path="/app/:programId/issue/:issueId" component={Issue} />
+                    <Route path="/app/:programId/issue/:issueId" component={IssueContainer} />
                </Route>
            </Route>
         </Router>

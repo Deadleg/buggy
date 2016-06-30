@@ -26,6 +26,55 @@
     }
 }
 
+@mixin button-underline($color) {
+    @include button-variant($text-color, $theme-bg, $theme-bg);
+    @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, 0);
+
+    border-width: 0;
+    border-bottom: 2px solid $color;
+
+    &:hover, &:active {
+        border-bottom: 2px solid lighten($color, 20%);
+        background-color: $theme-bg;
+    }
+
+    a:hover, a:active {
+        text-decoration: none;
+        color: $text-color;
+        background-color: transparent;
+    }
+
+    a:visited {
+        color: $text-color;
+    }
+}
+
+@keyframes fade-out {
+    0% {
+        background-color: lighten($red-highlight, 20%);
+    }
+
+    100% {
+        background-color: $theme-bg;
+    }
+}
+
+.btn-u-red {
+    @include button-underline($red-highlight);
+}
+
+.btn-u-blue {
+    @include button-underline($blue-highlight);
+}
+
+.btn-u-green {
+    @include button-underline($green-highlight);
+}
+
+.btn-u-purple {
+    @include button-underline($purple-highlight);
+}
+
 // TODO remove in mobile view
 .btn-group-spaced {
     .btn:not(:first-child) {

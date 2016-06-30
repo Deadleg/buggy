@@ -148,7 +148,7 @@ createIssue programId = do
         case issue of
             Left s -> badOperation 400 (T.pack s)
             Right issue -> do
-                response <- liftIO $ L.createIssue issue
+                response <- liftIO $ L.createIssue issue (getUserId user)
                 return response :: UserOperationsIO NewIssueResponse)
 
 createIssueReport :: Integer -> Integer -> ServerPart Response
@@ -161,7 +161,7 @@ createIssueReport programId issueId = do
         case issue of
             Left s -> badOperation 400 (T.pack s)
             Right issue -> do
-                liftIO $ L.createIssueReport issue
+                liftIO $ L.createIssueReport issue (getUserId user)
                 return ("" :: T.Text) :: UserOperationsIO T.Text)
 
 getIssueReports :: Integer -> Integer -> ServerPart Response
@@ -341,7 +341,7 @@ loginGoogle = do
             maybeUser <- liftIO $ A.getUser (username newUser)
             when (isNothing maybeUser) (liftIO $ A.newLogin newUser >> return ())
             let cookie = A.googleLogin newUser
-            addCookie (MaxAge 360) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
+            addCookie (MaxAge 3600) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
     ok $ toResponse ("" :: T.Text)
 
 loginSteam :: ServerPart Response
@@ -353,5 +353,5 @@ loginSteam = do
     maybeUser <- liftIO $ A.getUser (username newUser)
     when (isNothing maybeUser) (liftIO $ A.newLogin newUser >> return ())
     let cookie = A.steamLogin newUser
-    addCookie (MaxAge 360) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
+    addCookie (MaxAge 3600) (Cookie "1" "/" "localhost" "buggy-user" (T.unpack cookie) False True)
     seeOther ("/" :: T.Text) (toResponse ("Logging you in..." :: T.Text))

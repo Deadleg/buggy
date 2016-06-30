@@ -3,9 +3,14 @@ import { IssueParams } from "./model/router_params";
 import { Link, RouteComponentProps } from "react-router"
 import { Comment } from "./comment";
 import { ReportComment } from "./report_comment";
-import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import { connect } from "react-redux";
+import { UserState } from "./user";
 
-export interface IssueProps extends RouteComponentProps<IssueParams, any> {}
+declare var Chart;
+
+export interface IssueProps extends RouteComponentProps<IssueParams, any> {
+    user: UserState
+}
 
 export class Issue extends React.Component<IssueProps, any> {
     constructor(props: IssueProps) {
@@ -68,9 +73,24 @@ export class Issue extends React.Component<IssueProps, any> {
             self.setState({comments: data});
         });
 
-        $("#issueTabs a").click(function (e) {
-            e.preventDefault();
-            ($(this) as any).tab('show');
+        var element = document.getElementById('reports-graph');
+        var chart = new Chart(element, {
+            type: 'pie',
+            data: {
+                labels: ['Fixed', 'Broken', 'Working', 'PartiallyWorking'],
+                datasets: [{
+                    data: [12, 221, 152, 2],
+                    borderColor: ['rgba(207, 75, 84, 0.8)', 'rgba(75, 160, 207, 0.8)', 'rgba(75, 207, 155, 0.8)', 'rgba(155, 75, 207, 0.8)', 'rgba(207, 89, 75, 0.8)'],
+                    backgroundColor: ['rgba(207, 75, 84, 0.2)', 'rgba(75, 160, 207, 0.2)', 'rgba(75, 207, 155, 0.2)', 'rgba(155, 75, 207, 0.2)', 'rgba(207, 89, 75, 0.2)']
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Report status'
+                }
+            }
         });
     }
     
@@ -84,12 +104,7 @@ export class Issue extends React.Component<IssueProps, any> {
 
     markAsFixed = () => {
         var self = this;
-        $.post(
-            "/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId + "/fixed"
-        ).done(() => {
-            $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId, function(data) {
-                console.log(data);
-                self.setState({issue: data});
+        $.post( "/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId + "/fixed" ).done(() => { $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId, function(data) { console.log(data); self.setState({issue: data});
             });
         }).fail(function(data) {
             console.log("watch failed", data);
@@ -125,6 +140,12 @@ export class Issue extends React.Component<IssueProps, any> {
                 });
             }
 
+            var markAsFixedButton;
+            if (self.props.user && report.reporter.id === self.props.user.id) {
+                markAsFixedButton =
+                        <button className="btn btn-common" onClick={self.markReportAsFixed.bind(self, index)}>Mark as fixed</button>
+            }
+
             return (
                 <div key={index} className="col-sm-4" style={{"marginBottom": "1rem"}}>
                     <div style={{"marginBottom": "1rem"}}>
@@ -133,18 +154,11 @@ export class Issue extends React.Component<IssueProps, any> {
                                 <h5 className="card-title">{report.description}</h5>
                                 <p>{report.specs}</p>
                                 <div className="label-group">
-                                    <div className="label label-default">{report.status}</div>
-                                    <div className="label label-default">{report.type}</div>
-                                    <div className="label label-default">{report.confirmed ? "Confirmed" : "Unconfirmed"}</div>
+                                    <div className="label border-blue">{report.status}</div>
+                                    <div className="label border-red">{report.type}</div>
+                                    <div className="label border-purple">{report.confirmed ? "Confirmed" : "Unconfirmed"}</div>
                                 </div>
-                                <div><small>Reported by {report.reporter.username}</small></div>
-                                <div><small>At {moment(report.time).format("DD-MM-YYYY")}</small></div>
-                                <div className="btn-group-spaced" style={{"marginBottom": "1rem"}}>
-                                    <button className="btn btn-common" onClick={self.markReportAsFixed.bind(self, index)}>Mark as fixed</button>
-                                    <div className="btn btn-common">
-                                        <Link to={"/app/" + self.props.params.programId + "/issue/" + self.props.params.issueId + "/report/" + report.id}>Comments</Link>
-                                    </div>
-                                </div>
+                                <div><small>{report.reporter.username} at {moment(report.time).format("DD/MM/YYYY")}</small></div>
                             </div>
                         </div>
                     </div>
@@ -157,39 +171,63 @@ export class Issue extends React.Component<IssueProps, any> {
             edited = <div><small>Edit time: {moment(this.state.issue.lastEdited).format("DD-MM-YYYY HH:mm")}</small></div>
         }
 
+        var watchButton;
+        if (this.props.user) {
+            watchButton =
+                    <button className="btn btn-u-purple" onClick={this.watchIssue}>Watch</button>
+        }
+
+        var markAsFixedButton;
+        if (this.props.user && this.state.issue.status !== "Fixed") {
+            markAsFixedButton =
+                    <button className="btn btn-u-green" onClick={this.markAsFixed}>Mark as fixed</button>
+        }
+
+        var editButton;
+        if (this.props.user && this.state.issue.reporter.id === this.props.user.id) {
+            editButton =
+                    <button className="btn btn-u-blue"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}>Edit issue</Link></button>
+        }
+
         return (
             <div className="container bottom-margin-md">
                 <div className="row bottom-margin-md">
                     <div className="col-sm-6">
-                        <h3>{this.state.issue.title}</h3>
-                        <div className="label-group" style={{"marginBottom": "1rem"}}>
-                            <span className="label label-default">{this.state.issue.type}</span>
-                            <span className="label label-default">{this.state.issue.status}</span>
+                        <div className="row bottom-margin-md">
+                            <div className="col-sm-12">
+                                <h3>{this.state.issue.title}</h3>
+                                <div className="label-group" style={{"marginBottom": "1rem"}}>
+                                    <span className="label border-red">{this.state.issue.type}</span>
+                                    <span className="label border-blue">{this.state.issue.status}</span>
+                                </div>
+                                <div>{this.state.issue.description}</div>
+                            </div>
                         </div>
-                        <div>{this.state.issue.description}</div>
+                        <div className="row">
+                            <div className="col-sm-12">
+                                <h5>Reproduction steps</h5>
+                                <ol className="common-list">
+                                    {steps}
+                                </ol>
+                            </div>
+                        </div>
+                        <div className="row bottom-margin-md">
+                            <div className="col-sm-12">
+                                <div><small>{this.state.issue.reporter.username} at {moment(this.state.issue.time).format("DD-MM-YYYY")}</small></div>
+                                {edited}
+                            </div>
+                        </div>
+                        <div className="row" style={{"marginTop":"2rem", "marginBottom": "2rem"}}>
+                            <div className="col-sm-12 btn-group-spaced" /*id="issueTabs"*/>
+                                <button className="btn btn-u-red"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}>Add report</Link></button>
+                                { editButton }
+                                { markAsFixedButton }
+                                { watchButton }
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div className="row">
                     <div className="col-sm-6">
-                        <h5>Reproduction steps</h5>
-                        <ol className="common-list">
-                            {steps}
-                        </ol>
-                    </div>
-                </div>
-                <div className="row bottom-margin-md">
-                    <div className="col-sm-6">
-                        <div><small>Reported by: {this.state.issue.reporter.username}</small></div>
-                        <div><small>At {moment(this.state.issue.time).format("DD-MM-YYYY")}</small></div>
-                        {edited}
-                    </div>
-                </div>
-                <div className="row" style={{"marginTop":"2rem", "marginBottom": "2rem"}}>
-                    <div className="col-sm-12 btn-group-spaced" /*id="issueTabs"*/>
-                        <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/report/new"}>Add report</Link></button>
-                        <button className="btn btn-common"><Link to={"/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/edit"}>Edit issue</Link></button>
-                        <button className="btn btn-common" onClick={this.watchIssue}>Watch</button>
-                        <button className="btn btn-common" onClick={this.markAsFixed}>Mark as fixed</button>
+                        <canvas id="reports-graph"></canvas>
                     </div>
                 </div>
                 <div className="row">
@@ -206,3 +244,15 @@ export class Issue extends React.Component<IssueProps, any> {
         );
     }
 };
+
+const mapStateToProps = (state) => {
+    return {
+        user: state.user
+    };
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {};
+}
+
+export const IssueContainer = connect(mapStateToProps, mapDispatchToProps)(Issue);

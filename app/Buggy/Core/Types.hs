@@ -146,8 +146,9 @@ data StatusType = Fixed | Open | Closed | Reproducible | NotEnoughInformation de
 
 data LoginType = Google | Steam deriving (Eq, Show, Read)
 
-data ReproductionStep = Step { getStepDescription :: String 
-                             } deriving (Eq, Show, Read)
+data ReproductionStep = Step
+    { getStepDescription :: String
+    } deriving (Eq, Show, Read)
 
 data NewIssueResponse = NewIssueResponse
     { newIssueId :: Int
@@ -157,23 +158,23 @@ instance ToJSON NewIssueResponse where
     toJSON (NewIssueResponse id) = object ["id" .= id]
 
 data NewUser = NewUser
-                { username :: Text
-                , email :: Maybe Text
-                , steamId :: Maybe Text
-                , loginType :: LoginType
-                } deriving (Eq, Show, Read)
+    { username :: Text
+    , email :: Maybe Text
+    , steamId :: Maybe Text
+    , loginType :: LoginType
+    } deriving (Eq, Show, Read)
 
 data User = ExistingUser
-                { getUserId :: Integer
-                , getUsername :: Text
-                } |
-             FullExistingUser
-                { getUserId :: Integer
-                , getUsername :: Text
-                , getUserEmail :: Maybe Text
-                , getUserSteamId :: Maybe Text
-                , getUserLoginType :: LoginType
-                } deriving (Eq, Show, Read)
+    { getUserId :: Integer
+    , getUsername :: Text
+    } |
+    FullExistingUser
+    { getUserId :: Integer
+    , getUsername :: Text
+    , getUserEmail :: Maybe Text
+    , getUserSteamId :: Maybe Text
+    , getUserLoginType :: LoginType
+    } deriving (Eq, Show, Read)
 
 data IssueStats = IssueStats
     { getNumIssuesCreated :: [Int]
