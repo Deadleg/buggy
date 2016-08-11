@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Router, Route, Link, browserHistory } from "react-router";
+import { IndexRoute, Router, Route, Link, browserHistory } from "react-router";
 import { ProgramSummaries } from "./program_summaries";
 import { IssuesContainer } from "./issues";
 import { IssueContainer } from "./issue";
@@ -167,20 +167,21 @@ var Home = React.createClass({
 ReactDOM.render((
     <Provider store={store}>
         <Router history={browserHistory}>
-            <Route component={Layout}>
-                <Route path="/" component={Home}/>
-                <Route path="/browse" component={Games}/>
-                <Route path="/account/login" component={LoginContainer}/>
-                <Route path="/app/:programId" component={Program}>
-                    <Route path="/app/:programId/issue/new" component={CreateIssue} />
-                    <Route path="/app/:programId/issue" component={IssuesContainer} />
-                    <Route path="/app/:programId/issue/:issueId/edit" component={EditIssue} />
-                    <Route path="/app/:programId/issue/:issueId/report/new" component={CreateIssueReport} />
-                    <Route path="/app/:programId/issue/:issueId/report/:reportId/comments/new" component={CreateIssueReportComment} />
-                    <Route path="/app/:programId/issue/:issueId/report/:reportId" component={IssueReportContainer} />
-                    <Route path="/app/:programId/issue/:issueId/comments/new" component={CreateIssueComment} />
-                    <Route path="/app/:programId/issue/:issueId" component={IssueContainer} />
-               </Route>
+            <Route path="/" component={Layout}>
+                <Route path="browse" component={Games}/>
+                <Route path="account/login" component={LoginContainer}/>
+                <Route path="app/:programId" component={Program}>
+                    <Route path="issue/new" component={CreateIssue}/>
+                    <Route path="issue" component={IssuesContainer}>
+                        <Route path=":issueId" component={IssueContainer}/>
+                    </Route>
+                    <Route path="issue/:issueId/edit" component={EditIssue}/>
+                    <Route path="issue/:issueId/report/new" component={CreateIssueReport}/>
+                    <Route path="issue/:issueId/report/:reportId/comments/new" component={CreateIssueReportComment}/>
+                    <Route path="issue/:issueId/report/:reportId" component={IssueReportContainer}/>
+                    <Route path="issue/:issueId/comments/new" component={CreateIssueComment}/>
+                </Route>
+                <IndexRoute component={Home}/>
            </Route>
         </Router>
     </Provider>),

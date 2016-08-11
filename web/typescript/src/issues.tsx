@@ -148,8 +148,11 @@ export class Issues extends React.Component<any, any> {
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-sm-6 bottom-margin-md">
+                    <div className="col-sm-4 bottom-margin-md">
                         {content}
+                    </div>
+                    <div className="col-sm-8 bottom-margin-md">
+                        {this.props.children}
                     </div>
                 </div>
             </div>

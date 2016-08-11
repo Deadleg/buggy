@@ -34,6 +34,12 @@ export class Issue extends React.Component<IssueProps, any> {
         }
     }
 
+    componentWillReceiveProps(props: IssueProps) {
+        console.log("new props")
+        console.log(props)
+        this.getData(props.params.programId, props.params.issueId);
+    }
+
     markReportAsFixed(reportId) {
         $.post(
             "/app/" + this.props.params.programId + "/issue/" + this.props.params.issueId + "/reports/" + reportId + "/fixed",
@@ -44,31 +50,36 @@ export class Issue extends React.Component<IssueProps, any> {
             "json"
          );
     }
-    
+
     componentDidMount() {
+        this.getData(this.props.params.programId, this.props.params.issueId);
+    }
+    
+    getData(programId: string, issueId: string) {
         var self = this;
 
-        $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId, function(data) {
+        $.getJSON("/api/programs/" + programId + "/issues/" + issueId, function(data) {
             console.log(data);
             self.setState({issue: data});
         });
 
-        $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId + "/reports", function(data) {
-            data.map(function(report, index) {
-                $.getJSON("/api/programs/" + self.props.params.programId + "/issues/" + self.props.params.issueId + "/reports/" + report.id + "/comments", function(comments) {
-                    report.comments = comments;
-                    console.log("Setting data")
-                    self.setState({reports: data});
-                });
-            });
+        $.getJSON("/api/programs/" + programId + "/issues/" + issueId + "/reports", function(data) {
+            self.setState({reports: data});
+            //data.map(function(report, index) {
+            //    $.getJSON("/api/programs/" + programId + "/issues/" + issueId + "/reports/" + report.id + "/comments", function(comments) {
+            //        report.comments = comments;
+            //        console.log("Setting data")
+            //        self.setState({reports: data});
+            //    });
+            //});
             console.log(data);
         });
 
-        $.getJSON("api/programs/" + this.props.params.programId, function(data) {
+        $.getJSON("api/programs/" + programId, function(data) {
             self.setState({program: data});
         })
 
-        $.getJSON("/api/programs/" + this.props.params.programId + "/issues/" + this.props.params.issueId + "/comments", function(data) {
+        $.getJSON("/api/programs/" + programId + "/issues/" + issueId + "/comments", function(data) {
             console.log(data);
             self.setState({comments: data});
         });
