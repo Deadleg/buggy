@@ -49,7 +49,7 @@ import Data.Text (Text)
 import Data.Scientific (Scientific)
 import qualified Data.Map as M
 
-connectionString = "host='localhost' port=5433 user='buggy' password='buggy' dbname='buggy'"
+connectionString = "host='localhost' port=5432 user='buggy' password='buggy' dbname='buggy'"
 
 type ProgramId = Integer
 type IssueId = Integer

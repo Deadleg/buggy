@@ -1,6 +1,6 @@
 .btn-common {
     @include button-variant($text-color, $btn-common-bg, $btn-common-bg);
-    @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, 0);
+    @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, 0);
 
     a:hover, a:active {
         text-decoration: none;
@@ -14,7 +14,7 @@
 
 .btn-red {
     @include button-variant($text-color, $red, $red);
-    @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, 0);
+    @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, 0);
 
     a:hover, a:active {
         text-decoration: none;
@@ -28,7 +28,7 @@
 
 @mixin button-underline($color) {
     @include button-variant($text-color, $theme-bg, $theme-bg);
-    @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, 0);
+    @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, 0);
 
     border-width: 0;
     border-bottom: 2px solid $color;

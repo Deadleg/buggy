@@ -9,7 +9,7 @@ import qualified Buggy.Web.Entry as R
 
 main = do
     simpleHTTP nullConf $ msum
-        [ dir "assets" $ serveDirectory EnableBrowsing [] "/home/deadleg/buggy/web/assets"
+        [ dir "assets" $ serveDirectory EnableBrowsing [] "web/assets"
         , dirs "api/account/login/google" $ R.loginGoogle
         , dirs "api/account/me/basic" $ R.getMeBasic
         , dirs "api/issues/me/watch" $ path $ \issueId -> do method POST
