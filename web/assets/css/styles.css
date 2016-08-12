@@ -4911,30 +4911,32 @@ footer {
   color: black;
   background: white; }
 
-.label.border-red {
+.label {
+  margin-top: 0.2rem;
+  margin-right: 0.5rem;
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
   font-weight: normal;
-  background-color: #fafaff;
-  color: #000000;
-  border: 1px solid #b63144;
-  border-radius: 10rem;
-  padding: 0.2rem 0.5rem; }
-.label.border-blue {
-  font-weight: normal;
-  background-color: #fafaff;
-  color: #000000;
-  border: 1px solid #31b6a3;
-  border-radius: 10rem;
-  padding: 0.2rem 0.5rem; }
-.label.border-purple {
-  font-weight: normal;
-  background-color: #fafaff;
-  color: #000000;
-  border: 1px solid #a331b6;
-  border-radius: 10rem;
-  padding: 0.2rem 0.5rem; }
+  font-size: 0.7rem; }
+  .label.border-red {
+    background-color: #fafaff;
+    color: #000000;
+    border: 1px solid #b63144;
+    border-radius: 10rem; }
+  .label.border-blue {
+    background-color: #fafaff;
+    color: #000000;
+    border: 1px solid #31b6a3;
+    border-radius: 10rem; }
+  .label.border-purple {
+    background-color: #fafaff;
+    color: #000000;
+    border: 1px solid #a331b6;
+    border-radius: 10rem; }
 
-.label-group .label:not(:first-child) {
-  margin-left: 0.5rem; }
+.label-group {
+  display: flex;
+  flex-wrap: wrap; }
 
 .blue-underline {
   border-bottom-width: 1px;

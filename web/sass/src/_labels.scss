@@ -1,34 +1,34 @@
 .label {
+    margin-top: 0.2rem;
+    margin-right: 0.5rem;
+    display: inline-block;
+    padding: 0.1rem 0.6rem;
+    font-weight: normal;
+    font-size: 0.7rem;
+
     &.border-red {
-        font-weight: normal;
         background-color: $theme-bg;
         color: $text-color;
         border: 1px solid $red-highlight;
         border-radius: 10rem;
-        padding: 0.2rem 0.5rem;
     }
 
     &.border-blue {
-        font-weight: normal;
         background-color: $theme-bg;
         color: $text-color;
         border: 1px solid $blue-highlight;
         border-radius: 10rem;
-        padding: 0.2rem 0.5rem;
     }
 
     &.border-purple {
-        font-weight: normal;
         background-color: $theme-bg;
         color: $text-color;
         border: 1px solid $purple-highlight;
         border-radius: 10rem;
-        padding: 0.2rem 0.5rem;
     }
 }
 
 .label-group {
-    .label:not(:first-child) {
-        margin-left: 0.5rem;
-    }
+    display: flex;
+    flex-wrap: wrap;
 }
