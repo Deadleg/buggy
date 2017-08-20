@@ -57,7 +57,7 @@ steamLogin (NewUser username _ _ _) = JWT.encodeUnsigned (JWT.JWTClaimsSet (JWT.
 
 getSteamInfo :: Text -> IO (SteamUser)
 getSteamInfo steamId = do
-    request <- parseUrl $ unpack ("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=***REMOVED***&steamids=" `append` steamId)
+    request <- parseUrl $ unpack ("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=&steamids=" `append` steamId)
     response <- httpJSON request
     return (head $ players $ steamResponse (getResponseBody response :: SteamResponse))
 
