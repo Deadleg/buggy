@@ -1,13 +1,13 @@
 name:                buggy
 version:             0.1.0.0
-synopsis:            Initial project template from stack
+synopsis:            Bug tracker for games
 description:         Please see README.md
-homepage:            http://github.com/githubuser/buggy#readme
-license:             BSD3
+homepage:            https://github.com/Deadleg/buggy#readme
+license:             GPLv3
 license-file:        LICENSE
-author:              Example Author Name
-maintainer:          example@example.com
-copyright:           2010 Author Here
+author:              William
+maintainer:          deadleg@gmail.com
+copyright:           2017 William
 category:            Web
 build-type:          Simple
 -- extra-source-files:
@@ -63,4 +63,4 @@ test-suite buggy-test
 
 source-repository head
   type:     git
-  location: https://github.com/githubuser/buggy
+  location: https://github.com/Deadleg/buggy
